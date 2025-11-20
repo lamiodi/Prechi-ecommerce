@@ -1,0 +1,1271 @@
+import { useState, useEffect, useContext, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Loader2, Package, Star, X, AlertCircle, User } from 'lucide-react';
+import { toast } from 'react-toastify';
+import Navbar2 from '../components/Navbar2';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { CurrencyContext } from './CurrencyContext';
+
+const API_BASE_URL = import.meta.env.PROD
+  ? 'https://tia-backend-r331.onrender.com/api'
+  : '/api';
+
+// Lazy load non-critical components
+const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
+const Footer = lazy(() => import('../components/Footer'));
+
+// Skeleton loader for cart items
+const CartItemSkeleton = () => (
+  <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 animate-pulse">
+    <div className="flex flex-col sm:flex-row gap-4">
+      <div className="relative flex-shrink-0">
+        <div className="w-full h-40 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-gray-200 rounded-lg"></div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div className="flex justify-between">
+          <div className="h-8 bg-gray-200 rounded w-24"></div>
+          <div className="h-6 bg-gray-200 rounded w-16"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Spinner component without text
+const Spinner = () => (
+  <div className="flex justify-center items-center py-12">
+    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-Primarycolor"></div>
+  </div>
+);
+
+const Cart = () => {
+  const { user, loading: authLoading, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Safely access CurrencyContext with error handling
+  const currencyContext = useContext(CurrencyContext) || {
+    currency: 'NGN',
+    exchangeRate: 1,
+    country: 'Nigeria',
+    contextLoading: false,
+  };
+  
+  const {
+    currency = 'NGN',
+    exchangeRate = 1,
+    country = 'Nigeria',
+    contextLoading = false,
+  } = currencyContext;
+
+  // Initialize all state hooks BEFORE any conditional returns
+  const [cart, setCart] = useState({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [] });
+  const [error, setError] = useState('');
+  const [isUpdating, setIsUpdating] = useState(null);
+  const [isCartLoading, setIsCartLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
+  
+  // Helper function to decode JWT token
+  const decodeToken = useCallback((token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (err) {
+      console.error('Cart: Error decoding token:', err);
+      return null;
+    }
+  }, []);
+  
+  // Helper function to get the JWT token
+  const getToken = useCallback(() => {
+    if (user && user.token) {
+      return user.token;
+    }
+    return localStorage.getItem('token');
+  }, [user]);
+  
+  // Helper function to check if user is authenticated
+  const isAuthenticated = useCallback(() => {
+    return !!getToken();
+  }, [getToken]);
+  
+  // Helper function to get user ID
+  const getUserId = useCallback(() => {
+    const token = getToken();
+    if (!token) return null;
+    const tokenData = decodeToken(token);
+    return tokenData?.id;
+  }, [getToken, decodeToken]);
+  
+  // Helper function to handle authentication errors
+  const handleAuthError = useCallback(() => {
+    console.log('Cart: Authentication error, clearing user data and redirecting');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (logout) {
+      logout();
+    }
+    setError('Your session has expired. Please log in again.');
+    toast.error('Your session has expired. Please log in again.');
+    navigate('/login', { state: { from: location.pathname } });
+  }, [logout, navigate, location.pathname]);
+  
+  // Create a centralized axios instance with auth headers
+  const getAuthAxios = useCallback(() => {
+    const token = getToken();
+    if (!token) {
+      throw new Error('User not authenticated');
+    }
+    return axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-User-Country': country,
+      },
+      timeout: 15000,
+      withCredentials: true,
+    });
+  }, [getToken, country]);
+  
+  // Helper function to check if an item is a brief product
+  const isBriefItem = useCallback((item) => {
+    if (!item || !item.item) return false;
+    
+    const name = (item.item.name || '').toLowerCase();
+    const category = (item.item.category || '').toLowerCase();
+    
+    // Check for brief-related keywords in name or category
+    const isBrief = name.includes('brief') || 
+                   name.includes('boxer') || 
+                   name.includes('underwear') ||
+                   name.includes('trunk') ||
+                   name.includes('jordan') || // Include Jordan products as they appear to be briefs
+                   name.includes('micheal') || // Include Micheal products (common misspelling)
+                   name.includes('michael') || // Include Michael products
+                   category.includes('brief') ||
+                   category.includes('underwear') ||
+                   category.includes('intimates');
+    
+    // Additional check: if it's a single product with a price around typical brief pricing
+    if (item.item.is_product && !isBrief) {
+      const price = item.item.price || 0;
+      // If price is in the typical brief range (₦15,000 - ₦25,000), consider it a brief
+      if (price >= 15000 && price <= 25000) {
+        return true;
+      }
+    }
+    
+    return isBrief;
+  }, []);
+
+  // Helper function to validate brief minimum quantity for guest cart
+  const validateGuestBriefQuantity = useCallback((cartItems) => {
+    const briefItems = cartItems.filter(isBriefItem);
+    const totalBriefQuantity = briefItems.reduce((sum, item) => sum + item.quantity, 0);
+    const nonBriefItems = cartItems.filter(item => !isBriefItem(item));
+    const isBriefOnlyCart = briefItems.length > 0 && nonBriefItems.length === 0;
+    
+    // Check if cart contains at least one gymwear item and one single brief
+    const hasGymwear = cartItems.some(item => 
+      item.item.category && item.item.category.toLowerCase().includes('gymwear')
+    );
+    const hasSingleBrief = cartItems.some(item => 
+      isBriefItem(item) && item.quantity === 1
+    );
+    const meetsMinimumCombination = hasGymwear && hasSingleBrief;
+    
+    // Allow gymwear-only carts (Scenario 4)
+    const isGymwearOnlyCart = hasGymwear && briefItems.length === 0;
+    
+    return {
+      briefItems,
+      totalBriefQuantity,
+      isBriefOnlyCart,
+      hasInsufficientBriefs: briefItems.length > 0 && totalBriefQuantity < 3 && !meetsMinimumCombination && !isGymwearOnlyCart
+    };
+  }, [isBriefItem]);
+
+  // Load guest cart from localStorage
+  const loadGuestCart = useCallback(() => {
+    try {
+      const guestCart = localStorage.getItem('guestCart');
+      if (guestCart) {
+        const parsedCart = JSON.parse(guestCart);
+        console.log('Guest cart loaded from localStorage:', parsedCart.items?.length || 0, 'items');
+        
+        // Validate brief minimum quantity for guest cart
+        const briefValidation = validateGuestBriefQuantity(parsedCart.items || []);
+        let warningMessage = null;
+        
+        if (briefValidation.hasInsufficientBriefs) {
+          const remaining = 3 - briefValidation.totalBriefQuantity;
+          warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+        }
+        
+        setCart({ ...parsedCart, warning: warningMessage });
+        setIsGuest(true);
+      } else {
+        console.log('No guest cart found in localStorage, initializing empty cart');
+        setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [], warning: null });
+        setIsGuest(true);
+      }
+    } catch (err) {
+      console.error('Error loading guest cart:', err);
+      setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [], warning: null });
+      setIsGuest(true);
+    }
+    console.log('Cart loading completed - guest mode');
+    setIsCartLoading(false);
+  }, [validateGuestBriefQuantity])
+  
+  // Save guest cart to localStorage
+  const saveGuestCart = useCallback((updatedCart) => {
+    try {
+      localStorage.setItem('guestCart', JSON.stringify(updatedCart));
+    } catch (err) {
+      console.error('Error saving guest cart:', err);
+    }
+  }, []);
+  
+  // Function to migrate guest cart to user cart after account creation
+  const migrateGuestCartToUserCart = useCallback(async (userId, token) => {
+    const guestCartData = localStorage.getItem('guestCart');
+    if (!guestCartData) return;
+    
+    try {
+      const guestCart = JSON.parse(guestCartData);
+      if (!guestCart.items || guestCart.items.length === 0) return;
+      
+      const authAxios = axios.create({
+        baseURL: API_BASE_URL,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      // Process each item in the guest cart
+      for (const item of guestCart.items) {
+        if (item.product_type === 'single') {
+          await authAxios.post('/cart', {
+            user_id: userId,
+            product_type: 'single',
+            variant_id: item.variant_id,
+            size_id: item.size_id,
+            quantity: item.quantity,
+          });
+        } else if (item.product_type === 'bundle') {
+          await authAxios.post('/cart', {
+            user_id: userId,
+            product_type: 'bundle',
+            bundle_id: item.bundle_id,
+            quantity: item.quantity,
+            items: item.items,
+          });
+        }
+      }
+      
+      // Clear the guest cart after successful migration
+      localStorage.removeItem('guestCart');
+      toast.success('Your cart has been transferred to your account');
+      
+      // Reload the cart to show the updated items
+      const response = await authAxios.get(`/cart/${userId}`);
+      setCart(response.data);
+      setIsGuest(false);
+    } catch (error) {
+      console.error('Error migrating guest cart:', error);
+      toast.error('Failed to transfer your cart. Please try adding items again.');
+    }
+  }, []);
+  
+  // Fetch cart data
+  useEffect(() => {
+    console.log('Cart useEffect triggered:', { authLoading, contextLoading, user: !!user });
+    
+    const fetchCart = async (retries = 3, delay = 1000) => {
+      console.log('Starting cart fetch...');
+      
+      const token = getToken();
+      if (!token) {
+        console.log('No token found, loading guest cart');
+        loadGuestCart();
+        return;
+      }
+      
+      console.log('Token found, fetching user cart');
+      
+      try {
+        const userId = getUserId();
+        if (!userId) {
+          throw new Error('Could not determine user ID from authentication data');
+        }
+        const authAxios = getAuthAxios();
+        const response = await authAxios.get(`/cart/${userId}`);
+        if (response.status !== 200) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+        if (typeof response.data === 'string' && response.data.startsWith('<!doctype html')) {
+          throw new Error('Received HTML instead of JSON; check Vite proxy configuration');
+        }
+        
+        // Validate brief minimum quantity for logged-in users
+        const cartData = response.data;
+        const briefValidation = validateGuestBriefQuantity(cartData.items || []);
+        let warningMessage = null;
+        
+        if (briefValidation.hasInsufficientBriefs) {
+          const remaining = 3 - briefValidation.totalBriefQuantity;
+          warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+        }
+        
+        setCart({ ...cartData, warning: warningMessage });
+        setIsGuest(false);
+        setError('');
+      } catch (err) {
+          console.error('Cart: Fetch error details:', {
+            message: err.message,
+            code: err.code,
+            response: err.response
+              ? {
+                  status: err.response.status,
+                  data: typeof err.response.data === 'string' ? err.response.data.slice(0, 100) + '...' : err.response.data,
+                }
+              : 'No response',
+            config: err.config,
+          });
+          if (err.response?.status === 401 || err.response?.status === 404 || err.message.includes('Could not determine user ID')) {
+            console.log('Cart: Authentication failed or cart not found, falling back to guest cart');
+            loadGuestCart();
+            return;
+          }
+          
+          if (retries > 0 && (err.code === 'ECONNABORTED' || err.message.includes('Network Error') || err.message.includes('HTML instead of JSON'))) {
+            console.log(`Cart: Retrying fetchCart (${retries} retries left)...`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            return fetchCart(retries - 1, delay * 2);
+          }
+          
+          // For other errors, fall back to guest cart instead of showing errors
+          console.log('Cart: Max retries reached or non-retryable error, falling back to guest cart');
+          setError('');
+          loadGuestCart();
+        } finally {
+          console.log('Cart fetch completed, setting loading to false');
+          setIsCartLoading(false);
+        }
+    };
+    
+    if (!authLoading && !contextLoading) {
+      fetchCart();
+    }
+  }, [user, authLoading, contextLoading, country, getToken, getUserId, getAuthAxios, loadGuestCart]);
+  
+  // Update quantity
+  const updateQuantity = useCallback(
+    async (itemId, newQuantity) => {
+      if (newQuantity < 1 || isUpdating === itemId) return;
+      setIsUpdating(itemId);
+      
+      try {
+        if (isGuest) {
+          // Handle guest cart update
+          const item = cart.items.find((item) => item.id === itemId);
+          if (!item) throw new Error('Item not found in cart');
+          
+          // Validate stock quantity
+        let maxStock = item.item.stock_quantity;
+        // For bundles, skip stock validation since bundle items don't have stock_quantity info
+        // and bundles should be treated as separate entities with their own availability
+        if (!item.item.is_product) {
+          // For bundles, we don't have individual item stock information in the cart
+          // So we'll assume there's sufficient stock and allow quantity increases
+          maxStock = 999; // Set a high limit for bundles
+        }
+        if (maxStock === undefined || maxStock === null) {
+          throw new Error('Stock quantity information is missing');
+        }
+        if (newQuantity > maxStock) {
+          setError(`Cannot add more. Only ${maxStock} in stock.`);
+          toast.error(`Cannot add more. Only ${maxStock} in stock.`);
+          return;
+        }
+          
+          // Update cart
+          const updatedItems = cart.items.map((cartItem) =>
+            cartItem.id === itemId ? { ...cartItem, quantity: newQuantity } : cartItem
+          );
+          const subtotal = updatedItems.reduce(
+            (sum, cartItem) => sum + cartItem.quantity * cartItem.item.price,
+            0
+          );
+          const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
+          const total = subtotal + tax;
+          
+          // Validate brief minimum quantity for guest cart
+          const briefValidation = validateGuestBriefQuantity(updatedItems);
+          let warningMessage = null;
+          
+          if (briefValidation.hasInsufficientBriefs) {
+            const remaining = 3 - briefValidation.totalBriefQuantity;
+            warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+          }
+          
+          const updatedCart = { ...cart, items: updatedItems, subtotal, tax, total, warning: warningMessage };
+          setCart(updatedCart);
+          saveGuestCart(updatedCart);
+          toast.success('Quantity updated successfully');
+          return;
+        }
+        
+        // Handle authenticated user cart update
+        const token = getToken();
+        if (!token) {
+          console.log('Cart: No valid user session, redirecting to /login');
+          setError('Please log in to update your cart.');
+          toast.error('Please log in to update your cart.');
+          navigate('/login', { state: { from: location.pathname } });
+          return;
+        }
+        
+        const item = cart.items.find((item) => item.id === itemId);
+        if (!item) throw new Error('Item not found in cart');
+        
+        // Validate stock quantity
+        let maxStock = item.item.stock_quantity;
+        // For bundles, skip stock validation since bundle items don't have stock_quantity info
+        // and bundles should be treated as separate entities with their own availability
+        if (!item.item.is_product) {
+          // For bundles, we don't have individual item stock information in the cart
+          // So we'll assume there's sufficient stock and allow quantity increases
+          maxStock = 999; // Set a high limit for bundles
+        }
+        if (maxStock === undefined || maxStock === null) {
+          throw new Error('Stock quantity information is missing');
+        }
+        if (newQuantity > maxStock) {
+          setError(`Cannot add more. Only ${maxStock} in stock.`);
+          toast.error(`Cannot add more. Only ${maxStock} in stock.`);
+          return;
+        }
+        
+        // Optimistic update with brief validation
+        setCart((prev) => {
+          const updatedItems = prev.items.map((cartItem) =>
+            cartItem.id === itemId ? { ...cartItem, quantity: newQuantity } : cartItem
+          );
+          const subtotal = updatedItems.reduce(
+            (sum, cartItem) => sum + cartItem.quantity * cartItem.item.price,
+            0
+          );
+          const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
+          const total = subtotal + tax;
+          
+          // Validate brief minimum quantity for logged-in users
+          const briefValidation = validateGuestBriefQuantity(updatedItems);
+          let warningMessage = null;
+          
+          if (briefValidation.hasInsufficientBriefs) {
+            const remaining = 3 - briefValidation.totalBriefQuantity;
+            warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+          }
+          
+          console.log('Cart: Optimistic cart update:', { items: updatedItems, subtotal, tax, total, warning: warningMessage });
+          return { ...prev, items: updatedItems, subtotal, tax, total, warning: warningMessage };
+        });
+        
+        const authAxios = getAuthAxios();
+        const response = await authAxios.put(`/cart/${itemId}`, { quantity: newQuantity });
+        if (response.status !== 200) {
+          throw new Error(response.data?.error || 'Failed to update quantity');
+        }
+        
+        // Fetch the updated cart to ensure consistency
+        const userId = getUserId();
+        if (userId) {
+          const cartResponse = await authAxios.get(`/cart/${userId}`);
+          
+          // Validate brief minimum quantity for the final cart data
+          const cartData = cartResponse.data;
+          const briefValidation = validateGuestBriefQuantity(cartData.items || []);
+          let warningMessage = null;
+          
+          if (briefValidation.hasInsufficientBriefs) {
+            const remaining = 3 - briefValidation.totalBriefQuantity;
+            warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+          }
+          
+          setCart({ ...cartData, warning: warningMessage });
+        }
+        toast.success('Quantity updated successfully');
+      } catch (err) {
+        console.error('Cart: Update error:', err);
+        if (err.response?.status === 401 || err.message.includes('Could not determine user ID')) {
+          handleAuthError();
+          return;
+        }
+        const errorMessage = err.response?.status === 404
+          ? 'Item not found.'
+          : err.message || 'Server error';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        
+        // Revert optimistic update by fetching the latest cart
+        if (!isGuest) {
+          const userId = getUserId();
+          if (userId) {
+            const authAxios = getAuthAxios();
+            const cartResponse = await authAxios.get(`/cart/${userId}`);
+            setCart(cartResponse.data);
+          }
+        }
+      } finally {
+        setIsUpdating(null);
+      }
+    },
+    [isUpdating, isGuest, cart.items, country]
+  );
+  
+  // Debounced update quantity with useRef to maintain stable reference
+  const timeoutRef = useRef(null);
+  const debouncedUpdateQuantity = useCallback(
+    (itemId, newQuantity) => {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        updateQuantity(itemId, newQuantity);
+      }, 500);
+    },
+    [updateQuantity]
+  );
+  
+  // Remove item
+  const removeItem = useCallback(
+    async (itemId) => {
+      try {
+        if (isGuest) {
+          // Handle guest cart item removal
+          
+          const remaining = cart.items.filter((item) => item.id !== itemId);
+          const subtotal = remaining.reduce(
+            (sum, item) => sum + item.quantity * item.item.price,
+            0
+          );
+          const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
+          const total = subtotal + tax;
+          
+          // Validate brief minimum quantity for guest cart
+          const briefValidation = validateGuestBriefQuantity(remaining);
+          let warningMessage = null;
+          
+          if (briefValidation.hasInsufficientBriefs) {
+            const remaining = 3 - briefValidation.totalBriefQuantity;
+            warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+          }
+          
+          const updatedCart = { ...cart, items: remaining, subtotal, tax, total, warning: warningMessage };
+          setCart(updatedCart);
+          saveGuestCart(updatedCart);
+          setError('');
+          toast.success('Item removed from cart');
+          return;
+        }
+        
+        // Handle authenticated user cart item removal
+        const token = getToken();
+        if (!token) {
+          console.log('Cart: No valid user session, redirecting to /login');
+          setError('Please log in to update your cart.');
+          toast.error('Please log in to update your cart.');
+          navigate('/login', { state: { from: location.pathname } });
+          return;
+        }
+        
+        console.log(`Cart: Removing item with cart_item_id ${itemId}`);
+        
+        // Optimistic update with brief validation
+        setCart((prev) => {
+          const remaining = prev.items.filter((item) => item.id !== itemId);
+          const subtotal = remaining.reduce(
+            (sum, item) => sum + item.quantity * item.item.price,
+            0
+          );
+          const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
+          const total = subtotal + tax;
+          
+          // Validate brief minimum quantity for logged-in users
+          const briefValidation = validateGuestBriefQuantity(remaining);
+          let warningMessage = null;
+          
+          if (briefValidation.hasInsufficientBriefs) {
+            const remainingBriefs = 3 - briefValidation.totalBriefQuantity;
+            warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remainingBriefs} more brief${remainingBriefs > 1 ? 's' : ''} to meet the requirement.`;
+          }
+          
+          return { ...prev, items: remaining, subtotal, tax, total, warning: warningMessage };
+        });
+        
+        const authAxios = getAuthAxios();
+        const response = await authAxios.delete(`/cart/${itemId}`);
+        if (response.status !== 200) {
+          throw new Error(response.data?.error || 'Failed to remove item');
+        }
+        
+        setError('');
+        toast.success('Item removed from cart');
+      } catch (err) {
+        console.error('Cart: Remove error:', err);
+        if (err.response?.status === 401 || err.message.includes('Could not determine user ID')) {
+          handleAuthError();
+          return;
+        }
+        const errorMessage =
+          err.response?.status === 404
+            ? 'Item not found.'
+            : err.response?.data?.error || 'Server error';
+        setError(errorMessage);
+        toast.error(errorMessage);
+        
+        // Refresh cart from backend to revert optimistic update
+        if (!isGuest) {
+          const userId = getUserId();
+          if (userId) {
+            const authAxios = getAuthAxios();
+            const response = await authAxios.get(`/cart/${userId}`);
+            
+            // Validate brief minimum quantity for the refreshed cart data
+            const cartData = response.data;
+            const briefValidation = validateGuestBriefQuantity(cartData.items || []);
+            let warningMessage = null;
+            
+            if (briefValidation.hasInsufficientBriefs) {
+              const remaining = 3 - briefValidation.totalBriefQuantity;
+              warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
+            }
+            
+            setCart({ ...cartData, warning: warningMessage });
+          }
+        }
+      }
+    },
+    [isGuest, cart, country]
+  );
+  
+  // Clear cart
+  const clearCart = useCallback(
+    async () => {
+      try {
+        if (isGuest) {
+          // Handle guest cart clearing
+          const updatedCart = { cartId: null, subtotal: 0, tax: 0, total: 0, items: [], warning: null };
+          setCart(updatedCart);
+          saveGuestCart(updatedCart);
+          setError('');
+          toast.success('Cart cleared successfully');
+          return;
+        }
+        
+        // Handle authenticated user cart clearing
+        const token = getToken();
+        if (!token) {
+          console.log('Cart: No valid user session, redirecting to /login');
+          setError('Please log in to update your cart.');
+          toast.error('Please log in to update your cart.');
+          navigate('/login', { state: { from: location.pathname } });
+          return;
+        }
+        
+        const userId = getUserId();
+        const authAxios = getAuthAxios();
+        console.log(`Cart: Attempting to clear cart for userId=${userId}, URL=${API_BASE_URL}/cart/clear/${userId}`);
+        
+        let response;
+        try {
+          // Try DELETE first
+          response = await authAxios.delete(`/cart/clear/${userId}`);
+        } catch (deleteErr) {
+          console.warn(`Cart: DELETE request failed with status ${deleteErr.response?.status}:`, {
+            data: deleteErr.response?.data,
+            message: deleteErr.message,
+            url: deleteErr.config?.url,
+          });
+          if (deleteErr.response?.status === 405) {
+            // Fallback to POST
+            console.log(`Cart: Falling back to POST /cart/clear/${userId}`);
+            response = await authAxios.post(`/cart/clear/${userId}`);
+          } else {
+            throw deleteErr;
+          }
+        }
+        
+        if (response.status === 200 || response.status === 204) {
+          setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [], warning: null });
+          setError('');
+          toast.success('Cart cleared successfully');
+        } else {
+          throw new Error(response.data?.error || `Unexpected response status: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('Cart: Clear error:', {
+          message: err.message,
+          status: err.response?.status,
+          data: err.response?.data,
+          url: err.config?.url,
+        });
+        if (err.response?.status === 401 || err.message.includes('Could not determine user ID')) {
+          handleAuthError();
+          return;
+        }
+        const errorMessage =
+          err.response?.status === 404
+            ? 'Cart not found.'
+            : err.response?.status === 405
+            ? 'Unable to clear cart. Please try again or contact support.'
+            : err.response?.data?.error || `Server error: ${err.message}`;
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
+    },
+    [isGuest]
+  );
+  
+
+  
+  // Calculate cart totals with safe fallbacks
+  const subtotal = Number(cart.subtotal) || 0;
+  const tax = Number(cart.tax) || 0;
+  const total = Number(cart.total) || 0;
+  
+  // Format values for display
+  const displaySubtotal = country === 'Nigeria' ? subtotal : subtotal * exchangeRate;
+  const displayTax = country === 'Nigeria' ? tax : tax * exchangeRate;
+  const displayTotal = country === 'Nigeria' ? total : total * exchangeRate;
+  
+  // Memoized Cart Item Component
+  const CartItem = useCallback(
+    ({ item }) => {
+        const bundleItems = item.item.is_product ? [] : item.item.items || [];
+        console.log(`Cart: Rendering cart_item_id ${item.id}, bundle items:`, JSON.stringify(bundleItems, null, 2));
+        const basePrice = Number(item.item.price) || 0;
+        const displayPrice = country === 'Nigeria' ? basePrice : basePrice * exchangeRate;
+        const formattedPrice = displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+          style: 'currency',
+          currency: currency,
+          minimumFractionDigits: 0,
+        });
+        const totalPrice = displayPrice * item.quantity;
+        const formattedTotalPrice = totalPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+          style: 'currency',
+          currency: currency,
+          minimumFractionDigits: 0,
+        });
+        const isOutOfStock = item.item.stock_quantity === 0;
+        
+        return (
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Product Image */}
+              <div className="relative flex-shrink-0">
+                <div className="relative overflow-hidden rounded-lg bg-gray-100">
+                  <img
+                    src={item.item.image || 'https://via.placeholder.com/150x150?text=No+Image'}
+                    alt={item.item.name}
+                    className={`w-full h-40 sm:w-24 sm:h-24 md:w-28 md:h-28 object-cover ${isOutOfStock ? 'opacity-50 grayscale' : ''}`}
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/150x150?text=No+Image';
+                    }}
+                    loading="lazy"
+                    width="150"
+                    height="150"
+                  />
+                  {/* Quantity Badge */}
+                  <div className="absolute -top-2 -right-2 bg-gray-900 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center sm:text-xs sm:h-6 sm:w-6">
+                    {item.quantity}
+                  </div>
+                  {isOutOfStock && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-90 rounded-lg">
+                      <span className="text-white text-sm sm:text-xs font-bold">Out of Stock</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Product Details */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                  {/* Product Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="text-base md:text-lg font-semibold font-Inter text-gray-900 line-clamp-2">
+                          {item.item.name}
+                          {!item.item.is_product && (
+                            <span className="inline-flex items-center ml-2 px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                              <Package className="h-3 w-3 mr-1" />
+                              Bundle
+                            </span>
+                          )}
+                        </h3>
+                        
+                        {/* Product Variants */}
+                        {item.item.is_product && (item.item.color || item.item.size) && (
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {item.item.color && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
+                                Color: {item.item.color}
+                              </span>
+                            )}
+                            {item.item.size && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
+                                Size: {item.item.size}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Stock Status */}
+                        <div className="mt-2 flex items-center gap-2">
+                          {isOutOfStock ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              Out of Stock
+                            </span>
+                          ) : item.item.stock_quantity <= 5 ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              Only {item.item.stock_quantity} left
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                              In Stock
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Delete Button - Top Right */}
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                        title="Remove item"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    
+                    {/* Bundle Items Display */}
+                    {!item.item.is_product && Array.isArray(bundleItems) && bundleItems.length > 0 && (
+                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
+                          <Package className="h-3 w-3 mr-1" />
+                          Bundle includes ({bundleItems.length} items):
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {bundleItems.slice(0, 4).map((bi, index) => (
+                            <div key={`${item.id}-bundle-item-${bi.id}`} className="flex items-center gap-2">
+                              <img
+                                src={bi.image_url || 'https://via.placeholder.com/40x40'}
+                                alt={bi.product_name}
+                                className="w-8 h-8 rounded object-cover flex-shrink-0"
+                                onError={(e) => {
+                                  e.target.src = 'https://via.placeholder.com/40x40';
+                                }}
+                                loading="lazy"
+                                width="40"
+                                height="40"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-xs font-medium text-gray-800 truncate">{bi.product_name}</p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {bi.color_name && `${bi.color_name}`}
+                                  {bi.size_name && `, ${bi.size_name}`}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                          {bundleItems.length > 4 && (
+                            <div className="col-span-full text-center">
+                              <span className="text-xs text-gray-500">+{bundleItems.length - 4} more items</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {!item.item.is_product && (!Array.isArray(bundleItems) || bundleItems.length === 0) && (
+                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-red-600">Bundle items not available. Please remove and re-add the bundle.</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Price Section */}
+                  <div className="flex-shrink-0 text-right">
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-500 font-Jost">{formattedPrice} each</p>
+                      <p className="text-lg md:text-xl font-bold text-gray-900 font-Jost">{formattedTotalPrice}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Quantity Controls */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t border-gray-200 gap-3">
+                  <div className="flex items-center">
+                    <label className="text-sm text-gray-600 font-Jost mr-3">Quantity:</label>
+                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => debouncedUpdateQuantity(item.id, item.quantity - 1)}
+                        disabled={isOutOfStock || isUpdating === item.id || item.quantity <= 1}
+                        className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                      <div className="px-2 sm:px-4 py-1 sm:py-2 bg-gray-50 border-x border-gray-300 min-w-[2.5rem] sm:min-w-[3rem] text-center">
+                        {isUpdating === item.id ? (
+                          <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-Primarycolor mx-auto" />
+                        ) : (
+                          <span className="text-xs sm:text-sm font-semibold font-Jost">{item.quantity}</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => debouncedUpdateQuantity(item.id, item.quantity + 1)}
+                        disabled={isOutOfStock || isUpdating === item.id || item.quantity >= item.item.stock_quantity}
+                        className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Delete Button - Bottom */}
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-Jost transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+    },
+    [country, currency, exchangeRate, debouncedUpdateQuantity, isUpdating, removeItem]
+  );
+  
+  // Handle loading states AFTER all hooks are declared
+  if (authLoading || contextLoading) {
+    console.log('Cart page showing loading state:', { authLoading, contextLoading });
+    return (
+      <div
+        style={{
+          '--color-Primarycolor': '#1E1E1E',
+          '--color-Secondarycolor': '#ffffff',
+          '--color-Accent': '#6E6E6E',
+          '--font-Manrope': '"Manrope", "sans-serif"',
+          '--font-Jost': '"Jost", "sans-serif"',
+        }}
+      >
+        <Navbar2 />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center text-gray-600">
+            <Loader2 className="animate-spin h-8 w-8 text-Primarycolor" />
+            <p className="mt-2 text-sm font-Jost">Loading cart...</p>
+          </div>
+        </div>
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      </div>
+    );
+  }
+  
+  return (
+    <div
+      style={{
+        '--color-Primarycolor': '#1E1E1E',
+        '--color-Secondarycolor': '#ffffff',
+        '--color-Accent': '#6E6E6E',
+        '--font-Manrope': '"Manrope", "sans-serif"',
+        '--font-Jost': '"Jost", "sans-serif"',
+      }}
+    >
+      <Navbar2 />
+      <div className="min-h-screen bg-gray-50 pt-10 sm:pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-9 lg:py-1">
+          {/* Header Section */}
+          <div className="mb-6 md:mb-8">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-Inter text-gray-900">Shopping Cart</h1>
+                <p className="font-Jost text-gray-600 text-sm md:text-base mt-1">
+                  {cart.items.length} {cart.items.length === 1 ? 'item' : 'items'} in your cart
+                  {isGuest && (
+                    <span className="ml-2 text-sm font-Jost text-gray-500 flex items-center">
+                      <User className="h-4 w-4 mr-1" />
+                      Guest Cart
+                    </span>
+                  )}
+                </p>
+              </div>
+              
+              {/* Continue Shopping Button - Better Position */}
+              {cart.items.length > 0 && (
+                <Link to="/shop" className="self-start">
+                  <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium font-Jost flex items-center gap-2 transition-colors">
+                    <ArrowRight className="h-4 w-4 rotate-180" />
+                    Continue Shopping
+                  </button>
+                </Link>
+              )}
+            </div>
+          </div>
+          
+          {/* Error Display */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+              <span className="text-red-700 font-Jost text-sm">{error}</span>
+            </div>
+          )}
+          
+          {/* Main Content Area */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            {/* Cart Items Section */}
+            <div className="lg:col-span-2">
+              <div className="space-y-4">
+                {/* Your Items Header with Clear All Items Button */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                  <h2 className="text-lg md:text-xl font-semibold font-Inter text-gray-900">Your Items</h2>
+                  <button
+                    onClick={clearCart}
+                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium font-Jost flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Clear All Items
+                  </button>
+                </div>
+                
+                {/* Cart Items List */}
+                <div className="space-y-4">
+                  {isCartLoading ? (
+                    // Show spinner without text while cart is loading
+                    <Spinner />
+                  ) : cart.items.length === 0 ? (
+                    // Empty cart state
+                    <div className="text-center py-16 md:py-24">
+                      <div className="max-w-md mx-auto">
+                        <div className="mb-6">
+                          <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-full mb-4">
+                            <ShoppingBag className="h-10 w-10 md:h-12 md:w-12 text-gray-400" />
+                          </div>
+                          <h2 className="text-xl md:text-2xl font-bold font-Inter text-gray-900 mb-3">Your cart is empty</h2>
+                          <p className="font-Jost text-gray-600 mb-8 text-sm md:text-base">
+                            Looks like you haven't added anything to your cart yet. Start shopping to fill it up!
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          <Link to="/shop">
+                            <button className="w-full bg-gray-900 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-medium font-Jost">
+                              Continue Shopping
+                            </button>
+                          </Link>
+                          
+                          {isGuest && (
+                            <div className="bg-blue-50 rounded-lg p-4 mt-4">
+                              <p className="text-sm text-blue-700 font-Jost">
+                                <span className="font-medium">Shopping as a guest?</span> Your cart will be saved until you complete your purchase.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Cart with items
+                    cart.items.map((item) => (
+                      <CartItem key={`${item.id}-${item.item.is_product ? 'product' : 'bundle'}`} item={item} />
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Order Summary Section */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm sticky top-6">
+                {/* Header */}
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-xl font-semibold font-Inter text-gray-900">Order Summary</h2>
+                </div>
+                
+                {/* Summary Details */}
+                <div className="p-6 space-y-4">
+                  {/* Items Count */}
+                  <div className="flex justify-between text-sm">
+                    <span className="font-Jost text-gray-600">Items ({cart.items.length})</span>
+                    <span className="font-medium font-Jost text-gray-900">
+                      {displaySubtotal.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+                        style: 'currency',
+                        currency: currency,
+                        minimumFractionDigits: 0,
+                      })}
+                    </span>
+                  </div>
+                  
+                  {/* Shipping Info */}
+                  <div className="flex justify-between text-sm">
+                    <span className="font-Jost text-gray-600">Shipping</span>
+                    <span className="font-medium font-Jost text-gray-900">Calculated at checkout</span>
+                  </div>
+                  
+
+                  
+                  {/* Tax (for international) */}
+                  {displayTax > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="font-Jost text-gray-600">Tax (5%)</span>
+                      <span className="font-medium font-Jost text-gray-900">
+                        {displayTax.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+                          style: 'currency',
+                          currency: currency,
+                          minimumFractionDigits: 0,
+                        })}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex justify-between text-lg font-bold">
+                      <span className="font-Inter text-gray-900">Total</span>
+                      <span className="font-Jost text-gray-900">
+                        {displayTotal.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+                          style: 'currency',
+                          currency: currency,
+                          minimumFractionDigits: 0,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Checkout Button */}
+                  {cart.warning || cart.items.some((item) => item.item.stock_quantity === 0) ? (
+                    <div className="relative">
+                      <button
+                        className="w-full mt-6 bg-gray-400 text-white py-4 px-6 rounded-lg font-semibold font-Inter cursor-not-allowed flex items-center justify-center gap-2 opacity-50"
+                        disabled
+                        title={cart.warning || "Remove out of stock items to continue checkout"}
+                      >
+                        <span>Proceed to Checkout</span>
+                        <ArrowRight className="h-5 w-5" />
+                      </button>
+                      {cart.warning && cart.warning.includes('brief') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded-md -mt-12">
+                            Minimum 3 briefs required
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Link to="/checkout">
+                      <button
+                        className="w-full mt-6 bg-gray-900 text-white py-4 px-6 rounded-lg font-semibold font-Inter hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span>Proceed to Checkout</span>
+                        <ArrowRight className="h-5 w-5" />
+                      </button>
+                    </Link>
+                  )}
+                  
+                  {/* Enhanced Warning for brief minimum quantity */}
+                  {cart.warning && cart.warning.includes('brief') && (
+                    <div className="mt-3 p-4 bg-orange-50 rounded-lg border-2 border-orange-300">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-orange-800 font-Inter mb-1">Minimum Order Requirement</p>
+                          <p className="text-xs text-orange-700 font-Jost">{cart.warning}</p>
+                          <p className="text-xs text-orange-600 font-Jost mt-1">
+                            You can continue shopping to add more briefs to your cart.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Other warnings (non-brief related) */}
+                  {cart.warning && !cart.warning.includes('brief') && (
+                    <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-orange-600 flex-shrink-0" />
+                        <p className="text-xs text-orange-700 font-Jost">{cart.warning}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Warning for out of stock items */}
+                  {cart.items.some((item) => item.item.stock_quantity === 0) && (
+                    <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                        <p className="text-xs text-red-700 font-Jost">Remove out of stock items to continue checkout</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Guest Notice */}
+                  {isGuest && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                        <p className="text-xs text-blue-700 font-Jost">
+                          You're shopping as a guest. You'll have the option to create an account during checkout.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Shipping Note */}
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs text-gray-600 font-Jost text-center">
+                      {country === 'Nigeria'
+                        ? '🚚 Local delivery fees will be calculated at checkout based on your location.'
+                        : '✈️ International shipping fees will be provided via email after order confirmation.'}
+                    </p>
+                  </div>
+                  
+                  {/* Security Badge */}
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="font-Jost">Secure Checkout</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Suspense fallback={null}>
+        <WhatsAppChatWidget />
+        <Footer />
+      </Suspense>
+    </div>
+  );
+};
+
+export default Cart;
