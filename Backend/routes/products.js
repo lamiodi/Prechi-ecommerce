@@ -11,6 +11,11 @@
      { name: 'images_2', maxCount: 5 },
      { name: 'images_3', maxCount: 5 },
      { name: 'images_4', maxCount: 5 },
+     { name: 'videos_0', maxCount: 3 },
+     { name: 'videos_1', maxCount: 3 },
+     { name: 'videos_2', maxCount: 3 },
+     { name: 'videos_3', maxCount: 3 },
+     { name: 'videos_4', maxCount: 3 },
    ]);
 
    router.get('/:id', getProductById);

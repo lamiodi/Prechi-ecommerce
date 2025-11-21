@@ -67,6 +67,8 @@ export default function AdminUploader() {
           })),
           images: [],
           previews: [],
+          videos: [],
+          videoPreviews: [],
         },
       ],
     }));
@@ -100,6 +102,44 @@ export default function AdminUploader() {
     const updated = [...form.variants];
     updated[index].images = files;
     updated[index].previews = files.map((file) => URL.createObjectURL(file));
+    setForm((prev) => ({ ...prev, variants: updated }));
+  };
+
+  const handleVariantVideoChange = (index, e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 3) {
+      setError('Each color variant can have a maximum of 3 videos.');
+      return;
+    }
+    
+    // Validate video files
+    const validVideoTypes = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/avi'];
+    const invalidFiles = files.filter(file => !validVideoTypes.includes(file.type));
+    
+    if (invalidFiles.length > 0) {
+      setError('Only MP4, MOV, and AVI video files are supported.');
+      return;
+    }
+    
+    // Check file size (limit to 50MB per video)
+    const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      setError('Each video must be smaller than 50MB.');
+      return;
+    }
+    
+    const updated = [...form.variants];
+    updated[index].videos = files;
+    updated[index].videoPreviews = files.map((file) => URL.createObjectURL(file));
+    setForm((prev) => ({ ...prev, variants: updated }));
+  };
+
+  const removeVariantVideo = (variantIndex, videoIndex) => {
+    const updated = [...form.variants];
+    const variant = updated[variantIndex];
+    URL.revokeObjectURL(variant.videoPreviews[videoIndex]);
+    variant.videos.splice(videoIndex, 1);
+    variant.videoPreviews.splice(videoIndex, 1);
     setForm((prev) => ({ ...prev, variants: updated }));
   };
 
@@ -194,6 +234,12 @@ export default function AdminUploader() {
         setLoading(false);
         return;
       }
+      // Validate videos if any are uploaded
+      if (variant.videos && variant.videos.length > 3) {
+        setError('Each variant can have a maximum of 3 videos.');
+        setLoading(false);
+        return;
+      }
     }
 
     const hasStock = form.variants.some((v) =>
@@ -219,6 +265,9 @@ export default function AdminUploader() {
       data.append('data', JSON.stringify(payload));
       form.variants.forEach((variant, i) => {
         variant.images.forEach((img) => data.append(`images_${i}`, img));
+        if (variant.videos && variant.videos.length > 0) {
+          variant.videos.forEach((video) => data.append(`videos_${i}`, video));
+        }
       });
 
       // Use the correct endpoint path with /api prefix
@@ -573,6 +622,45 @@ export default function AdminUploader() {
                         <button
                           type="button"
                           onClick={() => removeVariantImage(i, idx)}
+                          className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    Videos (Max 3, Optional)
+                    <div className="group relative">
+                      <Info className="w-3 h-3 text-gray-400 cursor-help" />
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                        Upload product demonstration videos (MP4, MOV, AVI, max 50MB each)
+                      </div>
+                    </div>
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/quicktime,video/avi,video/x-msvideo"
+                    multiple
+                    onChange={(e) => handleVariantVideoChange(i, e)}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload product videos (MP4, MOV, AVI, max 50MB each) - Optional</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                    {variant.videoPreviews?.map((src, idx) => (
+                      <div key={idx} className="relative group">
+                        <video
+                          src={src}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                          controls
+                          muted
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeVariantVideo(i, idx)}
                           className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           ×

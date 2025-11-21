@@ -11,9 +11,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://tia-backend-r331.onrender.com',
+        target: 'http://localhost:5000',
         changeOrigin: true,
-        secure: true
+        secure: false
       }
     }
   },

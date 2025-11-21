@@ -114,79 +114,17 @@ const calculateCartTotals = (items, country) => {
   return { subtotal, tax, total };
 };
 
-// Helper function to fetch cart items
+// Helper function to fetch cart items (optimized)
 const fetchCartItems = async (sql, cartId) => {
+  // Use the optimized function for single query retrieval
   const cartItems = await sql`
-    SELECT
-      ci.id,
-      ci.quantity::INTEGER,
-      json_build_object(
-        'id', ci.variant_id,
-        'name', p.name,
-        'price', ci.price,
-        'image', pi.image_url,
-        'size', COALESCE(ci.size_name, s.size_name),
-        'size_id', ci.size_id,
-        'color', COALESCE(ci.color_name, c.color_name),
-        'is_product', true,
-        'stock_quantity', vs.stock_quantity
-      ) AS item
-    FROM cart_items ci
-    JOIN product_variants pv ON ci.variant_id = pv.id
-    JOIN products p ON pv.product_id = p.id
-    LEFT JOIN colors c ON pv.color_id = c.id
-    LEFT JOIN sizes s ON ci.size_id = s.id
-    LEFT JOIN product_images pi ON pi.variant_id = pv.id AND pi.is_primary = TRUE
-    LEFT JOIN variant_sizes vs ON vs.variant_id = pv.id AND vs.size_id = ci.size_id
-    WHERE ci.cart_id = ${cartId} AND ci.bundle_id IS NULL AND pv.deleted_at IS NULL AND p.deleted_at IS NULL
-    UNION ALL
-    SELECT
-      ci.id,
-      ci.quantity::INTEGER,
-      json_build_object(
-        'id', ci.bundle_id,
-        'name', b.name,
-        'price', ci.price,
-        'image', bi_image.image_url,
-        'is_product', false,
-        'items', (
-          SELECT json_agg(
-            json_build_object(
-              'id', cbi.id,
-              'variant_id', cbi.variant_id,
-              'size_id', cbi.size_id,
-              'product_id', pv2.product_id,
-              'product_name', p2.name,
-              'image_url', pi2.image_url,
-              'color_name', c2.color_name,
-              'size_name', s2.size_name,
-              'stock_quantity', vs2.stock_quantity
-            ) ORDER BY cbi.id
-          )
-          FROM cart_bundle_items cbi
-          JOIN product_variants pv2 ON cbi.variant_id = pv2.id
-          JOIN products p2 ON pv2.product_id = p2.id
-          JOIN colors c2 ON pv2.color_id = c2.id
-          JOIN sizes s2 ON cbi.size_id = s2.id
-          LEFT JOIN (
-            SELECT DISTINCT ON (variant_id) variant_id, image_url
-            FROM product_images
-            WHERE is_primary = TRUE
-          ) pi2 ON pi2.variant_id = cbi.variant_id
-          LEFT JOIN variant_sizes vs2 ON vs2.variant_id = cbi.variant_id AND vs2.size_id = cbi.size_id
-          WHERE cbi.cart_item_id = ci.id AND pv2.deleted_at IS NULL AND p2.deleted_at IS NULL
-        )
-      ) AS item
-    FROM cart_items ci
-    JOIN bundles b ON ci.bundle_id = b.id
-    LEFT JOIN bundle_images bi_image ON bi_image.bundle_id = b.id AND bi_image.is_primary = TRUE
-    WHERE ci.cart_id = ${cartId} AND ci.bundle_id IS NOT NULL AND b.deleted_at IS NULL
+    SELECT * FROM public.get_cart_items_optimized(${cartId})
   `;
   
   return cartItems.map(row => ({
-    id: row.id,
+    id: row.cart_item_id,
     quantity: row.quantity,
-    item: row.item
+    item: row.item_data
   }));
 };
 

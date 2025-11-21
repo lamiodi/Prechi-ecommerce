@@ -36,6 +36,7 @@ const ProductDetails = () => {
   const [error, setError] = useState(null)
   const [productData, setProductData] = useState(null)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedVideo, setSelectedVideo] = useState(0)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [selectedColor, setSelectedColor] = useState(null)
   const [selectedSize, setSelectedSize] = useState(null)
@@ -263,6 +264,7 @@ const ProductDetails = () => {
       setSelectedColor(variant.color_name)
       setSelectedSize(variant.sizes?.[0]?.size_name || null)
       setSelectedImage(0)
+      setSelectedVideo(0)
     }
   }
   const handleSizeChange = (sizeName) => {
@@ -549,6 +551,13 @@ const ProductDetails = () => {
     : Array.isArray(data?.images)
       ? data.images
       : []
+  const videos = isProduct
+    ? Array.isArray(selectedVariant?.videos)
+      ? selectedVariant.videos
+      : []
+    : Array.isArray(data?.videos)
+      ? data.videos
+      : []
   const name = data?.name || "Unnamed Product"
   const rawPrice = isProduct ? data?.price : getBundlePrice()
   const parsedPrice = Number.parseFloat(rawPrice) || 0
@@ -707,6 +716,65 @@ const ProductDetails = () => {
                         {selectedImage === idx && <div className="absolute inset-0 bg-gray-900/20"></div>}
                       </button>
                     ))}
+                  </div>
+                )}
+                {/* Product Videos */}
+                {videos.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 font-Inter">Product Videos</h3>
+                    <div className="relative aspect-[16/9] bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
+                      <video
+                        key={selectedVideo}
+                        controls
+                        className="w-full h-full object-cover"
+                        poster={videos[selectedVideo]?.video_thumbnail_url || videos[selectedVideo]?.thumbnail_url}
+                      >
+                        <source src={videos[selectedVideo]?.video_url || videos[selectedVideo]?.url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                      {/* Video Counter */}
+                      {videos.length > 1 && (
+                        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-Jost">
+                          {selectedVideo + 1} / {videos.length}
+                        </div>
+                      )}
+                    </div>
+                    {/* Video Title */}
+                    {videos[selectedVideo]?.title && (
+                      <div className="text-center">
+                        <h4 className="text-sm font-medium text-gray-700 font-Inter">{videos[selectedVideo].title}</h4>
+                        {videos[selectedVideo]?.description && (
+                          <p className="text-xs text-gray-500 font-Jost mt-1">{videos[selectedVideo].description}</p>
+                        )}
+                      </div>
+                    )}
+                    {/* Video Thumbnails */}
+                    {videos.length > 1 && (
+                      <div className="grid grid-cols-3 gap-3">
+                        {videos.map((video, idx) => (
+                          <button
+                            key={idx}
+                            className={`relative aspect-video rounded-lg overflow-hidden transition-all duration-200 ${
+                              selectedVideo === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
+                            }`}
+                            onClick={() => setSelectedVideo(idx)}
+                            title={video?.title || `Video ${idx + 1}`}
+                          >
+                            <img
+                              src={video?.video_thumbnail_url || video?.thumbnail_url || "/placeholder.svg"}
+                              alt={video?.title || `video thumbnail ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                                <div className="w-0 h-0 border-l-4 border-l-gray-900 border-y-2 border-y-transparent ml-1"></div>
+                              </div>
+                            </div>
+                            {selectedVideo === idx && <div className="absolute inset-0 ring-2 ring-gray-900 rounded-lg"></div>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
