@@ -16,7 +16,7 @@ const connectionOptions = {
 }
 
 // Use local database URL for development if DATABASE_URL is not available
-const databaseUrl = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/tia_brand'
+const databaseUrl = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/prechi_clothing'
 
 const sql = postgres(databaseUrl, connectionOptions)
 

@@ -1,5 +1,5 @@
 -- =============================================
--- TIA DATABASE OPTIMIZATION - PHASE 1
+-- PRECHI DATABASE OPTIMIZATION - PHASE 1
 -- SUPABASE MIGRATION SCRIPTS
 -- =============================================
 -- WARNING: Run these scripts in order and backup your data first!
@@ -231,9 +231,9 @@ ALTER TABLE public.cart_items REPLICA IDENTITY FULL;
 DO $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM pg_publication WHERE pubname = 'tia_realtime'
+        SELECT 1 FROM pg_publication WHERE pubname = 'prechi_realtime'
     ) THEN
-        CREATE PUBLICATION tia_realtime FOR TABLE public.orders, public.cart, public.cart_items;
+        CREATE PUBLICATION prechi_realtime FOR TABLE public.orders, public.cart, public.cart_items;
     END IF;
 END $$;
 

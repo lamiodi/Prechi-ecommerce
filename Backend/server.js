@@ -41,7 +41,7 @@ cloudinary.config({
 
 // ==== CORS Config ====
 const allowedOrigins = [
-  "https://www.thetiabrand.org", // Production frontend
+  "https://prechi-ecommerce-frontend.onrender.com", // Production frontend
   "http://localhost:5173",       // Local Vite dev
 ];
 
@@ -106,7 +106,7 @@ app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/email", emailRoutes);
 
 // ==== Health Checks ====
-app.get("/", (req, res) => res.send("TIA Backend is running 🚀"));
+app.get("/", (req, res) => res.send("Prechi Backend is running 🚀"));
 app.get("/health", (req, res) =>
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() })
 );

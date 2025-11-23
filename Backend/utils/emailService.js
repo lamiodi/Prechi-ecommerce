@@ -10,8 +10,8 @@ const getLogoHeader = () => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   return `
     <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-      <img src="${frontendUrl}/favicon.png" alt="The Tia Brand Logo" style="height: 60px; width: auto; margin-bottom: 12px;" />
-      <h1 style="font-size: 28px; color: #000000; margin: 0; font-weight: 700; letter-spacing: 0.5px;">THE TIA BRAND</h1>
+      <img src="${frontendUrl}/favicon.png" alt="Prechi Clothing Logo" style="height: 60px; width: auto; margin-bottom: 12px;" />
+      <h1 style="font-size: 28px; color: #000000; margin: 0; font-weight: 700; letter-spacing: 0.5px;">PRECHI CLOTHING</h1>
       <p style="font-size: 14px; color: #666666; margin: 4px 0 0 0; font-style: italic;">Premium Fashion & Lifestyle</p>
     </div>
   `;
@@ -36,14 +36,14 @@ export const sendResetEmail = async (to, token) => {
           This link expires in 15 minutes. If you didn't request this, you can safely ignore this message.
         </p>
         <p style="font-size: 13px; color: #aaaaaa; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to,
       subject: 'Password Reset Request',
       html,
@@ -87,14 +87,14 @@ export const sendAdminDeliveryFeePaymentConfirmation = async (orderId, customerN
           </a>
         </div>
         <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to: process.env.ADMIN_EMAIL,
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
@@ -141,14 +141,14 @@ export const sendAdminDeliveryFeeNotification = async (orderId, userName, countr
           </a>
         </div>
         <p style="font-size: 13px; color: #aaaaaa; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to: process.env.ADMIN_EMAIL,
       subject: `Action Required: DHL Delivery Fee for Order ${orderId}`,
       html,
@@ -441,10 +441,10 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
             </div>
           `}
           <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 20px;">
-            ${isTemporary ? 'Contact' : 'You can track your order status in your account. Contact'} <a href="mailto:Thetiabrand1@gmail.com" style="color: #2563eb;">Thetiabrand1@gmail.com</a> for assistance.
+            ${isTemporary ? 'Contact' : 'You can track your order status in your account. Contact'} <a href="mailto:prechi.clothing@gmail.com" style="color: #2563eb;">prechi.clothing@gmail.com</a> for assistance.
           </p>
           <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-top: 30px;">
-            — The Tia Brand Team
+            — Prechi Clothing Team
           </p>
         </div>
       </div>
@@ -452,7 +452,7 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
 
     try {
       await resend.emails.send({
-        from: 'The Tia Brand <support@thetiabrand.org>',
+        from: 'Prechi Clothing <prechi.clothing@gmail.com>',
         to,
         subject: `Order Confirmation - Order #${orderId}`,
         html,
@@ -494,17 +494,18 @@ export const sendOrderStatusUpdateEmail = async (to, name, orderId, status, addi
           </a>
         </div>
         <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 20px;">
-          You can track your order status in your account. Contact <a href="mailto:Thetiabrand1@gmail.com" style="color: #2563eb;">Thetiabrand1@gmail.com</a> for assistance.
+          You can track your order status in your account. Contact <a href="mailto:prechi.clothing@gmail.com" style="color: #2563eb;">prechi.clothing@gmail.com</a> for assistance.
         </p>
         <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
+
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to,
       subject: `${status === 'delivery_fee_paid' ? 'Delivery Fee Payment Confirmation' : 'Order Status Update'} - Order #${orderId}`,
       html,
@@ -570,17 +571,18 @@ export const sendDeliveryFeePaymentConfirmation = async (to, userName, orderId, 
         </div>
         ${viewOrderSection}
         <p style="font-size: 14px; color: #777777; text-align: center; margin-top: 20px;">
-          Thank you for your payment. Contact <a href="mailto:Thetiabrand1@gmail.com" style="color: #2563eb;">Thetiabrand1@gmail.com</a> for any questions.
+          Thank you for your payment. Contact <a href="mailto:prechi.clothing@gmail.com" style="color: #2563eb;">prechi.clothing@gmail.com</a> for any questions.
         </p>
         <p style="font-size: 13px; color: #aaaaaa; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
+
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to,
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
@@ -626,14 +628,15 @@ export const sendAdminPaymentConfirmationNotification = async (orderId, customer
           </a>
         </div>
         <p style="font-size: 13px; color: #9ca3af; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
+
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to: process.env.ADMIN_EMAIL,
       subject: `Payment Confirmed for Order #${orderId}`,
       html,
@@ -673,18 +676,18 @@ export const sendDeliveryFeePaymentLinkEmail = async (to, userName, orderId, del
           </a>
         </div>
         <p style="font-size: 14px; color: #777777; text-align: center; margin-top: 20px;">
-          Please complete your payment to proceed with your order. Contact <a href="mailto:Thetiabrand1@gmail.com" style="color: #2563eb;">Thetiabrand1@gmail.com</a> for assistance.
+          Please complete your payment to proceed with your order. Contact <a href="mailto:prechi.clothing@gmail.com" style="color: #2563eb;">prechi.clothing@gmail.com</a> for assistance.
         </p>
         <p style="font-size: 13px; color: #aaaaaa; text-align: center; margin-top: 30px;">
-          — The Tia Brand Team
+          — Prechi Clothing Team
         </p>
       </div>
     </div>
   `;
-  
+
   try {
     await resend.emails.send({
-      from: 'The Tia Brand <support@thetiabrand.org>',
+      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
       to,
       subject: `Delivery Fee Payment Required - Order #${orderId}`,
       html,

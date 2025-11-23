@@ -1,7 +1,7 @@
 // Cart utility functions for localStorage management
 
 // Constants
-const GUEST_CART_KEY = 'tia_guest_cart';
+const GUEST_CART_KEY = 'prechi_guest_cart';
 
 /**
  * Get the guest cart from localStorage

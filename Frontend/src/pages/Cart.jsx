@@ -7,9 +7,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from './CurrencyContext';
 
-const API_BASE_URL = import.meta.env.PROD
-  ? 'https://tia-backend-r331.onrender.com/api'
-  : '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Lazy load non-critical components
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));

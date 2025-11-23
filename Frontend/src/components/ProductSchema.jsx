@@ -26,18 +26,18 @@ const ProductSchema = ({ productData, selectedVariant, selectedSize, isProduct, 
   const availability = "https://schema.org/InStock"; // Assuming in stock based on UI
 
   // Get product URL
-  const productUrl = currentUrl || `https://www.thetiabrand.org/product/${data?.product_id || data?.bundle_id || ""}`;
+  const productUrl = currentUrl || `https://prechi-ecommerce-frontend.onrender.com/product/${data?.product_id || data?.bundle_id || ""}`;
 
   // Create structured data
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": name,
-    "image": images.length > 0 ? images : ["https://www.thetiabrand.org/images/placeholder.jpg"],
+    "image": images.length > 0 ? images : ["https://prechi-ecommerce-frontend.onrender.com/images/placeholder.jpg"],
     "description": description,
     "brand": {
       "@type": "Brand",
-      "name": "The Tia Brand"
+      "name": "Prechi Clothing"
     },
     "sku": sku,
     "offers": {

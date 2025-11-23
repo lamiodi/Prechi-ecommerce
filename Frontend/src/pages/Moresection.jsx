@@ -114,7 +114,7 @@ const MorePage = () => {
       content: (
         <div className="mt-4 pl-2 space-y-3">
           <p className="font-Jost text-gray-600">
-            To ensure the longevity of your Tia products, please follow these care instructions:
+            To ensure the longevity of your Prechi products, please follow these care instructions:
           </p>
           <div className="bg-purple-50 p-4 rounded-lg">
             <p className="font-Jost text-purple-800 font-medium">General Care Guidelines:</p>
@@ -139,7 +139,7 @@ const MorePage = () => {
       content: (
         <div className="mt-4 pl-2 space-y-3">
           <p className="font-Jost text-gray-600">
-            Interested in becoming a Tia brand retailer or distributor? We offer wholesale partnerships 
+            Interested in becoming a Prechi Clothing retailer or distributor? We offer wholesale partnerships 
             for qualified businesses.
           </p>
           <div className="bg-indigo-50 p-4 rounded-lg">
@@ -153,7 +153,7 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-Jost text-gray-600">
-            To apply for a wholesale account, please email us at <strong>Thetiabrand1@gmail.com</strong> with 
+            To apply for a wholesale account, please email us at <strong>prechi.clothing@gmail.com</strong> with 
             your business information, including your company name, location, and type of retail establishment.
           </p>
         </div>
@@ -193,12 +193,12 @@ const MorePage = () => {
           <div className="space-y-8 animate-fade-in">
             {/* Hero Section */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
-              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">About The Tia brand</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">About Prechi Clothing</h3>
               <p className="text-xl font-Jost text-gray-600 leading-relaxed mb-4">
                 Premium comfort, tailored for everyday movement.
               </p>
               <p className="font-Jost text-gray-600 leading-relaxed">
-                Founded with a vision to revolutionize men's underwear and activewear,The Tia brand combines cutting-edge design with uncompromising comfort.
+                Founded with a vision to revolutionize men's underwear and activewear, Prechi Clothing combines cutting-edge design with uncompromising comfort.
               </p>
             </div>
             {/* Mission & Vision */}
@@ -209,7 +209,7 @@ const MorePage = () => {
                 </div>
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">Our Mission</h4>
                 <p className="font-Jost text-gray-600 leading-relaxed mb-6">
-                  At Tia brand, we believe that comfort shouldn't compromise style. We create premium 
+                  At Prechi Clothing, we believe that comfort shouldn't compromise style. We create premium 
                   underwear and activewear that moves with you, providing unmatched comfort for your 
                   everyday adventures.
                 </p>
@@ -271,7 +271,7 @@ const MorePage = () => {
             </div>
             {/* Why Choose Us */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-8 text-center">Why Choose The Tia Brand?</h4>
+              <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-8 text-center">Why Choose Prechi Clothing?</h4>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <div className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -308,7 +308,7 @@ const MorePage = () => {
               <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-6">Our Story</h4>
               <div className="prose prose-gray max-w-none">
                 <p className="font-Jost text-gray-600 leading-relaxed mb-6">
-                  The Tia Brand was born from a simple observation: men deserve better underwear. After experiencing 
+                  Prechi Clothing was born from a simple observation: men deserve better underwear. After experiencing 
                   countless uncomfortable moments with ill-fitting, low-quality underwear, our founders decided to 
                   create a solution that would change the game entirely.
                 </p>
@@ -318,7 +318,7 @@ const MorePage = () => {
                   and worked directly with customers to understand their needs.
                 </p>
                 <p className="font-Jost text-gray-600 leading-relaxed">
-                  Today, The Tia Brand has grown into Nigeria's premier underwear brand, trusted by thousands of men 
+                  Today, Prechi Clothing has grown into Nigeria's premier underwear brand, trusted by thousands of men 
                   who refuse to compromise on comfort and quality. But our journey is just beginning – we're constantly 
                   innovating and expanding to serve you better.
                 </p>
@@ -345,7 +345,7 @@ const MorePage = () => {
                   1. Agreement to Terms
                 </h4>
                 <p className="font-Jost text-gray-600 leading-relaxed mb-4">
-                  By accessing and using The Tia Brand's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                  By accessing and using Prechi Clothing's website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
                 </p>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="font-Jost text-blue-800 text-sm">
@@ -360,7 +360,7 @@ const MorePage = () => {
                   2. Use License
                 </h4>
                 <p className="font-Jost text-gray-600 leading-relaxed mb-4">
-                  Permission is granted to temporarily download one copy of the materials on The Tia Brand's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.
+                  Permission is granted to temporarily download one copy of the materials on Prechi Clothing's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.
                 </p>
                 <div className="bg-red-50 p-4 rounded-lg mb-4">
                   <h5 className="font-semibold font-Manrope text-red-800 mb-2">Under this license you may NOT:</h5>
@@ -456,7 +456,7 @@ const MorePage = () => {
                   6. Limitation of Liability
                 </h4>
                 <p className="font-Jost text-gray-600 leading-relaxed mb-4">
-                  In no event shall The Tia brand or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.
+                  In no event shall Prechi Clothing or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.
                 </p>
                 <div className="bg-yellow-50 p-4 rounded-lg">
                   <p className="font-Jost text-yellow-800 text-sm">
@@ -472,7 +472,7 @@ const MorePage = () => {
                 </p>
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="font-Jost text-blue-800 text-sm">
-                    For questions about these Terms of Service, please contact us at: <strong>Thetiabrand1@gmail.com</strong>
+                    For questions about these Terms of Service, please contact us at: <strong>prechi.clothing@gmail.com</strong>
                   </p>
                 </div>
               </div>
@@ -643,7 +643,7 @@ const MorePage = () => {
                 </div>
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                   <p className="font-Jost text-blue-800 text-sm">
-                    <strong>To exercise your rights:</strong> Contact us at Thetiabrand1@gmail.com or call +2348104117122. We'll respond within 30 days.
+                    <strong>To exercise your rights:</strong> Contact us at prechi.clothing@gmail.com or call +2348104117122. We'll respond within 30 days.
                   </p>
                 </div>
               </div>
@@ -656,7 +656,7 @@ const MorePage = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-6">
                   <div className="flex items-center space-x-2">
                     <Mail className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-medium font-Jost text-gray-600">Thetiabrand1@gmail.com</span>
+                    <span className="text-sm font-medium font-Jost text-gray-600">prechi.clothing@gmail.com</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-gray-500" />
@@ -686,10 +686,10 @@ const MorePage = () => {
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Email Support</h4>
                 <p className="font-Jost text-gray-600 mb-4 text-sm">Get detailed help via email</p>
                 <a 
-                  href="mailto:Thetiabrand1@gmail.com"
+                  href="mailto:prechi.clothing@gmail.com"
                   className="text-blue-600 hover:text-blue-800 font-medium font-Jost transition-colors"
                 >
-                  Thetiabrand1@gmail.com
+                  prechi.clothing@gmail.com
                 </a>
                 <p className="text-xs font-Jost text-gray-500 mt-2">Response within 24 hours</p>
               </div>

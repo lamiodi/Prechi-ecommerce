@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Directly use the backup server URL
-const API_BASE_URL = 'https://tia-backend-r331.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   timeout: 10000,

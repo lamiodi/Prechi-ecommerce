@@ -22,9 +22,7 @@ import AdminNewsletterDashboard from '../components/AdminNewsletterDashboard';
 import { useAdminAuth } from '../context/AdminAuthContext';
 
 // Define API_BASE_URL based on environment
-const API_BASE_URL = import.meta.env.PROD
-  ? 'https://tia-backend-r331.onrender.com/api'
-  : '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');

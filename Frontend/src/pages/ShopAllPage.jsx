@@ -24,7 +24,7 @@ const useMetaTags = (title, description) => {
     
     // Cleanup on component unmount
     return () => {
-      document.title = 'The Tia Brand - Premium Comfort Wear';
+      document.title = 'Prechi Clothing - Premium Comfort Wear';
     };
   }, [title, description]);
 };
@@ -52,7 +52,7 @@ const CollectionPageSchema = () => {
 };
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api`
-  : 'https://tia-backend-r331.onrender.com/api';
+  : 'https://prechi-ecommerce.onrender.com/api';
 const api = axios.create({ baseURL: API_BASE_URL });
 
 const ShopAllPage = () => {
@@ -88,27 +88,27 @@ const ShopAllPage = () => {
   // Meta tags configuration for each category
   const metaConfig = {
     'All': {
-      title: 'Shop All - Premium Boxers, Gymwears & Bundles | The Tia Brand',
+      title: 'Shop All - Premium Boxers, Gymwears & Bundles | Prechi Clothing',
       description: 'Explore our complete collection of premium underwear, activewear, and exclusive bundles. Premium comfort wear designed for everyday luxury.'
     },
     'Briefs': {
-      title: 'Premium Boxers & Briefs Collection | The Tia Brand',
+      title: 'Premium Boxers & Briefs Collection | Prechi Clothing',
       description: 'Discover our luxury boxers and briefs collection. Premium comfort underwear with superior fit, breathable fabrics, and modern designs.'
     },
     'Gymwear': {
-      title: 'Premium Gymwear & Activewear Collection | The Tia Brand',
+      title: 'Premium Gymwear & Activewear Collection | Prechi Clothing',
       description: 'Shop high-performance gymwear and activewear. Moisture-wicking fabrics, superior comfort, and stylish designs for your workout routine.'
     },
     'New Arrivals': {
-      title: 'New Arrivals - Latest Comfort Wear Collection | The Tia Brand',
+      title: 'New Arrivals - Latest Comfort Wear Collection | Prechi Clothing',
       description: 'Discover our newest arrivals in premium comfort wear. Be the first to experience our latest boxers, gymwears, and exclusive bundle designs.'
     },
     '3 in 1': {
-      title: '3-in-1 Premium Bundles Collection | The Tia Brand',
+      title: '3-in-1 Premium Bundles Collection | Prechi Clothing',
       description: 'Explore our exclusive 3-in-1 bundles featuring coordinated boxers, gymwears, and accessories. Perfect matching sets for ultimate style and comfort.'
     },
     '5 in 1': {
-      title: '5-in-1 Luxury Bundles Collection | The Tia Brand',
+      title: '5-in-1 Luxury Bundles Collection | Prechi Clothing',
       description: 'Discover our premium 5-in-1 bundles with complete outfit coordination. Multiple pieces designed to work together for versatile styling options.'
     }
   };

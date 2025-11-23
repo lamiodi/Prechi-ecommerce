@@ -29,7 +29,7 @@ const Footer = () => {
             <li>Contact Us</li>
             </Link>
             <li className="pt-2 space-y-2">
-              <div>Thetiabrand1@gmail.com</div>
+              <div>Prechi.clothing@gmail.com</div>
               <div> +2348104117122 </div>
               <div className="text-xs opacity-60 mt-1">Opening hours 8:30am - 10pm</div>
             </li>
@@ -86,7 +86,7 @@ const Footer = () => {
         </div>
         <div className="flex items-center space-x-4">
         <div className='bg-Primarycolor p-2 rounded-full'>
-          <Link to="https://www.instagram.com/the.tiabrand/?igsh=MTM2bWoxODI1ZzFvZA%3D%3D#">
+          <Link to="https://www.instagram.com/prechi.clothing">
           <img
             src={instagramicon}
             alt="Instagram"
@@ -94,7 +94,7 @@ const Footer = () => {
           /></Link>
           </div>
          <div className='bg-Primarycolor  rounded-full'>
-          <Link to='https://www.threads.com/@tiastores.ng?igshid=NTc4MTIwNjQ2YQ=='>
+          <Link to='https://www.threads.com/@prechi.clothing'>
           <img
             src={threadsicon}
             alt="Threads"
@@ -103,7 +103,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="text-xs font-Manrope text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} The Tia Brand. All rights reserved.</p>
+      <p className="text-xs font-Manrope text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} Prechi Clothing. All rights reserved.</p>
     </div>
   );
 };

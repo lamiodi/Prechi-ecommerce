@@ -3,9 +3,7 @@ import axios from 'axios';
 import { CheckCircle, Loader2, AlertCircle, Info } from 'lucide-react';
 
 // Define API_BASE_URL with proper endpoint handling
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL 
-  ? `${import.meta.env.VITE_API_BASE_URL}` 
-  : 'https://tia-backend-r331.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Create axios instance with proper configuration
 const api = axios.create({
