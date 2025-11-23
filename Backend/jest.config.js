@@ -16,3 +16,6 @@ export default {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html']
 };
+
+// Note: No test files currently exist in the project.
+// Test configuration is maintained for future test implementation.
