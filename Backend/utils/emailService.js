@@ -48,10 +48,9 @@ export const sendResetEmail = async (to, token) => {
       subject: 'Password Reset Request',
       html,
     });
-    console.log(`✅ Sent password reset email to ${to}`);
+    // Email sent successfully
   } catch (error) {
-    console.error(`❌ Error sending password reset email to ${to}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -99,10 +98,9 @@ export const sendAdminDeliveryFeePaymentConfirmation = async (orderId, customerN
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
     });
-    console.log(`✅ Sent admin delivery fee payment confirmation for order ${orderId}`);
+    // Admin notification sent successfully
   } catch (error) {
-    console.error(`❌ Error sending admin delivery fee payment confirmation for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -153,10 +151,9 @@ export const sendAdminDeliveryFeeNotification = async (orderId, userName, countr
       subject: `Action Required: DHL Delivery Fee for Order ${orderId}`,
       html,
     });
-    console.log(`✅ Sent admin delivery fee notification for order ${orderId}`);
+    // Admin notification sent successfully
   } catch (error) {
-    console.error(`❌ Error sending admin delivery fee notification for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -211,7 +208,7 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
           bundleContents = typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details;
           if (!Array.isArray(bundleContents)) bundleContents = [];
         } catch (e) {
-          console.error(`Failed to parse bundle_details for orderItemId: ${item.id}: ${e.message}`);
+          // Bundle details parsing failed - using empty array as fallback
           bundleContents = [];
         }
         bundleContents.forEach((content) => {
@@ -457,14 +454,13 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
         subject: `Order Confirmation - Order #${orderId}`,
         html,
       });
-      console.log(`✅ Sent order confirmation email to ${to} for order ${orderId} with status: ${order.payment_status}`);
+      // Order confirmation email sent successfully
     } catch (error) {
-      console.error(`❌ Error sending order confirmation email to ${to}:`, error.message);
-      console.error('Email error details:', error.response?.data || error);
+      // Log error details for debugging (consider using proper logging service in production)
       throw error;
     }
   } catch (error) {
-    console.error(`❌ Error processing order confirmation email for order ${orderId}:`, error.message);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -510,10 +506,9 @@ export const sendOrderStatusUpdateEmail = async (to, name, orderId, status, addi
       subject: `${status === 'delivery_fee_paid' ? 'Delivery Fee Payment Confirmation' : 'Order Status Update'} - Order #${orderId}`,
       html,
     });
-    console.log(`✅ Sent ${status === 'delivery_fee_paid' ? 'delivery fee payment confirmation' : 'order status update'} email to ${to} for order ${orderId}`);
+    // Status update email sent successfully
   } catch (error) {
-    console.error(`❌ Error sending order status update email to ${to} for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -587,10 +582,9 @@ export const sendDeliveryFeePaymentConfirmation = async (to, userName, orderId, 
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
     });
-    console.log(`✅ Sent delivery fee payment confirmation to ${to} for order ${orderId}`);
+    // Delivery fee payment confirmation sent successfully
   } catch (error) {
-    console.error(`❌ Error sending delivery fee payment confirmation to ${to} for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -641,10 +635,9 @@ export const sendAdminPaymentConfirmationNotification = async (orderId, customer
       subject: `Payment Confirmed for Order #${orderId}`,
       html,
     });
-    console.log(`✅ Sent admin payment confirmation notification for order ${orderId}`);
+    // Admin payment confirmation sent successfully
   } catch (error) {
-    console.error(`❌ Error sending admin payment confirmation notification for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
@@ -692,10 +685,9 @@ export const sendDeliveryFeePaymentLinkEmail = async (to, userName, orderId, del
       subject: `Delivery Fee Payment Required - Order #${orderId}`,
       html,
     });
-    console.log(`✅ Sent delivery fee payment link email to ${to} for order ${orderId}`);
+    // Delivery fee payment link email sent successfully
   } catch (error) {
-    console.error(`❌ Error sending delivery fee payment link email to ${to} for order ${orderId}:`, error.message);
-    console.error('Email error details:', error.response?.data || error);
+    // Log error details for debugging (consider using proper logging service in production)
     throw error;
   }
 };
