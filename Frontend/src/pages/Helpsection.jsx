@@ -383,10 +383,10 @@ const HelpPage = () => {
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Call Us</h4>
                 <p className="font-Jost text-gray-600 mb-4 text-sm">Speak with our team</p>
                 <a 
-                  href="tel:+2348104117122"
+                  href="tel:+2349016420903"
                   className="text-green-600 hover:text-green-800 font-medium font-Jost transition-colors"
                 >
-                  +234 810 411 7122
+                  +234 901 642 0903
                 </a>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">

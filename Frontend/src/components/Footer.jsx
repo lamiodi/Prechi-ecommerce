@@ -30,7 +30,7 @@ const Footer = () => {
             </Link>
             <li className="pt-2 space-y-2">
               <div>Prechi.clothing@gmail.com</div>
-              <div> +2348104117122 </div>
+              <div> +2349016420903 </div>
               <div className="text-xs opacity-60 mt-1">Opening hours 8:30am - 10pm</div>
             </li>
             

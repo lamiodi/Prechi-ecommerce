@@ -11,7 +11,7 @@ const WhatsAppChatWidget = () => {
   const [widgetClosed, setWidgetClosed] = useState(false);
   const messagesEndRef = useRef(null);
   
-  const phoneNumber = '2348104117122';
+  const phoneNumber = '2349016420903';
   const defaultMessage = "Hi! I'm interested in your products.";
 
   useEffect(() => {

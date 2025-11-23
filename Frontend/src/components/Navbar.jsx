@@ -5,7 +5,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { LogOut, Search, User, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toastSuccess } from '../utils/toastConfig';
-import Logo from '../assets/icons/logo.svg';
+import Logo from '/PreachilogoWHITE.png';
 
 export default function Navbar() {
   const location = useLocation();

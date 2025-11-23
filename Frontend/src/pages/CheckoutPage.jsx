@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const WHATSAPP_NUMBER = '2348104117122';
+const WHATSAPP_NUMBER = '2349016420903';
 
 // Memoized GuestCheckoutModal component to prevent unnecessary re-renders
 const GuestCheckoutModal = React.memo(({ 

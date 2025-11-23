@@ -643,7 +643,7 @@ const MorePage = () => {
                 </div>
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                   <p className="font-Jost text-blue-800 text-sm">
-                    <strong>To exercise your rights:</strong> Contact us at prechi.clothing@gmail.com or call +2348104117122. We'll respond within 30 days.
+                    <strong>To exercise your rights:</strong> Contact us at prechi.clothing@gmail.com or call +2349016420903. We'll respond within 30 days.
                   </p>
                 </div>
               </div>
@@ -700,10 +700,10 @@ const MorePage = () => {
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Phone Support</h4>
                 <p className="font-Jost text-gray-600 mb-4 text-sm">Speak directly with our team</p>
                 <a 
-                  href="tel:+2348104117122"
+                  href="tel:+2349016420903"
                   className="text-green-600 hover:text-green-800 font-medium font-Jost transition-colors"
                 >
-                  +234 810 411 7122
+                  +234 901 642 0903
                 </a>
                 <p className="text-xs font-Jost text-gray-500 mt-2">Immediate assistance</p>
               </div>

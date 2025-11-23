@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 function ContactWhatsAppWidget() {
   const [formData, setFormData] = useState({ name: '', message: '' });
-  const phoneNumber = '2348104117122'; // Replace with your WhatsApp number
+  const phoneNumber = '2349016420903'; // Replace with your WhatsApp number
 
   const handleSubmit = (e) => {
     e.preventDefault();

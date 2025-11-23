@@ -10,7 +10,7 @@ const getLogoHeader = () => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   return `
     <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0;">
-      <img src="${frontendUrl}/favicon.png" alt="Prechi Clothing Logo" style="height: 60px; width: auto; margin-bottom: 12px;" />
+      <img src="${frontendUrl}/PreachilogoWHITE.png" alt="Prechi Clothing Logo" style="height: 60px; width: auto; margin-bottom: 12px;" />
       <h1 style="font-size: 28px; color: #000000; margin: 0; font-weight: 700; letter-spacing: 0.5px;">PRECHI CLOTHING</h1>
       <p style="font-size: 14px; color: #666666; margin: 4px 0 0 0; font-style: italic;">Premium Fashion & Lifestyle</p>
     </div>
