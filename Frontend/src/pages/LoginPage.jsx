@@ -4,9 +4,9 @@ import {
   Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, Loader2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import Pic1 from '../assets/images/Loginpic1.JPG';
-import Pic2 from '../assets/images/Loginpic2.JPG';
-import Pic3 from '../assets/images/Loginpic3.JPG';
+import Pic1 from '../assets/images/IMG_4552.JPG';
+import Pic2 from '../assets/images/IMG_4554.JPG';
+import Pic3 from '../assets/images/IMG_4559.JPG';
 import axios from 'axios';
 
 // Create API instance with environment variable support

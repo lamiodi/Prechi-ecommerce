@@ -709,7 +709,7 @@ const ProductDetails = () => {
                         onClick={() => setSelectedImage(idx)}
                       >
                         <img
-                          src={img || "/placeholder.svg"}
+                          src={img || "../assets/images/IMG_4552.JPG"}
                           alt={`thumbnail ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -761,7 +761,7 @@ const ProductDetails = () => {
                             title={video?.title || `Video ${idx + 1}`}
                           >
                             <img
-                              src={video?.video_thumbnail_url || video?.thumbnail_url || "/placeholder.svg"}
+                              src={video?.video_thumbnail_url || video?.thumbnail_url || "../assets/images/IMG_4554.JPG"}
                               alt={video?.title || `video thumbnail ${idx + 1}`}
                               className="w-full h-full object-cover"
                             />

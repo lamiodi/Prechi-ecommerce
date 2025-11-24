@@ -1,7 +1,7 @@
 import React from 'react';
 import threadsicon from '../assets/icons/threads.png'
 import instagramicon from '../assets/icons/instagram.png';
-import Logo from '../assets/icons/logo.svg';
+import Logo from '../assets/icons/Preachilogowhite.png';
 import { Link } from 'react-router-dom';
 
 // Reusable Button Component

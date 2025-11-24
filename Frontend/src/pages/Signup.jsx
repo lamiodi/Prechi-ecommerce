@@ -4,9 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
-import Pic1 from '../assets/images/Signuppic1.JPG';
-import Pic2 from '../assets/images/Signuppic2.JPG';
-import Pic3 from '../assets/images/Signuppic3.JPG';
+import Pic1 from '../assets/images/IMG_4558.JPG';
+import Pic2 from '../assets/images/IMG_4571.JPG';
+import Pic3 from '../assets/images/IMG_4566 (1).png';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 

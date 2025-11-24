@@ -5,7 +5,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { LogOut, Search, User, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toastSuccess } from '../utils/toastConfig';
-import Logo from '/PreachilogoWHITE.png';
+import Logo from '../assets/icons/Preachilogowhite.png';
 
 export default function Navbar() {
   const location = useLocation();
@@ -97,7 +97,7 @@ export default function Navbar() {
               {/* Center: Logo */}
               <div className="absolute left-1/2 transform -translate-x-1/2 sm:transform-none">
                 <Link to="/home" className="flex items-center">
-                  <img src={Logo} alt="Logo" className="h-6 w-auto sm:h-7 md:h-8" />
+                  <img src={Logo} alt="Logo" className="h-6 w-6 object-contain sm:h-7 sm:w-7 md:h-8 md:w-8" />
                 </Link>
               </div>
               
