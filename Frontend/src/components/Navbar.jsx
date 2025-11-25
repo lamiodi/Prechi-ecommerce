@@ -97,7 +97,7 @@ export default function Navbar() {
               {/* Center: Logo */}
               <div className="absolute left-1/2 transform -translate-x-1/2 sm:transform-none">
                 <Link to="/home" className="flex items-center">
-                  <img src={Logo} alt="Logo" className="h-6 w-6 object-contain sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                  <img src={Logo} alt="Logo" className="h-16 w-16 object-contain sm:h-18 sm:w-18 md:h-22 md:w-22" />
                 </Link>
               </div>
               

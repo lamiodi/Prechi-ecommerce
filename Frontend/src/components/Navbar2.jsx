@@ -114,7 +114,7 @@ export default function Navbar2() {
                   <img 
                     src={isWhiteBackgroundPage() ? LogoBlack : LogoWhite} 
                     alt="Logo" 
-                    className="h-10 w-40 sm:h-12 sm:w-48 md:h-14 md:w-56"
+                    className="h-6 w-8 object-contain sm:h-8 sm:w-10 md:h-10 md:w-12"
                   />
                 </Link>
               </div>
