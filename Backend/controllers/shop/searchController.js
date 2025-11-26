@@ -70,8 +70,7 @@ export const searchProducts = async (req, res) => {
         // We'll handle bundle types in the bundle query below
         productQuery = sql`
           ${productQuery}
-          AND (LOWER(p.name) LIKE ${searchTerm} 
-               OR LOWER(pv.name) LIKE ${searchTerm})
+          AND LOWER(p.name) LIKE ${searchTerm}
         `;
       } else {
         productQuery = sql`
