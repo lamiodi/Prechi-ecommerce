@@ -42,6 +42,7 @@ cloudinary.config({
 // ==== CORS Config ====
 const allowedOrigins = [
   "https://prechi-ecommerce-frontend.onrender.com", // Production frontend
+  "https://prechi-ecommerce.vercel.app",           // Vercel frontend
   "http://localhost:5173",       // Local Vite dev
 ];
 
