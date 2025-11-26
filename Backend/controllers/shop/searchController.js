@@ -27,7 +27,7 @@ export const searchProducts = async (req, res) => {
         p.id AS product_id,
         p.base_price AS price,
         pv.id AS variant_id,
-        pv.name AS variant_name,
+        p.name AS variant_name,
         p.name AS product_name,
         p.created_at,
         p.category,
@@ -83,8 +83,7 @@ export const searchProducts = async (req, res) => {
       // Otherwise search by name
       productQuery = sql`
         ${productQuery}
-        AND (LOWER(p.name) LIKE ${searchTerm} 
-             OR LOWER(pv.name) LIKE ${searchTerm})
+        AND LOWER(p.name) LIKE ${searchTerm}
       `;
     }
     
