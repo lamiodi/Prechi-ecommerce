@@ -24,8 +24,7 @@ export const getAllOrdersForAdmin = async (req, res) => {
         o.idempotency_key,
         u.email AS user_email,
         u.first_name,
-        u.last_name,
-        u.is_temporary
+        u.last_name
       FROM orders o
       JOIN users u ON o.user_id = u.id
       WHERE o.deleted_at IS NULL
