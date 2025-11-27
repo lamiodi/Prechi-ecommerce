@@ -13,25 +13,21 @@ export const getAllOrdersForAdmin = async (req, res) => {
         o.created_at AS order_date,
         o.total AS total_amount,
         o.status,
-        o.shipping_method,
-        o.shipping_cost,
+        o.subtotal,
+        o.discount,
         o.payment_method,
         o.payment_status,
         o.reference,
         o.updated_at,
-        o.address_id,
-        o.billing_address_id,
-        o.currency,
         o.delivery_fee,
-        o.delivery_fee_paid,
+        o.email_sent,
+        o.idempotency_key,
         u.email AS user_email,
         u.first_name,
         u.last_name,
-        u.is_temporary,
-        COALESCE(a.country, o.shipping_country) AS shipping_country
+        u.is_temporary
       FROM orders o
       JOIN users u ON o.user_id = u.id
-      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.deleted_at IS NULL
       ORDER BY o.created_at DESC
     `;
