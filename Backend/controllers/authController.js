@@ -49,7 +49,7 @@ export const adminLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const [user] = await sql`
-      SELECT id, first_name, last_name, username, email, phone_number, is_admin, password
+      SELECT id, first_name, last_name, username, email, phone_number, is_admin, password, first_order
       FROM users
       WHERE LOWER(email) = LOWER(${email}) AND is_admin = true AND deleted_at IS NULL
     `;
@@ -80,7 +80,7 @@ export const adminLogin = async (req, res) => {
 export const getMe = async (req, res) => {
   try {
     const [user] = await sql`
-      SELECT id, first_name, last_name, username, email, phone_number, is_admin
+      SELECT id, first_name, last_name, username, email, phone_number, is_admin, first_order
       FROM users
       WHERE id = ${req.user.id} AND deleted_at IS NULL
     `;
@@ -123,9 +123,9 @@ export const signupUser = async (req, res) => {
     await sql.begin(async (sql) => {
       const [user] = await sql`
         INSERT INTO users
-        (first_name, last_name, email, password, phone_number, created_at, updated_at, is_admin)
-        VALUES (${first_name}, ${last_name}, LOWER(${email}), ${hashedPassword}, ${phone_number}, NOW(), NOW(), ${false})
-        RETURNING id, email, is_admin
+        (first_name, last_name, email, password, phone_number, created_at, updated_at, is_admin, first_order)
+        VALUES (${first_name}, ${last_name}, LOWER(${email}), ${hashedPassword}, ${phone_number}, NOW(), NOW(), ${false}, ${true})
+        RETURNING id, email, is_admin, first_order
       `;
       
       await sql`INSERT INTO cart (user_id, total) VALUES (${user.id}, 0)`;
@@ -137,6 +137,7 @@ export const signupUser = async (req, res) => {
           id: user.id,
           email: user.email,
           role: user.is_admin ? 'admin' : 'user',
+          first_order: user.first_order,
         },
       });
     });
@@ -305,7 +306,6 @@ export const updateUserFirstOrder = async (req, res) => {
   }
 };
 
-// Add this to your auth controller
 export const createTemporaryUser = async (req, res) => {
   try {
     const { name, email, phone_number } = req.body;
