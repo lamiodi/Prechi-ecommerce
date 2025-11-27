@@ -69,7 +69,7 @@ const AdminDashboard = () => {
         setLoading(true);
         setError(null);
         const authAxios = getAuthAxios();
-        const response = await authAxios.get('/admin/analytics');
+        const response = await authAxios.get('/api/admin/analytics');
         setAnalytics(response.data);
         toast.success('Analytics loaded successfully');
       } catch (err) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Button from './Button';
 import { Link } from 'react-router-dom';
+import heroVideo from '../assets/dreamina-2025-11-27-1712-The camera pushes in on the woman in the....mp4';
 
 const HeroSection = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -10,13 +11,13 @@ const HeroSection = () => {
   const mobileVideoRef = useRef(null);
   const desktopVideoRef = useRef(null);
 
-  // Optimized Cloudinary video URLs with aggressive optimization
-  const mobileVideoURL = 'https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto:low,w_600,c_scale/v1/CS_m65dwf';
-  const desktopVideoURL = 'https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto:low,w_1000,c_scale/v1/tia2_gljwos';
+  // Local hero video
+  const mobileVideoURL = heroVideo;
+  const desktopVideoURL = heroVideo;
   
-  // Poster images for immediate display
-  const mobilePosterURL = 'https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto:low,w_600,c_scale,so_0/v1/CS_m65dwf.jpg';
-  const desktopPosterURL = 'https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto:low,w_1000,c_scale,so_0/v1/tia2_gljwos.jpg';
+  // Poster images for immediate display (using local image as fallback)
+  const mobilePosterURL = '/src/assets/images/IMG_4571.JPG';
+  const desktopPosterURL = '/src/assets/images/IMG_4571.JPG';
 
   // Detect iOS devices
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
