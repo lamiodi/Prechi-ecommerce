@@ -940,15 +940,9 @@ export const getOrderById = async (req, res) => {
     let [order] = await sql`
       SELECT 
         o.*, 
-        u.first_name, u.last_name, u.email,
-        a.address_line_1, a.address_line_2, a.city, a.state, a.zip_code, a.country as shipping_country_code,
-        ba.full_name as billing_full_name, ba.email as billing_email, ba.phone_number, 
-        ba.address_line_1 as billing_address_line_1, ba.address_line_2 as billing_address_line_2,
-        ba.city as billing_city, ba.state as billing_state, ba.zip_code as billing_zip_code
+        u.first_name, u.last_name, u.email
       FROM orders o
       JOIN users u ON o.user_id = u.id
-      JOIN addresses a ON o.address_id = a.id
-      JOIN billing_addresses ba ON o.billing_address_id = ba.id
       WHERE o.id = ${id}
     `;
     
@@ -957,15 +951,9 @@ export const getOrderById = async (req, res) => {
       [order] = await sql`
         SELECT 
           o.*, 
-          u.first_name, u.last_name, u.email,
-          a.address_line_1, a.address_line_2, a.city, a.state, a.zip_code, a.country as shipping_country_code,
-          ba.full_name as billing_full_name, ba.email as billing_email, ba.phone_number, 
-          ba.address_line_1 as billing_address_line_1, ba.address_line_2 as billing_address_line_2,
-          ba.city as billing_city, ba.state as billing_state, ba.zip_code as billing_zip_code
+          u.first_name, u.last_name, u.email
         FROM orders o
         JOIN users u ON o.user_id = u.id
-        JOIN addresses a ON o.address_id = a.id
-        JOIN billing_addresses ba ON o.billing_address_id = ba.id
         WHERE o.id = ${id} AND o.deleted_at IS NULL
       `;
     }

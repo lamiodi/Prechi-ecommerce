@@ -686,13 +686,27 @@ export const getOrderShippingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
     
+    // Get the order to find the user
+    const [order] = await sql`
+      SELECT user_id, shipping_country
+      FROM orders 
+      WHERE id = ${orderId}
+    `;
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    
+    // Get the user's default shipping address
     const [address] = await sql`
       SELECT 
         a.*,
-        o.id AS order_id
+        ${orderId} AS order_id
       FROM addresses a
-      JOIN orders o ON a.id = o.address_id
-      WHERE o.id = ${orderId}
+      WHERE a.user_id = ${order.user_id}
+      AND a.deleted_at IS NULL
+      ORDER BY a.is_default DESC, a.created_at DESC
+      LIMIT 1
     `;
     
     if (!address) {
@@ -710,13 +724,27 @@ export const getOrderBillingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
     
+    // Get the order to find the user
+    const [order] = await sql`
+      SELECT user_id
+      FROM orders 
+      WHERE id = ${orderId}
+    `;
+    
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    
+    // Get the user's default billing address
     const [address] = await sql`
       SELECT 
         a.*,
-        o.id AS order_id
-      FROM addresses a
-      JOIN orders o ON a.id = o.billing_address_id
-      WHERE o.id = ${orderId}
+        ${orderId} AS order_id
+      FROM billing_addresses a
+      WHERE a.user_id = ${order.user_id}
+      AND a.deleted_at IS NULL
+      ORDER BY a.created_at DESC
+      LIMIT 1
     `;
     
     if (!address) {
