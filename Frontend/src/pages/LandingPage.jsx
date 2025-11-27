@@ -6,6 +6,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import heroVideo from '../assets/dreamina-2025-11-27-1712-The camera pushes in on the woman in the....mp4';
 
 // Lazy load components for better performance
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
@@ -76,7 +77,7 @@ const LandingPage = () => {
           <video
             ref={mobileVideoRef}
             className="absolute top-0 left-0 w-full h-full object-cover lg:hidden z-10"
-            src="https://res.cloudinary.com/dgcwviufp/video/upload/f_mp4,q_auto:low,w_600,c_scale/v1/CS_m65dwf.mp4"
+            src={heroVideo}
             autoPlay
             muted
             loop
@@ -90,7 +91,7 @@ const LandingPage = () => {
           <video
             ref={desktopVideoRef}
             className="absolute top-0 left-0 w-full h-full object-cover hidden lg:block z-10"
-            src="https://res.cloudinary.com/dgcwviufp/video/upload/f_mp4,q_auto:low,w_1000,c_scale/v1/tia2_gljwos.mp4"
+            src={heroVideo}
             autoPlay
             muted
             loop
