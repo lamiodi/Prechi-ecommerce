@@ -56,8 +56,8 @@ const NewsletterForm = () => {
       <div className="relative w-full z-10 bg-Primarycolor overflow-visible pt-12 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-20 2xl:pt-30 pb-8 sm:pb-10 px-4 sm:px-6 md:px-12">
         
         {/* Image */}
-        <div className="absolute top-[-3.5em] left-6 sm:top-[-4.5em] sm:left-6 md:top-[-5.5em] md:left-8 lg:top-[-6em] lg:left-10 xl:top-[-8em] xl:left-12 2xl:top-[-9em] 2xl:left-16 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 2xl:w-110 z-0">
-          <img src={Newsletterimage} alt="Newsletter Illustration" className="w-full h-auto object-contain sm:w-[150%] md:w-full" />
+        <div className="absolute top-[-10em] left-[-3em] sm:top-[-12em] sm:left-[-4em] md:top-[-14em] md:left-[1em] lg:top-[-16em] lg:left-10 xl:top-[-18em] xl:left-12 2xl:top-[-20em] 2xl:left-16 w-[16rem] sm:w-[20rem] md:w-[24rem] lg:w-[28rem] xl:w-[32rem] 2xl:w-[36rem] z-0">
+          <img src={Newsletterimage} alt="Newsletter Illustration" className="w-full h-auto object-contain" />
         </div>
         
         {/* Text + Form */}
