@@ -39,8 +39,8 @@ export const uploadProduct = async (req, res) => {
 
         for (const size of variant.sizes) {
           await sql`
-            INSERT INTO variant_sizes (variant_id, size_id, stock_quantity)
-            VALUES (${variantId}, ${size.size_id}, ${size.stock_quantity || 0})
+            INSERT INTO variant_sizes (variant_id, size_id, stock_quantity, price)
+            VALUES (${variantId}, ${size.size_id}, ${size.stock_quantity || 0}, ${size.price || 0})
           `;
         }
 

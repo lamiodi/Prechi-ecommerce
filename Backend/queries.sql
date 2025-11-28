@@ -977,7 +977,8 @@ BEGIN
       jsonb_build_object(
         'size_id', s.id,
         'size_name', s.size_name,
-        'stock_quantity', vs.stock_quantity
+        'stock_quantity', vs.stock_quantity,
+        'price', vs.price
       ) ORDER BY s.id
     ) as sizes_array
     FROM variant_sizes vs
@@ -1062,7 +1063,7 @@ BEGIN
           'id', p.id,
           'name', p.name,
           'description', p.description,
-          'price', p.base_price,
+          'price', COALESCE(vs_price.price, p.base_price),
           'sku_prefix', p.sku_prefix,
           'is_active', p.is_active,
           'variant', jsonb_build_object(
@@ -1096,6 +1097,7 @@ BEGIN
   LEFT JOIN products p ON pv.product_id = p.id
   LEFT JOIN colors c ON pv.color_id = c.id
   LEFT JOIN bundles b ON ci.bundle_id = b.id
+  LEFT JOIN variant_sizes vs_price ON vs_price.variant_id = pv.id AND vs_price.size_id = ci.size_id
   LEFT JOIN LATERAL (
     SELECT jsonb_agg(
       jsonb_build_object(

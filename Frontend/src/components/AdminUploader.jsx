@@ -61,7 +61,9 @@ export default function AdminUploader() {
           sizes: sizes.map((s) => ({
             size_id: s.id,
             size_code: s.size_code,
+            size_name: s.size_name,
             stock_quantity: 0,
+            price: s.size_name.includes('3XL') || s.size_name.includes('4XL') || s.size_name.includes('5XL') ? '80000' : '70000',
           })),
           images: [],
           previews: [],
@@ -88,6 +90,12 @@ export default function AdminUploader() {
   const updateSizeStock = (variantIndex, sizeIndex, value) => {
     const updated = [...form.variants];
     updated[variantIndex].sizes[sizeIndex].stock_quantity = parseInt(value) || 0;
+    setForm((prev) => ({ ...prev, variants: updated }));
+  };
+
+  const updateSizePrice = (variantIndex, sizeIndex, value) => {
+    const updated = [...form.variants];
+    updated[variantIndex].sizes[sizeIndex].price = value;
     setForm((prev) => ({ ...prev, variants: updated }));
   };
 
@@ -165,7 +173,7 @@ export default function AdminUploader() {
       errors.description = 'Description should be at least 10 characters for better customer understanding';
     }
     
-    if (!form.base_price || form.base_price <= 0) {
+    if (form.base_price && form.base_price <= 0) {
       errors.base_price = 'Please enter a valid price greater than 0';
     }
     
@@ -200,6 +208,13 @@ export default function AdminUploader() {
         if (!hasStock) {
           errors[`variant_${index}_stock`] = `Variant ${index + 1} must have stock in at least one size`;
         }
+        
+        // Validate size-specific pricing
+        variant.sizes.forEach((size, sizeIndex) => {
+          if (size.stock_quantity > 0 && (!size.price || size.price <= 0)) {
+            errors[`variant_${index}_size_${sizeIndex}_price`] = `Price is required for ${sizes.find(s => s.id === size.size_id)?.size_name} size with stock`;
+          }
+        });
       });
     }
     
@@ -371,29 +386,28 @@ export default function AdminUploader() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-            Base Price (NGN)
+            Suggested Base Price (NGN)
             <div className="group relative">
               <Info className="w-4 h-4 text-gray-400 cursor-help" />
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                Starting price in Nigerian Naira (variants may have different prices)
+                Suggested base price (size-specific pricing will override this)
               </div>
             </div>
           </label>
           <input
             type="number"
             step="0.01"
-            required
             className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
               fieldErrors.base_price ? 'border-red-500 bg-red-50' : 'border-gray-300'
             }`}
-            placeholder="Enter base price (e.g., 15000)"
+            placeholder="Enter suggested base price (optional)"
             value={form.base_price}
             onChange={(e) => setForm({ ...form, base_price: e.target.value })}
           />
           {fieldErrors.base_price && (
             <p className="text-xs text-red-600 mt-1">{fieldErrors.base_price}</p>
           )}
-          <p className="text-xs text-gray-500 mt-1">Base price for the product - individual variants can have adjusted prices</p>
+          <p className="text-xs text-gray-500 mt-1">Optional suggested base price - size-specific pricing will be used for each variant</p>
         </div>
 
         <div>
@@ -573,7 +587,7 @@ export default function AdminUploader() {
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {variant.sizes.map((sz, sIdx) => (
-                      <div key={sIdx}>
+                      <div key={sIdx} className="space-y-1">
                         <label className="block text-xs font-medium text-gray-600 mb-1">
                           {sizes.find((s) => s.id === sz.size_id)?.size_name || 'Unknown Size'}
                         </label>
@@ -581,9 +595,18 @@ export default function AdminUploader() {
                           type="number"
                           min="0"
                           placeholder="Stock qty"
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
                           value={sz.stock_quantity}
                           onChange={(e) => updateSizeStock(i, sIdx, e.target.value)}
+                        />
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="Price (₦)"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
+                          value={sz.price}
+                          onChange={(e) => updateSizePrice(i, sIdx, e.target.value)}
                         />
                       </div>
                     ))}

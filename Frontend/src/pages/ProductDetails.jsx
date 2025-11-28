@@ -390,19 +390,20 @@ const ProductDetails = () => {
           window.dispatchEvent(new Event("cartUpdated"))
         } else {
           // Add to guest cart
+          const sizeSpecificPrice = getSizeSpecificPrice();
           addToGuestCart({
             product_type: "single",
             variant_id: selectedVariant.variant_id,
             size_id: selectedSizeObj.size_id,
             quantity,
-            price: productPrice,
+            price: sizeSpecificPrice,
             item: {
               id: selectedVariant.variant_id,
               name: productName,
               image: productImage,
               color: selectedColor,
               size: selectedSize,
-              price: productPrice,
+              price: sizeSpecificPrice,
               stock_quantity: selectedSizeObj.stock_quantity,
               is_product: true,
             },
@@ -559,7 +560,21 @@ const ProductDetails = () => {
       ? data.videos
       : []
   const name = data?.name || "Unnamed Product"
-  const rawPrice = isProduct ? data?.price : getBundlePrice()
+  
+  // Function to get size-specific price
+  const getSizeSpecificPrice = () => {
+    if (!isProduct || !selectedSize || !selectedVariant) {
+      return data?.price || 0;
+    }
+    
+    const sizes = Array.isArray(selectedVariant.sizes) ? selectedVariant.sizes : [];
+    const selectedSizeObj = sizes.find(s => s.size_name === selectedSize);
+    
+    // Use size-specific price if available, otherwise fall back to base price
+    return selectedSizeObj?.price || data?.price || 0;
+  };
+  
+  const rawPrice = isProduct ? getSizeSpecificPrice() : getBundlePrice()
   const parsedPrice = Number.parseFloat(rawPrice) || 0
   const displayPrice = country === "Nigeria" ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2)
   const displayCurrency = country === "Nigeria" ? "NGN" : "USD"

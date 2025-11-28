@@ -176,7 +176,7 @@ export const updateProduct = async (req, res) => {
           for (const size of variant.sizes || []) {
             await sql`
               UPDATE variant_sizes
-              SET stock_quantity = ${size.stock_quantity}
+              SET stock_quantity = ${size.stock_quantity}, price = ${size.price || 0}
               WHERE variant_id = ${variant.id} AND size_id = ${size.size_id}
             `;
           }

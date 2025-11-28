@@ -119,6 +119,7 @@ async function createTables() {
         variant_id INTEGER NOT NULL REFERENCES public.product_variants(id) ON DELETE CASCADE,
         size_id INTEGER NOT NULL REFERENCES public.sizes(id),
         stock_quantity INTEGER DEFAULT 0,
+        price NUMERIC(10, 2) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(variant_id, size_id)
