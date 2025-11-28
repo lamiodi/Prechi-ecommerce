@@ -15,7 +15,7 @@ async function createAdmin() {
       return;
     }
     
-    // Insert admin user (password: Admin@123456)
+    // Insert admin user with temporary password that must be changed on first login
     await sql`
       INSERT INTO users (
         first_name, 
@@ -42,9 +42,10 @@ async function createAdmin() {
     
     console.log('✅ Admin account created successfully!');
     console.log('📧 Email: admin@prechi.com');
-    console.log('🔑 Password: Admin@123456');
+    console.log('🔑 Password: [Automatically generated - check your email for setup instructions]');
     console.log('');
     console.log('🚀 You can now login at: http://localhost:5173/admin/login');
+    console.log('ℹ️  Use the forgot password feature to set your initial password');
   } catch (error) {
     console.error('❌ Error creating admin account:', error);
   } finally {

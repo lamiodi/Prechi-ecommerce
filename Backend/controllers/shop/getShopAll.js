@@ -83,10 +83,10 @@ export const getShopAll = async (req, res) => {
     }
 
     // 3. Fetch products
+    // Build base query
     let productQuery = sql`
       SELECT 
         p.id AS product_id,
-        p.base_price AS price,
         pv.id AS variant_id,
         p.name AS variant_name,
         (
@@ -103,12 +103,14 @@ export const getShopAll = async (req, res) => {
       WHERE p.is_active = TRUE AND pv.is_active = TRUE
     `;
 
+    // Add category filter safely using parameterized queries
     if (category) {
       if (category.toLowerCase() === 'new') {
         productQuery = sql`${productQuery} AND p.is_new_release = TRUE`;
       } else {
+        // Use parameterized query - postgres.js will handle the escaping
         const cat = category.toLowerCase();
-        productQuery = sql`${productQuery} AND LOWER(p.category) = ${cat}`;
+        productQuery = sql`${productQuery} AND LOWER(p.category) = LOWER(${cat})`;
       }
     }
 

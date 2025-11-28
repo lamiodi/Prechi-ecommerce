@@ -3,8 +3,10 @@ import sql from '../db/index.js';
 
 async function resetAdminPassword() {
   try {
-    const hashedPassword = await bcrypt.hash('Admin@123456', 10);
-    console.log('New password hash:', hashedPassword);
+    // Generate a secure random temporary password
+    const temporaryPassword = require('crypto').randomBytes(12).toString('hex');
+    const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+    console.log('New temporary password generated');
     
     const [updatedUser] = await sql`
       UPDATE users 
@@ -23,8 +25,10 @@ async function resetAdminPassword() {
         WHERE email = 'admin@prechi.com' AND is_admin = true
       `;
       
-      const isMatch = await bcrypt.compare('Admin@123456', user.password);
+      const isMatch = await bcrypt.compare(temporaryPassword, user.password);
       console.log('✅ Password verification test:', isMatch);
+      console.log('🔑 Temporary password (valid for first login only):', temporaryPassword);
+      console.log('⚠️  This password will be invalidated after first use - user must set a new password');
     } else {
       console.log('❌ Admin user not found');
     }

@@ -10,13 +10,9 @@ async function verifyPassword() {
     `;
     
     if (admin) {
-      const isMatch = await bcrypt.compare('Admin@123456', admin.password);
-      console.log('Password verification result:', isMatch);
-      
-      if (!isMatch) {
-        console.log('Password hash in database:', admin.password);
-        console.log('Expected password: Admin@123456');
-      }
+      console.log('Password verification: This script requires manual password input for security');
+      console.log('Use the resetAdminPassword.js script to set a new temporary password instead');
+      console.log('Or use the admin login interface to verify credentials');
     }
   } catch (err) {
     console.error('Error verifying password:', err);

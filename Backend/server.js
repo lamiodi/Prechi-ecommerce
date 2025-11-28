@@ -28,6 +28,30 @@ import emailRoutes from "./routes/email.js";
 import { cleanupOldOrders } from "./utils/cleanupOrders.js";
 
 dotenv.config();
+
+// ==== Environment Variable Validation ====
+const requiredEnvVars = [
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY', 
+  'CLOUDINARY_API_SECRET',
+  'RESEND_API_KEY',
+  'PAYSTACK_SECRET_KEY',
+  'DATABASE_URL'
+];
+
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('❌ Critical error: Missing required environment variables:');
+  missingEnvVars.forEach(varName => {
+    console.error(`   - ${varName}`);
+  });
+  console.error('💡 Please check your .env file or deployment environment configuration');
+  process.exit(1);
+}
+
+console.log('✅ All required environment variables are present');
+
 EventEmitter.defaultMaxListeners = 40;
 
 const app = express();
