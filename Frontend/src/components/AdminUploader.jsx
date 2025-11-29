@@ -55,11 +55,25 @@ export default function AdminUploader() {
           api.get('/api/meta/colors'),
           api.get('/api/meta/sizes'),
         ]);
-        setColors(colorRes.data);
+        
+        // Merge API colors with standard colors to ensure all 12 colors are available
+        const apiColors = colorRes.data || [];
+        const mergedColors = [...STANDARD_COLORS];
+        
+        // Add any additional colors from API that aren't in standard colors
+        apiColors.forEach(apiColor => {
+          if (!mergedColors.find(color => color.id === apiColor.id)) {
+            mergedColors.push(apiColor);
+          }
+        });
+        
+        setColors(mergedColors);
         setSizes(sizeRes.data);
       } catch (err) {
         console.error('Error fetching meta data:', err);
         setError('Failed to load colors and sizes');
+        // Keep standard colors as fallback even on error
+        setColors(STANDARD_COLORS);
       }
     };
     fetchMeta();
