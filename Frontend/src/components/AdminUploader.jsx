@@ -13,8 +13,24 @@ const api = axios.create({
   }
 });
 
+// Standard colors fallback in case database connection fails
+const STANDARD_COLORS = [
+  { id: 1, color_name: 'Black', color_code: '#000000' },
+  { id: 2, color_name: 'White', color_code: '#FFFFFF' },
+  { id: 3, color_name: 'Grey', color_code: '#808080' },
+  { id: 4, color_name: 'Navy Blue', color_code: '#000080' },
+  { id: 5, color_name: 'Brown', color_code: '#8B4513' },
+  { id: 6, color_name: 'Beige', color_code: '#F5F5DC' },
+  { id: 7, color_name: 'Red', color_code: '#FF0000' },
+  { id: 8, color_name: 'Blue', color_code: '#0000FF' },
+  { id: 9, color_name: 'Green', color_code: '#008000' },
+  { id: 10, color_name: 'Burgundy', color_code: '#800020' },
+  { id: 11, color_name: 'Pink', color_code: '#FFC0CB' },
+  { id: 12, color_name: 'Olive', color_code: '#808000' }
+];
+
 export default function AdminUploader() {
-  const [colors, setColors] = useState([]);
+  const [colors, setColors] = useState(STANDARD_COLORS); // Start with standard colors
   const [sizes, setSizes] = useState([]);
   const [form, setForm] = useState({
     name: '',
@@ -173,14 +189,20 @@ export default function AdminUploader() {
       errors.description = 'Description should be at least 10 characters for better customer understanding';
     }
     
-    if (form.base_price && form.base_price <= 0) {
-      errors.base_price = 'Please enter a valid price greater than 0';
+    // Validate base_price - allow empty but validate if provided
+    if (form.base_price !== '' && form.base_price !== null && form.base_price !== undefined) {
+      const price = parseFloat(form.base_price);
+      if (isNaN(price) || price <= 0) {
+        errors.base_price = 'Please enter a valid price greater than 0';
+      }
     }
     
     if (!form.sku_prefix) {
       errors.sku_prefix = 'SKU prefix is required';
     } else if (form.sku_prefix.length !== 3) {
       errors.sku_prefix = 'SKU prefix must be exactly 3 characters';
+    } else if (!/^[A-Za-z0-9]+$/.test(form.sku_prefix)) {
+      errors.sku_prefix = 'SKU prefix must contain only letters and numbers';
     }
     
     if (!form.category) {
@@ -203,7 +225,15 @@ export default function AdminUploader() {
         }
         if (variant.images.length === 0) {
           errors[`variant_${index}_images`] = `Variant ${index + 1} must have at least one image`;
+        } else if (variant.images.length > 5) {
+          errors[`variant_${index}_images`] = `Variant ${index + 1} can have maximum 5 images`;
         }
+        
+        // Validate videos if any are uploaded
+        if (variant.videos && variant.videos.length > 3) {
+          errors[`variant_${index}_videos`] = `Variant ${index + 1} can have maximum 3 videos`;
+        }
+        
         const hasStock = variant.sizes.some(s => s.stock_quantity > 0);
         if (!hasStock) {
           errors[`variant_${index}_stock`] = `Variant ${index + 1} must have stock in at least one size`;
@@ -211,8 +241,15 @@ export default function AdminUploader() {
         
         // Validate size-specific pricing
         variant.sizes.forEach((size, sizeIndex) => {
-          if (size.stock_quantity > 0 && (!size.price || size.price <= 0)) {
-            errors[`variant_${index}_size_${sizeIndex}_price`] = `Price is required for ${sizes.find(s => s.id === size.size_id)?.size_name} size with stock`;
+          if (size.stock_quantity > 0) {
+            if (!size.price || size.price === '' || size.price === null || size.price === undefined) {
+              errors[`variant_${index}_size_${sizeIndex}_price`] = `Price is required for ${sizes.find(s => s.id === size.size_id)?.size_name} size with stock`;
+            } else {
+              const price = parseFloat(size.price);
+              if (isNaN(price) || price <= 0) {
+                errors[`variant_${index}_size_${sizeIndex}_price`] = `Price must be a valid positive number for ${sizes.find(s => s.id === size.size_id)?.size_name} size`;
+              }
+            }
           }
         });
       });
@@ -560,19 +597,45 @@ export default function AdminUploader() {
                       </div>
                     </div>
                   </label>
-                  <select
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={variant.color_id || ''}
-                    onChange={(e) => updateVariantField(i, 'color_id', e.target.value)}
-                  >
-                    <option value="">-- Select Color --</option>
-                    {colors.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.color_name} ({c.color_code})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={variant.color_id || ''}
+                      onChange={(e) => updateVariantField(i, 'color_id', e.target.value)}
+                    >
+                      <option value="">-- Select Color --</option>
+                      {colors.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.color_name}
+                        </option>
+                      ))}
+                    </select>
+                    {variant.color_code && (
+                      <div 
+                        className="absolute right-3 top-3 w-6 h-6 rounded-full border-2 border-gray-300 shadow-sm"
+                        style={{ backgroundColor: variant.color_code }}
+                        title={colors.find(c => c.id === variant.color_id)?.color_name}
+                      />
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500 mt-1">Choose the color that best represents this variant</p>
+                  
+                  {/* Color swatch preview */}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <p className="text-xs text-gray-600 w-full">Standard Colors:</p>
+                    {colors.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => updateVariantField(i, 'color_id', c.id)}
+                        className={`w-8 h-8 rounded-full border-2 shadow-sm hover:scale-110 transition-transform ${
+                          variant.color_id === c.id ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-300'
+                        }`}
+                        style={{ backgroundColor: c.color_code }}
+                        title={c.color_name}
+                      />
+                    ))}
+                  </div>
                 </div>
 
                 <div>
