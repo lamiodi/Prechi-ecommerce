@@ -20,7 +20,7 @@ const STANDARD_COLORS = [
 export const getSizes = async (req, res) => {
   try {
     const result = await sql`
-      SELECT id, size_name
+      SELECT id, size_name, size_order as size_code
       FROM sizes
       ORDER BY id
     `;

@@ -93,7 +93,7 @@ export default function AdminUploader() {
             size_code: s.size_code,
             size_name: s.size_name,
             stock_quantity: 0,
-            price: s.size_name.includes('3XL') || s.size_name.includes('4XL') || s.size_name.includes('5XL') ? '80000' : '70000',
+            price: s.size_code >= 6 ? '80000' : '70000', // 3XL+ (size_code 6+) gets premium pricing
           })),
           images: [],
           previews: [],
