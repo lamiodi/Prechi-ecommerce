@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ArrowLeft, AlertCircle, CheckCircle, Trash2, Bitcoin, MessageCircle, Smartphone, Truck, Clock, MapPin, Gift, X, Copy, User, RefreshCw, Edit, Plus, CreditCard } from 'lucide-react';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
+import CouponCode from '../components/CouponCode';
 const BillingAddressForm = React.lazy(() => import('../components/BillingAddressForm'));
 const ShippingAddressForm = React.lazy(() => import('../components/ShippingAddressForm'));
 const WhatsAppChatWidget = React.lazy(() => import('../components/WhatsAppChatWidget'));
@@ -2543,68 +2544,11 @@ const CheckoutPage = () => {
                   </div>
                   
                   {/* Coupon Code Section */}
-                  <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div className="flex items-center mb-3">
-                      <Gift className="h-5 w-5 text-green-600 mr-2" />
-                      <h3 className="font-medium text-gray-900 font-Jost">Have a coupon code?</h3>
-                    </div>
-                    
-                    {appliedCoupon ? (
-                      <div className="bg-green-50 rounded-lg p-3 mb-3 border border-green-200">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="flex items-center">
-                              <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-                              <span className="font-medium text-green-800 font-Jost">{appliedCoupon.code} applied</span>
-                            </div>
-                            <p className="text-sm text-green-700 font-Jost mt-1">
-                              You saved {appliedCoupon.type === 'percentage' 
-                                ? `${appliedCoupon.value}% (₦${appliedCoupon.amount.toFixed(2)})` 
-                                : `₦${appliedCoupon.amount.toFixed(2)}`}
-                            </p>
-                          </div>
-                          <button 
-                            onClick={handleRemoveCoupon}
-                            className="text-gray-400 hover:text-gray-600"
-                            aria-label="Remove coupon"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={couponCode}
-                          onChange={handleCouponCodeChange}
-                          placeholder="Enter coupon code"
-                          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 font-Jost"
-                          disabled={couponLoading}
-                        />
-                        <button
-                          type="submit"
-                          disabled={couponLoading || !couponCode.trim()}
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-Jost"
-                        >
-                          {couponLoading ? 'Applying...' : 'Apply'}
-                        </button>
-                      </form>
-                    )}
-                    
-                    {couponError && (
-                      <div className="mt-2 flex items-center text-sm text-red-600 font-Jost">
-                        <AlertCircle className="h-4 w-4 mr-1" />
-                        {couponError}
-                      </div>
-                    )}
-                    
-                    {couponSuccess && !appliedCoupon && (
-                      <div className="mt-2 flex items-center text-sm text-green-600 font-Jost">
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        {couponSuccess}
-                      </div>
-                    )}
+                  <div className="mb-6">
+                    <CouponCode 
+                      subtotal={displaySubtotal} 
+                      onDiscountApplied={(amount) => setCouponDiscount(amount)} 
+                    />
                   </div>
                   
                   <div className="mb-6">

@@ -25,6 +25,8 @@ const Orders = () => {
   const [countryFilter, setCountryFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showOrderDetail, setShowOrderDetail] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -63,8 +65,19 @@ const Orders = () => {
         setLoading(true);
         setError(null);
         const authAxios = getAuthAxios();
-        const response = await authAxios.get('/api/admin/orders');
-        const processedOrders = response.data.map(order => ({
+        const response = await authAxios.get('/api/admin/orders', {
+          params: {
+            page: currentPage,
+            limit: ordersPerPage,
+            search: searchTerm,
+            status: statusFilter !== 'all' ? statusFilter : undefined
+          }
+        });
+        
+        const ordersData = response.data.orders || response.data;
+        const pagination = response.data.pagination || {};
+
+        const processedOrders = ordersData.map(order => ({
           ...order,
           total: Number(order.total_amount) || 0,
           shipping_cost: Number(order.shipping_cost) || 0,
@@ -81,6 +94,8 @@ const Orders = () => {
           is_guest_order: order.is_temporary || false
         }));
         setOrders(processedOrders);
+        setTotalOrders(pagination.total || processedOrders.length);
+        setTotalPages(pagination.totalPages || Math.ceil(processedOrders.length / ordersPerPage));
         toast.success('Orders loaded successfully');
       } catch (err) {
         console.error('Fetch orders error:', err);
@@ -90,7 +105,7 @@ const Orders = () => {
       }
     };
     fetchOrders();
-  }, [admin, adminLoading, adminLogout, navigate]);
+  }, [admin, adminLoading, adminLogout, navigate, currentPage, searchTerm, statusFilter]);
   
   const handleError = (err, defaultMessage) => {
     if (err.response?.status === 401) {
@@ -303,24 +318,14 @@ const Orders = () => {
     failed: <XCircle className="w-4 h-4" />,
   }[status] || <Clock className="w-4 h-4" />);
   
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.id.toString().includes(searchTerm) ||
-      order.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.last_name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    const matchesPaymentStatus = paymentStatusFilter === 'all' || order.payment_status === paymentStatusFilter;
-    const matchesCountry = countryFilter === 'all' || order.shipping_country === countryFilter;
-    return matchesSearch && matchesStatus && matchesPaymentStatus && matchesCountry;
-  });
+  // Client-side filtering removed as it's now handled by backend
   
   const countries = [...new Set(orders.map(order => order.shipping_country).filter(Boolean))];
+  
+  // Calculate indexes for display only
+  const indexOfFirstOrder = (currentPage - 1) * ordersPerPage;
   const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+   
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
   
   const viewOrderDetails = async (order) => {
@@ -446,7 +451,7 @@ const Orders = () => {
             </div>
           </div>
         </div>
-        {filteredOrders.length === 0 ? (
+        {orders.length === 0 ? (
           <div className="text-center py-8"><p className="text-gray-500 font-Jost">No orders found.</p></div>
         ) : (
           <>
@@ -465,7 +470,7 @@ const Orders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentOrders.map(order => (
+                  {orders.map(order => (
                     <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 text-sm">
                         <div className="font-medium text-gray-900 font-Manrope">#{order.id}</div>
@@ -532,21 +537,44 @@ const Orders = () => {
               <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 mt-4">
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <p className="text-sm text-gray-700 font-Jost">
-                    Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to <span className="font-medium">{Math.min(indexOfLastOrder, filteredOrders.length)}</span> of <span className="font-medium">{filteredOrders.length}</span> orders
+                    Showing <span className="font-medium">{(currentPage - 1) * ordersPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * ordersPerPage, totalOrders)}</span> of <span className="font-medium">{totalOrders}</span> orders
                   </p>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1} className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost">
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
+                      disabled={currentPage === 1} 
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost disabled:opacity-50"
+                    >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
                     {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                      let pageNumber = totalPages <= 5 ? i + 1 : currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i;
+                      // Simple pagination logic for display
+                      let pageNumber;
+                      if (totalPages <= 5) {
+                        pageNumber = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNumber = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNumber = totalPages - 4 + i;
+                      } else {
+                        pageNumber = currentPage - 2 + i;
+                      }
+                      
                       return (
-                        <button key={pageNumber} onClick={() => paginate(pageNumber)} className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-Jost ${currentPage === pageNumber ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}>
+                        <button 
+                          key={pageNumber} 
+                          onClick={() => setCurrentPage(pageNumber)} 
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-Jost ${currentPage === pageNumber ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
+                        >
                           {pageNumber}
                         </button>
                       );
                     })}
-                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages} className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost">
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
+                      disabled={currentPage === totalPages} 
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost disabled:opacity-50"
+                    >
                       <ChevronRight className="h-5 w-5" />
                     </button>
                   </nav>

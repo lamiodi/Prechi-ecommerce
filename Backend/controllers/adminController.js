@@ -6,6 +6,39 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const getAllOrdersForAdmin = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+    const status = req.query.status || 'all';
+
+    let queryConditions = sql`o.deleted_at IS NULL`;
+    
+    if (search) {
+      const searchPattern = `%${search}%`;
+      queryConditions = sql`${queryConditions} AND (
+        o.reference ILIKE ${searchPattern} OR
+        u.email ILIKE ${searchPattern} OR
+        u.first_name ILIKE ${searchPattern} OR
+        u.last_name ILIKE ${searchPattern}
+      )`;
+    }
+
+    if (status !== 'all') {
+      queryConditions = sql`${queryConditions} AND o.status = ${status}`;
+    }
+
+    // Get total count
+    const [countResult] = await sql`
+      SELECT COUNT(*) as count
+      FROM orders o
+      JOIN users u ON o.user_id = u.id
+      WHERE ${queryConditions}
+    `;
+    
+    const totalOrders = parseInt(countResult.count);
+    const totalPages = Math.ceil(totalOrders / limit);
+
     const orders = await sql`
       SELECT 
         o.id,
@@ -27,11 +60,21 @@ export const getAllOrdersForAdmin = async (req, res) => {
         u.last_name
       FROM orders o
       JOIN users u ON o.user_id = u.id
-      WHERE o.deleted_at IS NULL
+      WHERE ${queryConditions}
       ORDER BY o.created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
     `;
+    
     console.log('getAllOrdersForAdmin: Fetched orders:', orders.length);
-    res.json(orders);
+    res.json({
+      orders,
+      pagination: {
+        total: totalOrders,
+        page,
+        limit,
+        totalPages
+      }
+    });
   } catch (error) {
     console.error('getAllOrdersForAdmin error:', error.message, error.stack);
     res.status(500).json({ error: 'Server error' });
@@ -176,12 +219,16 @@ export const getCompleteOrderDetails = async (req, res) => {
       
       bundleItems.forEach(item => {
         if (item.bundle_details) {
-          let bundleContents = typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details;
-          bundleContents.forEach(content => {
-            if (!content.image_url && content.variant_id) {
-              variantsNeedingImages.push(content.variant_id);
-            }
-          });
+          try {
+            let bundleContents = typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details;
+            bundleContents.forEach(content => {
+              if (!content.image_url && content.variant_id) {
+                variantsNeedingImages.push(content.variant_id);
+              }
+            });
+          } catch (e) {
+            console.error(`Error parsing bundle details for item ${item.id}:`, e);
+          }
         }
       });
       
