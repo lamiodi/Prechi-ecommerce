@@ -31,9 +31,10 @@ async function restoreDatabase() {
     await sql`ALTER TABLE product_variants ADD COLUMN IF NOT EXISTS name VARCHAR(255)`;
     console.log('✅ Restored columns in product_variants table');
 
-    // 5. Restore tables (optional, but good for completeness if old code used them)
-    // We won't restore tables (wishlist, payments) as they were likely unused even in old code, 
-    // but columns in active tables are critical.
+    // 5. Restore columns in variant_sizes table
+    console.log('Restoring columns in variant_sizes table...');
+    await sql`ALTER TABLE variant_sizes ADD COLUMN IF NOT EXISTS price NUMERIC(10, 2) DEFAULT 0`;
+    console.log('✅ Restored columns in variant_sizes table');
 
     console.log('✨ Database restoration completed successfully!');
   } catch (error) {
