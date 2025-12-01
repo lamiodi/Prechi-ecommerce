@@ -687,19 +687,21 @@ const ProductDetails = () => {
                       />
                     ) : (
                       // Show Video
-                      <video
-                        key={selectedImage} // Force re-render when changing videos
-                        controls
-                        autoPlay
-                        className="w-full h-full object-cover"
-                        poster={videos[selectedImage - images.length]?.video_thumbnail_url || videos[selectedImage - images.length]?.thumbnail_url}
-                      >
-                        <source 
-                          src={videos[selectedImage - images.length]?.video_url || videos[selectedImage - images.length]?.url} 
-                          type="video/mp4" 
-                        />
-                        Your browser does not support the video tag.
-                      </video>
+                      <div className="w-full h-full bg-black flex items-center justify-center">
+                        <video
+                          key={selectedImage} // Force re-render when changing videos
+                          controls
+                          autoPlay
+                          className="w-full h-full object-contain"
+                          poster={videos[selectedImage - images.length]?.video_thumbnail_url || videos[selectedImage - images.length]?.thumbnail_url}
+                        >
+                          <source 
+                            src={videos[selectedImage - images.length]?.video_url || videos[selectedImage - images.length]?.url} 
+                            type="video/mp4" 
+                          />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
                     )}
 
                     {/* Bundle Badge */}

@@ -57,6 +57,7 @@ const api = axios.create({ baseURL: API_BASE_URL });
 
 const ShopAllPage = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // State for dynamic categories
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentFilter, setCurrentFilter] = useState('All');
@@ -69,20 +70,33 @@ const ShopAllPage = () => {
   const navigate = useNavigate();
   const itemsPerPage = 16;
   const category = searchParams.get('category');
-  const filterCategories = ['All', 'Briefs', 'Gymwear', 'New Arrivals', '3 in 1', '5 in 1'];
+  
+  // Define special filters that should always appear
+  const specialFilters = ['All', 'New Arrivals', '3 in 1', '5 in 1'];
+  
+  // Combine special filters with dynamic categories
+  const filterCategories = useMemo(() => {
+    // Filter out categories that are already covered by special filters to avoid duplicates
+    const dynamicCategories = categories.filter(c => 
+      !['new arrivals', '3 in 1', '5 in 1', 'all'].includes(c.toLowerCase())
+    );
+    return [...specialFilters, ...dynamicCategories];
+  }, [categories]);
+
   const categoryMap = {
     'New Arrivals': 'new',
-    'Briefs': 'briefs',
-    'Gymwear': 'gymwear',
     '3 in 1': '3in1',
-    '5 in 1': '5in1'
+    '5 in 1': '5in1',
+    // Add dynamic mappings
+    ...categories.reduce((acc, cat) => ({ ...acc, [cat]: cat }), {})
   };
+
   const reverseCategoryMap = {
     'new': 'New Arrivals',
-    'briefs': 'Briefs',
-    'gymwear': 'Gymwear',
     '3in1': '3 in 1',
-    '5in1': '5 in 1'
+    '5in1': '5 in 1',
+     // Add dynamic mappings (lowercase key to normal value)
+    ...categories.reduce((acc, cat) => ({ ...acc, [cat.toLowerCase()]: cat }), {})
   };
 
   // Meta tags configuration for each category
@@ -147,6 +161,13 @@ const ShopAllPage = () => {
     setLoading(true);
     setError(null);
     try {
+      // 1. Fetch Categories first
+      const catRes = await api.get('/shopall/categories');
+      if (Array.isArray(catRes.data)) {
+        setCategories(catRes.data);
+      }
+
+      // 2. Fetch Products
       const endpoint = category ? `/shopall?category=${category}` : `/shopall`;
       const res = await api.get(endpoint);
   
@@ -194,13 +215,28 @@ const ShopAllPage = () => {
       }
   
       setProducts(processedData);
-      setCurrentFilter(reverseCategoryMap[category?.toLowerCase()] || 'All');
+      
+      // Update current filter based on URL param
+      if (category) {
+          const normalizedCategory = category.toLowerCase();
+          // Check standard maps first
+          if (reverseCategoryMap[normalizedCategory]) {
+              setCurrentFilter(reverseCategoryMap[normalizedCategory]);
+          } else {
+              // Try to find a matching dynamic category (case-insensitive)
+              const match = categories.find(c => c.toLowerCase() === normalizedCategory);
+              setCurrentFilter(match || 'All');
+          }
+      } else {
+          setCurrentFilter('All');
+      }
+
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Failed to fetch products');
     } finally {
       setLoading(false);
     }
-  }, [category, isBrief]);
+  }, [category, isBrief, categories]); // Added categories dependency to re-run if categories change (though usually fetched once)
 
   useEffect(() => {
     fetchProducts();

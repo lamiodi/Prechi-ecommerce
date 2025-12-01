@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from 'react';
 import { Menu, X, Star, Shield, Truck, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Navbar2 from '../components/Navbar2';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
@@ -12,9 +13,14 @@ import heroVideo from '../assets/dreamina-2025-11-27-1712-The camera pushes in o
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/api`
+  : 'https://prechi-ecommerce.onrender.com/api';
+
 const LandingPage = () => {
   const [videoError, setVideoError] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState({ mobile: false, desktop: false });
+  const [products, setProducts] = useState([]);
   const mobileVideoRef = useRef(null);
   const desktopVideoRef = useRef(null);
   
@@ -34,8 +40,14 @@ const LandingPage = () => {
   } = currencyContext;
   
   // Helper function to format prices dynamically
-  const formatPrice = (priceInNaira) => {
-    const parsedPrice = parseFloat(priceInNaira.replace(/[₦,]/g, '')) || 0;
+  const formatPrice = (price) => {
+    let parsedPrice = 0;
+    if (typeof price === 'number') {
+        parsedPrice = price;
+    } else if (typeof price === 'string') {
+        parsedPrice = parseFloat(price.replace(/[₦,]/g, '')) || 0;
+    }
+    
     const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate);
     const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
     
@@ -45,6 +57,22 @@ const LandingPage = () => {
       minimumFractionDigits: country === 'Nigeria' ? 0 : 2
     });
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/shopall`);
+        if (Array.isArray(res.data)) {
+          // Set only the first 4 products
+          setProducts(res.data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Failed to fetch products for landing page:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleVideoError = (videoType) => {
     console.error(`${videoType} video failed to load`);
@@ -141,86 +169,43 @@ const LandingPage = () => {
         {/* Product Showcase Grid */}
         <section className="bg-gray-50">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-            {/* Product 1 */}
-            <div className="relative group cursor-pointer overflow-hidden">
-              <div className="aspect-[4/5]">
-                <img 
-                  src="https://res.cloudinary.com/dgcwviufp/image/upload/v1756112981/Loginpic1_lki5se.jpg" 
-                  alt="Sculpt Blush Collection" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-3xl font-bold mb-2">THE MICHEAL JORDAN</h3>
-                  <p className="text-lg mb-4">{formatPrice('₦19,999')}</p>
-                  <Link to="/shop?category=briefs">
-                    <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                      SHOP NOW
-                    </button>
-                  </Link>
+            {products.length > 0 ? (
+              products.map((product, index) => {
+                const productUrl = product.is_product
+                  ? `/product/${product.id}${product.variantId ? `?variant=${product.variantId}` : ''}`
+                  : `/bundle/${product.id}`;
+
+                return (
+                  <div key={product.id || index} className="relative group cursor-pointer overflow-hidden">
+                    <div className="aspect-[4/5]">
+                      <img 
+                        src={product.image || "https://via.placeholder.com/400x500?text=No+Image"} 
+                        alt={product.name || "Product Image"} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500?text=No+Image'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-8 left-8 text-white">
+                        <h3 className="text-3xl font-bold mb-2 uppercase">{product.name}</h3>
+                        <p className="text-lg mb-4">{formatPrice(product.price)}</p>
+                        <Link to={productUrl}>
+                          <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                            SHOP NOW
+                          </button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              // Skeleton loading state
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="relative group cursor-pointer overflow-hidden bg-gray-200 animate-pulse">
+                  <div className="aspect-[4/5]"></div>
                 </div>
-              </div>
-            </div>
-            {/* Product 2 */}
-            <div className="relative group cursor-pointer overflow-hidden">
-              <div className="aspect-[4/5]">
-                <img 
-                  src="https://res.cloudinary.com/dgcwviufp/image/upload/v1751100926/e2okih4fkrhkejikken4.webp" 
-                  alt="Sculpt Bon Bon Collection" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-3xl font-bold mb-2">YOU THE BOSS</h3>
-                  <p className="text-lg mb-4">{formatPrice('₦19,000')}</p>
-                  <Link to="/shop?category=briefs">
-                    <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                      SHOP NOW
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            {/* Product 3 */}
-            <div className="relative group cursor-pointer overflow-hidden">
-              <div className="aspect-[4/5]">
-                <img 
-                  src="https://res.cloudinary.com/dgcwviufp/image/upload/v1757873752/tinywow_IMG_2972_2__83441506_eqsdds.jpg" 
-                  alt="Sculpt Storm Collection" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-3xl font-bold mb-2">HIS AND HERS</h3>
-                  <p className="text-lg mb-4">{formatPrice('₦103,850')}</p>
-                  <Link to="/shop">
-                    <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                      SHOP NOW
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-            {/* Product 4 */}
-            <div className="relative group cursor-pointer overflow-hidden">
-              <div className="aspect-[4/5]">
-                <img 
-                  src="https://res.cloudinary.com/dgcwviufp/image/upload/v1756112985/Signuppic2_q1rzbx.jpg" 
-                  alt="Sculpt Premium Collection" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-3xl font-bold mb-2">EVSS TEA I</h3>
-                  <p className="text-lg mb-4">{formatPrice('₦52,850.00')}</p>
-                  <Link to="/shop?category=gymwear">
-                    <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                      SHOP NOW
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              ))
+            )}
           </div>
         </section>
 
