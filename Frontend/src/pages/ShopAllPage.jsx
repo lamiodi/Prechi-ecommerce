@@ -420,9 +420,9 @@ const ProductCard = ({ product, onImageError }) => {
   
   // Clean product name (remove trailing "– Something")
   let displayName = name || 'Unnamed Product';
-  if (displayName.includes('–')) {
-    displayName = displayName.split('–')[0].trim();
-  }
+  // if (displayName.includes('–')) {
+  //   displayName = displayName.split('–')[0].trim();
+  // }
   
   const productUrl = is_product
     ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
