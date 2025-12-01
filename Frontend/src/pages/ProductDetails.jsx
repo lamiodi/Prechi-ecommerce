@@ -559,7 +559,9 @@ const ProductDetails = () => {
     : Array.isArray(data?.videos)
       ? data.videos
       : []
-  const name = data?.name || "Unnamed Product"
+  const name = isProduct 
+    ? (selectedVariant?.variant_name || data?.name || "Unnamed Product")
+    : (data?.name || "Unnamed Bundle")
   
   // Function to get size-specific price
   const getSizeSpecificPrice = () => {
@@ -674,124 +676,111 @@ const ProductDetails = () => {
             {/* Image Section */}
             <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white">
               <div className="space-y-6">
-                {/* Main Image */}
-                <div className="relative aspect-[3/4] bg-white rounded-2xl overflow-hidden shadow-lg group">
-                  <img
-                    src={images[selectedImage] || "https://via.placeholder.com/500"}
-                    alt="Product"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Bundle Badge */}
-                  {!isProduct && (
-                    <div className="absolute top-4 left-4 bg-gradient-to-r font-Inter from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                      <Package className="w-4 h-4" />
-                      <span>Bundle</span>
-                    </div>
-                  )}
-                  {/* Navigation Buttons */}
-                  {images.length > 1 && (
-                    <>
-                      <button
-                        onClick={() => setSelectedImage((selectedImage - 1 + images.length) % images.length)}
-                        className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => setSelectedImage((selectedImage + 1) % images.length)}
-                        className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
-                  {/* Image Counter */}
-                  {images.length > 1 && (
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-Jost">
-                      {selectedImage + 1} / {images.length}
-                    </div>
-                  )}
-                </div>
-                {/* Thumbnail Images */}
-                {images.length > 1 && (
-                  <div className="grid grid-cols-4 gap-3">
-                    {images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
-                          selectedImage === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
-                        }`}
-                        onClick={() => setSelectedImage(idx)}
-                      >
-                        <img
-                          src={img || "../assets/images/IMG_4552.JPG"}
-                          alt={`thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                        {selectedImage === idx && <div className="absolute inset-0 bg-gray-900/20"></div>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {/* Product Videos */}
-                {videos.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 font-Inter">Product Videos</h3>
-                    <div className="relative aspect-[16/9] bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
+                  {/* Media Display Area */}
+                  <div className="relative aspect-[3/4] bg-white rounded-2xl overflow-hidden shadow-lg group">
+                    {selectedImage < images.length ? (
+                      // Show Image
+                      <img
+                        src={images[selectedImage] || "https://via.placeholder.com/500"}
+                        alt="Product"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      // Show Video
                       <video
-                        key={selectedVideo}
+                        key={selectedImage} // Force re-render when changing videos
                         controls
+                        autoPlay
                         className="w-full h-full object-cover"
-                        poster={videos[selectedVideo]?.video_thumbnail_url || videos[selectedVideo]?.thumbnail_url}
+                        poster={videos[selectedImage - images.length]?.video_thumbnail_url || videos[selectedImage - images.length]?.thumbnail_url}
                       >
-                        <source src={videos[selectedVideo]?.video_url || videos[selectedVideo]?.url} type="video/mp4" />
+                        <source 
+                          src={videos[selectedImage - images.length]?.video_url || videos[selectedImage - images.length]?.url} 
+                          type="video/mp4" 
+                        />
                         Your browser does not support the video tag.
                       </video>
-                      {/* Video Counter */}
-                      {videos.length > 1 && (
-                        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-Jost">
-                          {selectedVideo + 1} / {videos.length}
-                        </div>
-                      )}
-                    </div>
-                    {/* Video Title */}
-                    {videos[selectedVideo]?.title && (
-                      <div className="text-center">
-                        <h4 className="text-sm font-medium text-gray-700 font-Inter">{videos[selectedVideo].title}</h4>
-                        {videos[selectedVideo]?.description && (
-                          <p className="text-xs text-gray-500 font-Jost mt-1">{videos[selectedVideo].description}</p>
-                        )}
+                    )}
+
+                    {/* Bundle Badge */}
+                    {!isProduct && (
+                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Inter from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
+                        <Package className="w-4 h-4" />
+                        <span>Bundle</span>
                       </div>
                     )}
-                    {/* Video Thumbnails */}
-                    {videos.length > 1 && (
-                      <div className="grid grid-cols-3 gap-3">
-                        {videos.map((video, idx) => (
-                          <button
-                            key={idx}
-                            className={`relative aspect-video rounded-lg overflow-hidden transition-all duration-200 ${
-                              selectedVideo === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
-                            }`}
-                            onClick={() => setSelectedVideo(idx)}
-                            title={video?.title || `Video ${idx + 1}`}
-                          >
-                            <img
-                              src={video?.video_thumbnail_url || video?.thumbnail_url || "../assets/images/IMG_4554.JPG"}
-                              alt={video?.title || `video thumbnail ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                              <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
-                                <div className="w-0 h-0 border-l-4 border-l-gray-900 border-y-2 border-y-transparent ml-1"></div>
-                              </div>
-                            </div>
-                            {selectedVideo === idx && <div className="absolute inset-0 ring-2 ring-gray-900 rounded-lg"></div>}
-                          </button>
-                        ))}
+
+                    {/* Navigation Buttons */}
+                    {(images.length + videos.length) > 1 && (
+                      <>
+                        <button
+                          onClick={() => setSelectedImage((selectedImage - 1 + (images.length + videos.length)) % (images.length + videos.length))}
+                          className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => setSelectedImage((selectedImage + 1) % (images.length + videos.length))}
+                          className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Counter */}
+                    {(images.length + videos.length) > 1 && (
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-Jost z-10">
+                        {selectedImage + 1} / {images.length + videos.length}
                       </div>
                     )}
                   </div>
-                )}
+
+                  {/* Combined Thumbnails */}
+                  {(images.length + videos.length) > 1 && (
+                    <div className="grid grid-cols-4 gap-3">
+                      {/* Image Thumbnails */}
+                      {images.map((img, idx) => (
+                        <button
+                          key={`img-${idx}`}
+                          className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
+                            selectedImage === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
+                          }`}
+                          onClick={() => setSelectedImage(idx)}
+                        >
+                          <img
+                            src={img || "../assets/images/IMG_4552.JPG"}
+                            alt={`thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          {selectedImage === idx && <div className="absolute inset-0 bg-gray-900/20"></div>}
+                        </button>
+                      ))}
+
+                      {/* Video Thumbnails */}
+                      {videos.map((video, idx) => (
+                        <button
+                          key={`vid-${idx}`}
+                          className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
+                            selectedImage === (images.length + idx) ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
+                          }`}
+                          onClick={() => setSelectedImage(images.length + idx)}
+                        >
+                          <img
+                            src={video?.video_thumbnail_url || video?.thumbnail_url || "../assets/images/IMG_4554.JPG"}
+                            alt={`video thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                              <div className="w-0 h-0 border-l-4 border-l-gray-900 border-y-2 border-y-transparent ml-1"></div>
+                            </div>
+                          </div>
+                          {selectedImage === (images.length + idx) && <div className="absolute inset-0 ring-2 ring-gray-900 rounded-lg"></div>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
             {/* Product Info Section */}
