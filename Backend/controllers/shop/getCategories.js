@@ -1,4 +1,4 @@
-import sql from '../db/index.js';
+import sql from '../../db/index.js';
 
 export const getCategories = async (req, res) => {
   try {
