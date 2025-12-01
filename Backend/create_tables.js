@@ -206,10 +206,25 @@ async function createTables() {
         size_id INTEGER REFERENCES public.sizes(id),
         quantity INTEGER NOT NULL DEFAULT 1,
         price NUMERIC(10,2) NOT NULL,
+        is_bundle BOOLEAN DEFAULT FALSE,
+        color_name VARCHAR(50),
+        size_name VARCHAR(50),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         deleted_at TIMESTAMP,
         CHECK ((variant_id IS NOT NULL AND bundle_id IS NULL) OR (variant_id IS NULL AND bundle_id IS NOT NULL))
+      );
+    `)
+
+    // 13b. Cart Bundle Items table
+    console.log('🛍️ Creating cart_bundle_items table...')
+    await sql.unsafe(`
+      CREATE TABLE IF NOT EXISTS public.cart_bundle_items (
+        id SERIAL PRIMARY KEY,
+        cart_item_id INTEGER NOT NULL REFERENCES public.cart_items(id) ON DELETE CASCADE,
+        variant_id INTEGER NOT NULL REFERENCES public.product_variants(id),
+        size_id INTEGER NOT NULL REFERENCES public.sizes(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `)
 
@@ -246,6 +261,12 @@ async function createTables() {
         bundle_id INTEGER REFERENCES public.bundles(id),
         quantity INTEGER NOT NULL,
         price NUMERIC(10,2) NOT NULL,
+        size_id INTEGER REFERENCES public.sizes(id),
+        product_name VARCHAR(255),
+        image_url TEXT,
+        color_name VARCHAR(50),
+        size_name VARCHAR(50),
+        bundle_details TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CHECK ((variant_id IS NOT NULL AND bundle_id IS NULL) OR (variant_id IS NULL AND bundle_id IS NOT NULL))
       );

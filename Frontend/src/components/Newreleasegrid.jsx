@@ -51,7 +51,7 @@ const NewReleaseGrid = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${API_BASE_URL}/api/shopall?category=new`);
+      const response = await fetch(`${API_BASE_URL}/api/shopall?category=new&limit=4`);
       if (!response.ok) {
         const errData = await response.json();
         throw new Error(errData.message || 'Failed to fetch products');
@@ -74,8 +74,10 @@ const NewReleaseGrid = () => {
         if (!aIsBrief && bIsBrief) return 1;  // b comes before a
         return 0; // maintain original order for non-briefs
       });
-      
-      setProducts(filteredProducts);
+
+      // Ensure we only show up to 4 items
+      setProducts(filteredProducts.slice(0, 4));
+
     } catch (err) {
       const errorMessage = err.message || 'Failed to fetch products';
       console.error('Fetch products error:', errorMessage);

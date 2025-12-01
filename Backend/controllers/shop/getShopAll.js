@@ -89,6 +89,7 @@ export const getShopAll = async (req, res) => {
         p.id AS product_id,
         pv.id AS variant_id,
         p.name AS variant_name,
+        p.base_price AS price,
         (
           SELECT pi.image_url 
           FROM product_images pi 
