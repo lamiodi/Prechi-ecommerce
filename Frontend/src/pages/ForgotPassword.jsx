@@ -66,7 +66,7 @@ function ForgotPassword() {
       <div className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold font-Manrope">
+            <h2 className="text-2xl font-bold font-StoryScript">
               {isTemporaryAccount ? 'Create Password for Your Account' : 'Forgot Password'}
             </h2>
             
@@ -108,7 +108,7 @@ function ForgotPassword() {
             </div>
             <button
               type="submit"
-              className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition font-Manrope disabled:opacity-50"
+              className="w-full bg-black text-white py-3 rounded-xl hover:bg-gray-800 transition font-StoryScript disabled:opacity-50"
               disabled={loading}
             >
               {loading ? 'Sending...' : (isTemporaryAccount ? 'Send Conversion Link' : 'Send Reset Link')}
@@ -124,7 +124,7 @@ function ForgotPassword() {
                 </p>
                 <button
                   onClick={() => setIsTemporaryAccount(true)}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-Manrope text-sm flex items-center justify-center gap-2"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-StoryScript text-sm flex items-center justify-center gap-2"
                 >
                   <UserPlus className="h-4 w-4" />
                   Convert Guest Account to Permanent

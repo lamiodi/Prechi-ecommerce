@@ -536,7 +536,7 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😔</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-Manrope">Oops! Product Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-StoryScript">Oops! Product Not Found</h2>
           <p className="text-gray-600 font-PatrickHand">{error || "Failed to load product"}</p>
         </div>
       </div>
@@ -706,7 +706,7 @@ const ProductDetails = () => {
 
                     {/* Bundle Badge */}
                     {!isProduct && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Manrope from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
+                      <div className="absolute top-4 left-4 bg-gradient-to-r font-StoryScript from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
                         <Package className="w-4 h-4" />
                         <span>Bundle</span>
                       </div>
@@ -792,14 +792,14 @@ const ProductDetails = () => {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-Manrope">
+                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-StoryScript">
                         {name}
                       </h1>
                     </div>
 
                   </div>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="text-3xl font-bold text-gray-900 font-Manrope">
+                    <p className="text-3xl font-bold text-gray-900 font-StoryScript">
                       {Number.parseFloat(displayPrice).toLocaleString(country === "Nigeria" ? "en-NG" : "en-US", {
                         style: "currency",
                         currency: displayCurrency,
@@ -829,8 +829,8 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
-                        Color: <span className="font-normal font-Manrope text-gray-600">{selectedColor}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
+                        Color: <span className="font-normal font-StoryScript text-gray-600">{selectedColor}</span>
                       </h3>
                       <div className="flex flex-wrap gap-3">
                         {colorOptions.map((color) => (
@@ -855,8 +855,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-Primarycolor font-Manrope mb-4">
-                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-Primarycolor font-StoryScript mb-4">
+                        Size: <span className="font-normal text-gray-600 font-StoryScript">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((s) => (
@@ -864,7 +864,7 @@ const ProductDetails = () => {
                             key={s.size_name}
                             onClick={() => handleSizeChange(s.size_name)}
                             disabled={s.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${
+                            className={`relative py-3 px-2 text-sm font-StoryScript font-medium border-2 rounded-xl transition-all duration-200 ${
                               selectedSize === s.size_name
                                 ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
                                 : s.stock_quantity > 0
@@ -889,7 +889,7 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Bundle Type Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">Bundle Type</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">Bundle Type</h3>
                       <div className="flex space-x-4">
                         {bundleTypes.map((type) => (
                           <button
@@ -908,8 +908,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection for Bundle */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
-                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
+                        Size: <span className="font-normal text-gray-600 font-StoryScript">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((size) => (
@@ -937,7 +937,7 @@ const ProductDetails = () => {
                     </div>
                     {/* Bundle Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
                         Select Items
                         <span className="text-sm font-normal text-gray-600 ml-2 font-PatrickHand">
                           ({Object.keys(selectedBundleVariants).length}/{bundleType === "3-in-1" ? "3" : "5"})
@@ -946,7 +946,7 @@ const ProductDetails = () => {
                       <div className="p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50">
                         {/* Available Colors */}
                         <div className="mb-6">
-                          <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Available Colors</h4>
+                          <h4 className="font-medium text-gray-900 mb-3 font-StoryScript">Available Colors</h4>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {(Array.isArray(data?.items?.[0]?.all_variants) ? data.items[0].all_variants : []).map(
                               (variant) => {
@@ -997,7 +997,7 @@ const ProductDetails = () => {
                         {/* Selected Items Display */}
                         {Object.keys(selectedBundleVariants).length > 0 && (
                           <div className="mb-6">
-                            <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Selected Items</h4>
+                            <h4 className="font-medium text-gray-900 mb-3 font-StoryScript">Selected Items</h4>
                             <div className="flex flex-wrap gap-3">
                               {Object.entries(selectedBundleVariants).map(([index, selection]) => (
                                 <div
@@ -1054,7 +1054,7 @@ const ProductDetails = () => {
                 {/* Quantity and Add to Cart */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm font-medium font-Manrope text-gray-900">Quantity:</span>
+                    <span className="text-sm font-medium font-StoryScript text-gray-900">Quantity:</span>
                     <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -1078,7 +1078,7 @@ const ProductDetails = () => {
                       className="flex-1 py-4 bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-gray-800 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart className="h-5 w-5 " />
-                      <span className="font-Manrope">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+                      <span className="font-StoryScript">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
                     </button>
                     <button className="p-4 border-2 border-gray-200 rounded-xl hover:border-gray-300 transition-all duration-200 hover:shadow-md">
                       <Share2 className="h-5 w-5" />

@@ -161,10 +161,12 @@ const ShopAllPage = () => {
     setLoading(true);
     setError(null);
     try {
-      // 1. Fetch Categories first
-      const catRes = await api.get('/shopall/categories');
-      if (Array.isArray(catRes.data)) {
-        setCategories(catRes.data);
+      // 1. Fetch Categories first (only if we haven't fetched them yet)
+      if (categories.length === 0) {
+        const catRes = await api.get('/shopall/categories');
+        if (Array.isArray(catRes.data)) {
+          setCategories(catRes.data);
+        }
       }
 
       // 2. Fetch Products
@@ -236,7 +238,7 @@ const ShopAllPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [category, isBrief, categories]); // Added categories dependency to re-run if categories change (though usually fetched once)
+  }, [category, isBrief, categories.length]); // Changed categories dependency to categories.length to avoid infinite loop
 
   useEffect(() => {
     fetchProducts();

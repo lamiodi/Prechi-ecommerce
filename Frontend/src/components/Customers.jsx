@@ -154,7 +154,7 @@ const Customers = () => {
         <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-xl border border-gray-100">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900 font-Manrope">
+              <h2 className="text-xl font-semibold text-gray-900 font-StoryScript">
                 Customer Details - {selectedCustomer.first_name} {selectedCustomer.last_name}
               </h2>
               <button
@@ -178,7 +178,7 @@ const Customers = () => {
               <div className="space-y-6">
                 {/* Customer Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 font-Manrope">Customer Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 font-StoryScript">Customer Information</h3>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
@@ -188,7 +188,7 @@ const Customers = () => {
                         <div>
                           <p className="text-sm text-gray-500 font-PatrickHand">Full Name</p>
                           <div className="flex items-center">
-                            <p className="font-medium font-Manrope">
+                            <p className="font-medium font-StoryScript">
                               {selectedCustomer.first_name} {selectedCustomer.last_name}
                             </p>
                             {selectedCustomer.is_temporary && (
@@ -205,7 +205,7 @@ const Customers = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 font-PatrickHand">Email</p>
-                          <p className="font-medium font-Manrope">{selectedCustomer.email}</p>
+                          <p className="font-medium font-StoryScript">{selectedCustomer.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
@@ -214,7 +214,7 @@ const Customers = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 font-PatrickHand">Phone</p>
-                          <p className="font-medium font-Manrope">
+                          <p className="font-medium font-StoryScript">
                             {selectedCustomer.phone_number || 'N/A'}
                           </p>
                         </div>
@@ -225,7 +225,7 @@ const Customers = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 font-PatrickHand">Joined</p>
-                          <p className="font-medium font-Manrope">
+                          <p className="font-medium font-StoryScript">
                             {formatDate(selectedCustomer.created_at)}
                           </p>
                         </div>
@@ -236,14 +236,14 @@ const Customers = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 font-PatrickHand">Account Type</p>
-                          <p className="font-medium font-Manrope">
+                          <p className="font-medium font-StoryScript">
                             {selectedCustomer.is_admin ? 'Administrator' : 'Customer'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                         <span className="text-sm text-gray-500 font-PatrickHand">Total Spent</span>
-                        <span className="text-lg font-semibold text-green-600 font-Manrope">
+                        <span className="text-lg font-semibold text-green-600 font-StoryScript">
                           {formatCurrency(selectedCustomer.total_spent)}
                         </span>
                       </div>
@@ -253,7 +253,7 @@ const Customers = () => {
                 
                 {/* Shipping Addresses */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 font-Manrope">Shipping Addresses</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 font-StoryScript">Shipping Addresses</h3>
                   {customerAddresses && customerAddresses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {customerAddresses.map((address) => (
@@ -262,7 +262,7 @@ const Customers = () => {
                           className="border border-gray-200 rounded-lg p-4 bg-gray-50"
                         >
                           <div className="flex items-center justify-between mb-2">
-                            <p className="font-medium text-gray-900 font-Manrope">
+                            <p className="font-medium text-gray-900 font-StoryScript">
                               {address.title || 'Default'}
                             </p>
                             <span className="text-xs px-2 py-1 bg-gray-200 rounded-full font-PatrickHand">
@@ -311,7 +311,7 @@ const Customers = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", "sans-serif"',
+        '--font-StoryScript': '"Story Script", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
@@ -336,7 +336,7 @@ const Customers = () => {
         <>
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-              <h2 className="text-xl font-semibold text-gray-900 font-Manrope">
+              <h2 className="text-xl font-semibold text-gray-900 font-StoryScript">
                 Customers Management
               </h2>
               <div className="relative w-full md:w-96">
@@ -375,14 +375,14 @@ const Customers = () => {
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10">
                                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                  <span className="text-blue-800 font-medium font-Manrope">
+                                  <span className="text-blue-800 font-medium font-StoryScript">
                                     {customer.first_name.charAt(0)}{customer.last_name.charAt(0)}
                                   </span>
                                 </div>
                               </div>
                               <div className="ml-4">
                                 <div className="flex items-center">
-                                  <div className="text-sm font-medium text-gray-900 font-Manrope">
+                                  <div className="text-sm font-medium text-gray-900 font-StoryScript">
                                     {customer.first_name} {customer.last_name}
                                   </div>
                                   {customer.is_temporary && (
@@ -401,7 +401,7 @@ const Customers = () => {
                           <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">
                             {customer.phone_number || 'N/A'}
                           </td>
-                          <td className="py-3 px-4 font-medium text-sm font-Manrope">
+                          <td className="py-3 px-4 font-medium text-sm font-StoryScript">
                             {formatCurrency(customer.total_spent)}
                           </td>
                           <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">

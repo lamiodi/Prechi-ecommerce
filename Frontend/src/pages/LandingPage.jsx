@@ -63,8 +63,10 @@ const LandingPage = () => {
       try {
         const res = await axios.get(`${API_BASE_URL}/shopall`);
         if (Array.isArray(res.data)) {
-          // Set only the first 4 products
-          setProducts(res.data.slice(0, 4));
+          // Shuffle the array
+          const shuffled = res.data.sort(() => 0.5 - Math.random());
+          // Set only the first 4 products from the shuffled array
+          setProducts(shuffled.slice(0, 4));
         }
       } catch (error) {
         console.error('Failed to fetch products for landing page:', error);
@@ -141,15 +143,13 @@ const LandingPage = () => {
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
-              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed">
-                <span className="max-sm:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold">
-                  <span className="max-sm:block sm:inline">UNMATCHED COMFORT.</span>
-                  <span className="max-sm:hidden sm:inline"> BOLD PERFORMANCE.</span>
+              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed font-UnifrakturCook text-white">
+                <span className="max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+                  Forged in Comfort.
                 </span>
-                <br className="max-sm:hidden" />
-                <span className="max-sm:text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl block mt-1 sm:mt-0 md:mt-1">
-                  <span className="sm:hidden text-sm font-light font-PatrickHand">STYLE FOR ALL</span>
-                  <span className="hidden font-PatrickHand sm:inline">EVERYDAY STYLE</span>
+                <br />
+                <span className="max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2">
+                  Defined by Style.
                 </span>
               </h1>
               <Link to="/shop">

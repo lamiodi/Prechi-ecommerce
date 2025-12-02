@@ -136,7 +136,7 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-bold text-gray-900 font-StoryScript">
                 {formatCurrency(analytics.totalRevenue)}
               </p>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
@@ -150,7 +150,7 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-bold text-gray-900 font-StoryScript">
                 {analytics.totalOrders}
               </p>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-bold text-gray-900 font-StoryScript">
                 {analytics.totalCustomers}
               </p>
               <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
@@ -178,7 +178,7 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 font-PatrickHand">Avg. Order Value</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-bold text-gray-900 font-StoryScript">
                 {formatCurrency(analytics.avgOrderValue)}
               </p>
             </div>
@@ -200,7 +200,7 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 font-Manrope">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900 font-StoryScript">Admin Dashboard</h1>
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"

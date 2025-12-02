@@ -338,7 +338,7 @@ const Orders = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
         <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold font-Manrope">Update Order Status</h3>
+          <h3 className="text-lg font-semibold font-StoryScript">Update Order Status</h3>
         </div>
         <div className="p-6">
           <p className="mb-4 font-PatrickHand">Update status for order #{selectedOrder.id}</p>
@@ -364,7 +364,7 @@ const Orders = () => {
             <button onClick={() => setShowStatusModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-PatrickHand">
               Cancel
             </button>
-            <button onClick={updateOrderStatus} disabled={newStatus === selectedOrder.status} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 font-Manrope">
+            <button onClick={updateOrderStatus} disabled={newStatus === selectedOrder.status} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 font-StoryScript">
               Update Status
             </button>
           </div>
@@ -377,7 +377,7 @@ const Orders = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
         <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold font-Manrope">Delete Order</h3>
+          <h3 className="text-lg font-semibold font-StoryScript">Delete Order</h3>
         </div>
         <div className="p-6">
           <p className="mb-4 font-PatrickHand">Are you sure you want to delete order #{selectedOrder.id}?</p>
@@ -385,7 +385,7 @@ const Orders = () => {
             <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-PatrickHand">
               Cancel
             </button>
-            <button onClick={deleteOrder} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-Manrope">
+            <button onClick={deleteOrder} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-StoryScript">
               Delete Order
             </button>
           </div>
@@ -404,13 +404,13 @@ const Orders = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", "sans-serif"',
+        '--font-StoryScript': '"Story Script", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-900 font-Manrope">Orders Management</h2>
+          <h2 className="text-xl font-semibold text-gray-900 font-StoryScript">Orders Management</h2>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <div className="relative w-full md:w-96">
               <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -473,7 +473,7 @@ const Orders = () => {
                   {orders.map(order => (
                     <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 text-sm">
-                        <div className="font-medium text-gray-900 font-Manrope">#{order.id}</div>
+                        <div className="font-medium text-gray-900 font-StoryScript">#{order.id}</div>
                         <div className="text-gray-600 font-PatrickHand">{order.reference}</div>
                         {order.shipping_country !== 'Nigeria' && (
                           <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 font-PatrickHand">
@@ -483,7 +483,7 @@ const Orders = () => {
                       </td>
                       <td className="py-3 px-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <div className="font-medium text-gray-900 font-Manrope">{order.first_name} {order.last_name}</div>
+                          <div className="font-medium text-gray-900 font-StoryScript">{order.first_name} {order.last_name}</div>
                           {order.is_temporary && (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-PatrickHand">
                               Guest
@@ -494,7 +494,7 @@ const Orders = () => {
                       </td>
                       <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">{formatDate(order.created_at)}</td>
                       <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">{order.shipping_country}</td>
-                      <td className="py-3 px-4 font-medium text-sm font-Manrope">{formatCurrency(order.total, order.currency)}</td>
+                      <td className="py-3 px-4 font-medium text-sm font-StoryScript">{formatCurrency(order.total, order.currency)}</td>
                       <td className="py-3 px-4 text-sm">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)} font-PatrickHand`}>
                           {getPaymentStatusIcon(order.payment_status)}

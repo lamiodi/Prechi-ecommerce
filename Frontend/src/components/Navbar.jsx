@@ -89,7 +89,7 @@ export default function Navbar() {
               <div className="hidden lg:flex flex-1 items-center">
                 {user && (
                   <div className="flex items-center text-Secondarycolor">
-                    <span className="text-sm font-medium font-Manrope">Hi, {user.first_name}</span>
+                    <span className="text-sm font-medium font-StoryScript">Hi, {user.first_name}</span>
                   </div>
                 )}
               </div>

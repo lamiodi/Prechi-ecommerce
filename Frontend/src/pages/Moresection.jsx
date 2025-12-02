@@ -193,7 +193,7 @@ const MorePage = () => {
           <div className="space-y-8 animate-fade-in">
             {/* Hero Section */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-8 rounded-xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
-              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">About Prechi Clothing</h3>
+              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">About Prechi Clothing</h3>
               <p className="text-xl font-PatrickHand text-gray-600 leading-relaxed mb-4">
                 Premium comfort, tailored for everyday movement.
               </p>
@@ -207,7 +207,7 @@ const MorePage = () => {
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-6">
                   <Award className="w-8 h-8 text-blue-600" />
                 </div>
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">Our Mission</h4>
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4">Our Mission</h4>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
                   At Prechi Clothing, we believe that comfort shouldn't compromise style. We create premium 
                   underwear and activewear that moves with you, providing unmatched comfort for your 
@@ -222,7 +222,7 @@ const MorePage = () => {
                 <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-blue-100 rounded-full flex items-center justify-center mb-6">
                   <Zap className="w-8 h-8 text-green-600" />
                 </div>
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">Our Vision</h4>
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4">Our Vision</h4>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
                   To become Africa's leading premium underwear brand, setting new standards for comfort, 
                   quality, and style in men's intimate apparel.
@@ -235,13 +235,13 @@ const MorePage = () => {
             </div>
             {/* Our Values */}
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-8 text-center">Our Core Values</h4>
+              <h4 className="text-2xl font-semibold font-StoryScript text-Primarycolor mb-8 text-center">Our Core Values</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-20 h-20 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:shadow-lg transition-shadow">
                     <Star className="w-10 h-10 text-blue-600" />
                   </div>
-                  <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Quality First</h5>
+                  <h5 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-3">Quality First</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
                     We source only the finest materials and employ rigorous quality control processes 
                     to ensure every product meets our high standards.
@@ -251,7 +251,7 @@ const MorePage = () => {
                   <div className="w-20 h-20 bg-gradient-to-r from-green-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:shadow-lg transition-shadow">
                     <Users className="w-10 h-10 text-green-600" />
                   </div>
-                  <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Customer-Centric</h5>
+                  <h5 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-3">Customer-Centric</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
                     Your comfort and satisfaction drive everything we do. We listen to feedback and 
                     continuously improve our products and services.
@@ -261,7 +261,7 @@ const MorePage = () => {
                   <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:shadow-lg transition-shadow">
                     <Zap className="w-10 h-10 text-purple-600" />
                   </div>
-                  <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Innovation</h5>
+                  <h5 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-3">Innovation</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
                     We constantly push boundaries, exploring new technologies and designs to create 
                     products that exceed expectations.
@@ -271,41 +271,41 @@ const MorePage = () => {
             </div>
             {/* Why Choose Us */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-8 text-center">Why Choose Prechi Clothing?</h4>
+              <h4 className="text-2xl font-semibold font-StoryScript text-Primarycolor mb-8 text-center">Why Choose Prechi Clothing?</h4>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <div className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Package className="w-6 h-6 text-blue-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Premium Materials</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Premium Materials</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">High-grade fabrics sourced from trusted suppliers worldwide</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Award className="w-6 h-6 text-green-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Perfect Fit</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Perfect Fit</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Designed for comfort with multiple size options and fits</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                   <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <MessageCircle className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Great Service</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Great Service</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Exceptional customer support and fast, reliable delivery</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                   <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Star className="w-6 h-6 text-orange-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Proven Quality</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Proven Quality</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Thousands of satisfied customers across Nigeria</p>
                 </div>
               </div>
             </div>
             {/* Our Story */}
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-6">Our Story</h4>
+              <h4 className="text-2xl font-semibold font-StoryScript text-Primarycolor mb-6">Our Story</h4>
               <div className="prose prose-gray max-w-none">
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
                   Prechi Clothing was born from a simple observation: men deserve better underwear. After experiencing 
@@ -330,7 +330,7 @@ const MorePage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Terms of Service</h3>
+              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Terms of Service</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Please read these terms and conditions carefully before using our service. 
                 By accessing our website and making purchases, you agree to these terms.
@@ -340,7 +340,7 @@ const MorePage = () => {
             <div className="space-y-6">
               {/* Agreement to Terms */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
                   1. Agreement to Terms
                 </h4>
@@ -355,7 +355,7 @@ const MorePage = () => {
               </div>
               {/* Use License */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <FileText className="w-6 h-6 text-blue-600 mr-3" />
                   2. Use License
                 </h4>
@@ -363,7 +363,7 @@ const MorePage = () => {
                   Permission is granted to temporarily download one copy of the materials on Prechi Clothing's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.
                 </p>
                 <div className="bg-red-50 p-4 rounded-lg mb-4">
-                  <h5 className="font-semibold font-Manrope text-red-800 mb-2">Under this license you may NOT:</h5>
+                  <h5 className="font-semibold font-StoryScript text-red-800 mb-2">Under this license you may NOT:</h5>
                   <ul className="list-disc list-inside font-PatrickHand text-red-700 space-y-1 text-sm">
                     <li>Modify or copy the materials</li>
                     <li>Use the materials for commercial purposes or public display</li>
@@ -377,7 +377,7 @@ const MorePage = () => {
               </div>
               {/* Product Information */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <Package className="w-6 h-6 text-purple-600 mr-3" />
                   3. Product Information & Pricing
                 </h4>
@@ -386,7 +386,7 @@ const MorePage = () => {
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Pricing Policy</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Pricing Policy</h5>
                     <ul className="font-PatrickHand text-gray-600 text-sm space-y-1">
                       <li>• All prices are in Nigerian Naira (₦)</li>
                       <li>• Prices are subject to change without notice</li>
@@ -394,7 +394,7 @@ const MorePage = () => {
                     </ul>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Payment Terms</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Payment Terms</h5>
                     <ul className="font-PatrickHand text-gray-600 text-sm space-y-1">
                       <li>• Payment must be received prior to shipment</li>
                       <li>• We accept major credit cards and bank transfers</li>
@@ -405,13 +405,13 @@ const MorePage = () => {
               </div>
               {/* Shipping & Delivery */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <Package className="w-6 h-6 text-blue-600 mr-3" />
                   4. Shipping & Delivery
                 </h4>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Domestic Shipping</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Domestic Shipping</h5>
                     <ul className="font-PatrickHand text-gray-600 text-sm space-y-1">
                       <li>• We ship nationwide within Nigeria</li>
                       <li>• Delivery typically takes 2-5 business days</li>
@@ -419,7 +419,7 @@ const MorePage = () => {
                     </ul>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">International Shipping</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">International Shipping</h5>
                     <ul className="font-PatrickHand text-gray-600 text-sm space-y-1">
                       <li>• We offer international shipping via DHL</li>
                       <li>• Shipping fees calculated at checkout</li>
@@ -433,12 +433,12 @@ const MorePage = () => {
               </div>
               {/* Returns & Exchanges */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <RefreshCw className="w-6 h-6 text-green-600 mr-3" />
                   5. Returns & Exchanges
                 </h4>
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Our Policy</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Our Policy</h5>
                   <ul className="font-PatrickHand text-gray-600 text-sm space-y-1">
                     <li>• 3-day return policy for unused items</li>
                     <li>• Free size exchanges within Nigeria</li>
@@ -451,7 +451,7 @@ const MorePage = () => {
               </div>
               {/* Limitation of Liability */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                   <Shield className="w-6 h-6 text-orange-600 mr-3" />
                   6. Limitation of Liability
                 </h4>
@@ -466,7 +466,7 @@ const MorePage = () => {
               </div>
               {/* Governing Law */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">7. Governing Law & Contact</h4>
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4">7. Governing Law & Contact</h4>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-4">
                   These terms and conditions are governed by and construed in accordance with the laws of Nigeria, and you irrevocably submit to the exclusive jurisdiction of the courts in that state or location.
                 </p>
@@ -483,7 +483,7 @@ const MorePage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Privacy Policy</h3>
+              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Privacy Policy</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Your privacy is important to us. This policy explains how we collect, use, and protect your 
                 personal information when you visit our website or make a purchase.
@@ -493,14 +493,14 @@ const MorePage = () => {
             <div className="space-y-6">
               {/* Information We Collect */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <Info className="w-6 h-6 text-blue-600 mr-3" />
                   Information We Collect
                 </h4>
                 
                 <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                   <div className="p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                       <Users className="w-5 h-5 mr-2" />
                       Personal Information
                     </h5>
@@ -513,7 +513,7 @@ const MorePage = () => {
                     </ul>
                   </div>
                   <div className="p-6 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
                       <Eye className="w-5 h-5 mr-2" />
                       Usage Information
                     </h5>
@@ -529,13 +529,13 @@ const MorePage = () => {
               </div>
               {/* How We Use Your Information */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <Zap className="w-6 h-6 text-green-600 mr-3" />
                   How We Use Your Information
                 </h4>
                 <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                   <div className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-3">Service Delivery</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-3">Service Delivery</h5>
                     <ul className="font-PatrickHand text-gray-600 space-y-2 text-sm">
                       <li>• Process and fulfill your orders</li>
                       <li>• Provide customer support</li>
@@ -545,7 +545,7 @@ const MorePage = () => {
                     </ul>
                   </div>
                   <div className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-3">Communication</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-3">Communication</h5>
                     <ul className="font-PatrickHand text-gray-600 space-y-2 text-sm">
                       <li>• Send promotional emails (with consent)</li>
                       <li>• Notify about new products and sales</li>
@@ -555,7 +555,7 @@ const MorePage = () => {
                     </ul>
                   </div>
                   <div className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-3">Analytics & Security</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-3">Analytics & Security</h5>
                     <ul className="font-PatrickHand text-gray-600 space-y-2 text-sm">
                       <li>• Analyze website usage patterns</li>
                       <li>• Prevent fraud and security threats</li>
@@ -568,7 +568,7 @@ const MorePage = () => {
               </div>
               {/* Data Protection */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <Shield className="w-6 h-6 text-red-600 mr-3" />
                   Data Protection & Security
                 </h4>
@@ -578,24 +578,24 @@ const MorePage = () => {
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="text-center p-6 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                     <Shield className="w-10 h-10 text-green-600 mx-auto mb-3" />
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">SSL Encryption</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">SSL Encryption</h5>
                     <p className="text-sm font-PatrickHand text-gray-600">All data transmission is encrypted using industry-standard SSL</p>
                   </div>
                   <div className="text-center p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                     <Shield className="w-10 h-10 text-blue-600 mx-auto mb-3" />
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Secure Storage</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Secure Storage</h5>
                     <p className="text-sm font-PatrickHand text-gray-600">Your data is stored in secure, protected databases</p>
                   </div>
                   <div className="text-center p-6 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                     <Shield className="w-10 h-10 text-purple-600 mx-auto mb-3" />
-                    <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Access Control</h5>
+                    <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Access Control</h5>
                     <p className="text-sm font-PatrickHand text-gray-600">Limited access to your data by authorized personnel only</p>
                   </div>
                 </div>
               </div>
               {/* Your Rights */}
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <CheckCircle className="w-6 h-6 text-orange-600 mr-3" />
                   Your Privacy Rights
                 </h4>
@@ -606,7 +606,7 @@ const MorePage = () => {
                         <CheckCircle className="w-4 h-4 text-green-600" />
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor">Access Your Data</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor">Access Your Data</h5>
                         <p className="text-sm font-PatrickHand text-gray-600">Request a copy of all personal information we have about you</p>
                       </div>
                     </div>
@@ -615,7 +615,7 @@ const MorePage = () => {
                         <CheckCircle className="w-4 h-4 text-blue-600" />
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor">Update Information</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor">Update Information</h5>
                         <p className="text-sm font-PatrickHand text-gray-600">Correct or update your personal data at any time</p>
                       </div>
                     </div>
@@ -626,7 +626,7 @@ const MorePage = () => {
                         <CheckCircle className="w-4 h-4 text-red-600" />
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor">Delete Account</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor">Delete Account</h5>
                         <p className="text-sm font-PatrickHand text-gray-600">Request deletion of your personal information</p>
                       </div>
                     </div>
@@ -635,7 +635,7 @@ const MorePage = () => {
                         <CheckCircle className="w-4 h-4 text-purple-600" />
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor">Opt-out</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor">Opt-out</h5>
                         <p className="text-sm font-PatrickHand text-gray-600">Unsubscribe from marketing communications</p>
                       </div>
                     </div>
@@ -649,7 +649,7 @@ const MorePage = () => {
               </div>
               {/* Contact Information */}
               <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-                <h4 className="text-lg font-semibold font-Manrope text-Primarycolor mb-4">Questions About Privacy?</h4>
+                <h4 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-4">Questions About Privacy?</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4">
                   If you have any questions about this Privacy Policy or how we handle your personal information, please don't hesitate to contact us.
                 </p>
@@ -671,7 +671,7 @@ const MorePage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Customer Support</h3>
+              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Customer Support</h3>
               <p className="text-lg font-PatrickHand text-gray-600 leading-relaxed">
                 Our dedicated support team is here to help you with any questions, concerns, or issues you may have. 
                 We're committed to providing exceptional service every step of the way.
@@ -683,7 +683,7 @@ const MorePage = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-8 h-8 text-blue-600" />
                 </div>
-                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Email Support</h4>
+                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Email Support</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Get detailed help via email</p>
                 <a 
                   href="mailto:prechi.clothing@gmail.com"
@@ -697,7 +697,7 @@ const MorePage = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="w-8 h-8 text-green-600" />
                 </div>
-                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Phone Support</h4>
+                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Phone Support</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Speak directly with our team</p>
                 <a 
                   href="tel:+2349016420903"
@@ -711,7 +711,7 @@ const MorePage = () => {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Clock className="w-8 h-8 text-purple-600" />
                 </div>
-                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Business Hours</h4>
+                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Business Hours</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">We're available to help</p>
                 <p className="text-purple-600 font-medium font-PatrickHand">8:30am - 10:00pm</p>
                 <p className="text-xs font-PatrickHand text-gray-500 mt-2">Monday - Sunday</p>
@@ -720,7 +720,7 @@ const MorePage = () => {
             {/* Quick Help Topics */}
             <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <HelpCircle className="w-6 h-6 text-blue-600 mr-3" />
                   Quick Help Topics
                 </h4>
@@ -746,7 +746,7 @@ const MorePage = () => {
                             {item.icon}
                           </div>
                           <div>
-                            <h5 className="font-medium font-Manrope text-Primarycolor">{item.topic}</h5>
+                            <h5 className="font-medium font-StoryScript text-Primarycolor">{item.topic}</h5>
                             <p className="text-sm font-PatrickHand text-gray-600 mt-1">{item.desc}</p>
                           </div>
                         </div>
@@ -761,7 +761,7 @@ const MorePage = () => {
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                   <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
                   Support Channels
                 </h4>
@@ -771,7 +771,7 @@ const MorePage = () => {
                       <Mail className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <h5 className="font-semibold font-Manrope text-Primarycolor">Email Support</h5>
+                      <h5 className="font-semibold font-StoryScript text-Primarycolor">Email Support</h5>
                       <p className="text-sm font-PatrickHand text-gray-600 mb-2">Best for detailed questions and documentation</p>
                       <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-PatrickHand">24hr response</span>
                     </div>
@@ -781,7 +781,7 @@ const MorePage = () => {
                       <Phone className="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                      <h5 className="font-semibold font-Manrope text-Primarycolor">Phone Support</h5>
+                      <h5 className="font-semibold font-StoryScript text-Primarycolor">Phone Support</h5>
                       <p className="text-sm font-PatrickHand text-gray-600 mb-2">For urgent issues and immediate assistance</p>
                       <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-PatrickHand">Instant help</span>
                     </div>
@@ -791,7 +791,7 @@ const MorePage = () => {
                       <MessageCircle className="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
-                      <h5 className="font-semibold font-Manrope text-Primarycolor">Live Chat</h5>
+                      <h5 className="font-semibold font-StoryScript text-Primarycolor">Live Chat</h5>
                       <p className="text-sm font-PatrickHand text-gray-600 mb-2">Real-time messaging support</p>
                       <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-PatrickHand">Coming soon</span>
                     </div>
@@ -801,7 +801,7 @@ const MorePage = () => {
             </div>
             {/* Common Issues Solutions */}
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6 flex items-center">
+              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6 flex items-center">
                 <CheckCircle className="w-6 h-6 text-orange-600 mr-3" />
                 Common Issues & Quick Solutions
               </h4>
@@ -813,7 +813,7 @@ const MorePage = () => {
                         <span className="text-red-600 text-sm font-bold">!</span>
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Order Not Received</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Order Not Received</h5>
                         <p className="text-sm font-PatrickHand text-gray-600 mb-3">Expected delivery date has passed but package hasn't arrived.</p>
                         <div className="bg-gray-50 p-3 rounded text-xs font-PatrickHand text-gray-600">
                           <strong>Solution:</strong> Check your tracking number first, then contact us immediately for investigation and replacement.
@@ -827,7 +827,7 @@ const MorePage = () => {
                         <span className="text-blue-600 text-sm font-bold">?</span>
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Wrong Size Delivered</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Wrong Size Delivered</h5>
                         <p className="text-sm font-PatrickHand text-gray-600 mb-3">Received a different size than what you ordered.</p>
                         <div className="bg-gray-50 p-3 rounded text-xs font-PatrickHand text-gray-600">
                           <strong>Solution:</strong> We offer free exchanges within 30 days. Contact us to arrange pickup and replacement.
@@ -843,7 +843,7 @@ const MorePage = () => {
                         <span className="text-yellow-600 text-sm font-bold">⚠</span>
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Product Defect</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Product Defect</h5>
                         <p className="text-sm font-PatrickHand text-gray-600 mb-3">Manufacturing defect or quality issue with your purchase.</p>
                         <div className="bg-gray-50 p-3 rounded text-xs font-PatrickHand text-gray-600">
                           <strong>Solution:</strong> We provide immediate replacement or full refund for any defective items with photo proof.
@@ -857,7 +857,7 @@ const MorePage = () => {
                         <span className="text-green-600 text-sm font-bold">₦</span>
                       </div>
                       <div>
-                        <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Payment Failed</h5>
+                        <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Payment Failed</h5>
                         <p className="text-sm font-PatrickHand text-gray-600 mb-3">Transaction was declined or payment couldn't be processed.</p>
                         <div className="bg-gray-50 p-3 rounded text-xs font-PatrickHand text-gray-600">
                           <strong>Solution:</strong> Try a different payment method, check your card details, or contact your bank for assistance.
@@ -870,27 +870,27 @@ const MorePage = () => {
             </div>
             {/* Support Guarantee */}
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 text-center">Our Support Promise</h4>
+              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 text-center">Our Support Promise</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Clock className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Quick Response</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Quick Response</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">We respond to all inquiries within 24 hours, usually much faster</p>
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Star className="w-8 h-8 text-green-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Expert Help</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Expert Help</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Our team knows our products inside and out to give you the best advice</p>
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <HeartHandshake className="w-8 h-8 text-purple-600" />
                   </div>
-                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Personal Care</h5>
+                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Personal Care</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Every customer matters to us - we treat you like family</p>
                 </div>
               </div>
@@ -908,7 +908,7 @@ const MorePage = () => {
       '--color-Secondarycolor': '#ffffff',
       '--color-Accent': '#6E6E6E',
       '--color-Softcolor': '#F5F5DC',
-      '--font-Manrope': '"Manrope", "sans-serif"',
+      '--font-StoryScript': '"Story Script", "sans-serif"',
       '--font-PatrickHand': '"Jost", "sans-serif"'
     }}>
       <Navbar2 />
@@ -949,7 +949,7 @@ const MorePage = () => {
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-8">
-              <h2 className="text-lg font-semibold font-Manrope text-Primarycolor mb-6">More Information</h2>
+              <h2 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-6">More Information</h2>
               <nav className="space-y-2">
                 {moreItems.map((item) => {
                   const Icon = item.icon;

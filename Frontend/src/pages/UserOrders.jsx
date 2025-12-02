@@ -131,17 +131,17 @@ const UserOrders = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", "sans-serif"',
+        '--font-StoryScript': '"Story Script", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <Navbar2 />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 font-Manrope">My Orders</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 font-StoryScript">My Orders</h1>
         {/* Orders Section */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center font-Manrope">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center font-StoryScript">
               <Package className="h-5 w-5 mr-2" /> Order History
             </h2>
           </div>
@@ -208,7 +208,7 @@ const UserOrders = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 font-Manrope">Order #{selectedOrder.id} Details</h2>
+                <h2 className="text-xl font-semibold text-gray-900 font-StoryScript">Order #{selectedOrder.id} Details</h2>
                 <button
                   onClick={() => {
                     setSelectedOrder(null);
@@ -222,7 +222,7 @@ const UserOrders = () => {
               <div className="space-y-6">
                 {/* Order Summary */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Order Summary</h3>
+                  <h3 className="text-lg font-medium text-gray-900 font-StoryScript">Order Summary</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 text-sm">
                     <div>
                       <p className="text-gray-500 font-PatrickHand">Order ID</p>
@@ -262,7 +262,7 @@ const UserOrders = () => {
                 </div>
                 {/* Shipping Address */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Shipping Address</h3>
+                  <h3 className="text-lg font-medium text-gray-900 font-StoryScript">Shipping Address</h3>
                   {selectedOrder.shipping_address_title ? (
                     <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
                       <p>{selectedOrder.shipping_address_title}</p>
@@ -280,7 +280,7 @@ const UserOrders = () => {
                 </div>
                 {/* Billing Address */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Billing Address</h3>
+                  <h3 className="text-lg font-medium text-gray-900 font-StoryScript">Billing Address</h3>
                   {selectedOrder.billing_address_full_name ? (
                     <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
                       <p>{selectedOrder.billing_address_full_name}</p>
@@ -299,7 +299,7 @@ const UserOrders = () => {
                 </div>
                 {/* Items */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Items</h3>
+                  <h3 className="text-lg font-medium text-gray-900 font-StoryScript">Items</h3>
                   <div className="mt-2 space-y-4">
                     {selectedOrder.items.map((item, index) => (
                       <div key={item.id} className="flex items-start p-2 bg-gray-50 rounded">

@@ -120,7 +120,7 @@ const ProductGrid = () => {
             Premium comfort, tailored for everyday movement.
           </h4>
           <Link to="/shop" className="text-black hover:text-accent transition-colors">
-          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-PatrickHand'>ALL</span></h4>
+          <h4 className="font-semibold font-StoryScript">SHOP <span className='hidden font-semibold sm:inline font-PatrickHand'>ALL</span></h4>
           </Link>
         </div>
       </div>
@@ -131,7 +131,7 @@ const ProductGrid = () => {
           size="large"
           stateProp="default"
           className="w-60 mb-4"
-          divClassName="bg-Softcolor w-full gap-x-1.5 font-Manrope rounded-sm"
+          divClassName="bg-Softcolor w-full gap-x-1.5 font-StoryScript rounded-sm"
           iconclassname="text-base"
           showIcon={true}
         />
@@ -140,7 +140,7 @@ const ProductGrid = () => {
             <div
               key={category}
               onClick={() => handleFilterChange(category)}
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 font-Manrope ${
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 font-StoryScript ${
                 filter === category
                   ? 'bg-accent text-black font-bold'
                   : 'text-gray-700 hover:text-accent hover:bg-gray-100'
@@ -325,10 +325,10 @@ const ProductCard = ({ product, onImageError }) => {
           )}
         </div>
         <div className="p-3 sm:p-4">
-          <h3 className="text-sm sm:text-base font-semibold font-Manrope text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200">
+          <h3 className="text-sm sm:text-base font-semibold font-StoryScript text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200">
             {displayName}
           </h3>
-          <p className="text-lg sm:text-xl font-semibold font-Manrope text-Accent">
+          <p className="text-lg sm:text-xl font-semibold font-StoryScript text-Accent">
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,

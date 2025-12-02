@@ -40,7 +40,7 @@ const GuestCheckoutModal = React.memo(({
             <User className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-Primarycolor font-Manrope">
+            <h3 className="text-xl font-bold text-Primarycolor font-StoryScript">
               Complete Your Order
             </h3>
             <p className="text-sm text-Accent font-PatrickHand">
@@ -1784,7 +1784,7 @@ const CheckoutPage = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Inter", sans-serif',
+        '--font-StoryScript': '"Inter", sans-serif',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
@@ -1793,7 +1793,7 @@ const CheckoutPage = () => {
         <Link to="/cart" className="inline-flex items-center text-Accent hover:text-Primarycolor mb-6 font-PatrickHand">
           <ArrowLeft className="h-5 w-5 mr-1" /> Back to Cart
         </Link>
-        <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Checkout</h2>
+        <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-StoryScript">Checkout</h2>
         
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
@@ -1813,7 +1813,7 @@ const CheckoutPage = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-md w-full p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-Primarycolor flex items-center font-Manrope">
+                <h3 className="text-xl font-bold text-Primarycolor flex items-center font-StoryScript">
                   <Bitcoin className="h-5 w-5 mr-2 text-orange-500" />
                   Bitcoin Payment Instructions
                 </h3>
@@ -1894,7 +1894,7 @@ const CheckoutPage = () => {
                   <>
                     {/* Shipping Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Shipping Address</h3>
                       
                       {requiredForm === 'shipping' && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -1917,12 +1917,12 @@ const CheckoutPage = () => {
                           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <div className="flex items-start">
                               <div className="flex-1">
-                                <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Shipping Address</h4>
+                                <h4 className="font-medium text-Primarycolor font-StoryScript mb-2">Shipping Address</h4>
                                 <div className="text-sm text-black font-PatrickHand">
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.address_line_1}</p>
                                   {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.country}</p>
                                 </div>
                               </div>
                               <button
@@ -1963,7 +1963,7 @@ const CheckoutPage = () => {
                     
                     {/* Billing Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Billing Address</h3>
                       
                       {/* Billing Address Option Selector */}
                       <div className="mb-6">
@@ -2013,13 +2013,13 @@ const CheckoutPage = () => {
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                           <div className="flex items-start">
                             <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
+                              <h4 className="font-medium text-Primarycolor font-StoryScript mb-2">Billing Address (Same as Shipping)</h4>
                               {shippingForm.address_line_1 ? (
                                 <div className="text-sm text-black font-PatrickHand">
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.address_line_1}</p>
                                   {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
+                                  <p className="text-sm text-Primarycolor font-StoryScript">{shippingForm.country}</p>
                                 </div>
                               ) : (
                                 <p className="text-sm text-gray-500 font-PatrickHand">Please enter a shipping address first</p>
@@ -2056,7 +2056,7 @@ const CheckoutPage = () => {
                   <>
                     {/* Shipping Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Shipping Address</h3>
                       
                       {shippingAddresses.length > 0 ? (
                         <>
@@ -2127,7 +2127,7 @@ const CheckoutPage = () => {
                       ) : (
                         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                           <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No shipping address found</p>
+                          <p className="text-lg font-medium text-Primarycolor mb-2 font-StoryScript">No shipping address found</p>
                           <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your shipping address to continue with checkout</p>
                           <button
                             onClick={handleAddNewShippingAddress}
@@ -2145,7 +2145,7 @@ const CheckoutPage = () => {
                     {/* Shipping Address Form for Logged-in Users */}
                     {showShippingForm && (
                       <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">
+                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">
                           {editingShippingAddress ? 'Edit Shipping Address' : 'Add Shipping Address'}
                         </h3>
                         <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
@@ -2164,7 +2164,7 @@ const CheckoutPage = () => {
 
                     {/* Billing Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Billing Address</h3>
                       
                       {/* Billing Address Option Selector for Logged-in Users */}
                       <div className="mb-6">
@@ -2199,19 +2199,19 @@ const CheckoutPage = () => {
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                           <div className="flex items-start">
                             <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
+                              <h4 className="font-medium text-Primarycolor font-StoryScript mb-2">Billing Address (Same as Shipping)</h4>
                               {shippingAddresses.length > 0 && shippingAddressId ? (
                                 <div className="text-sm text-black font-PatrickHand">
                                   {shippingAddresses
                                     .filter(addr => String(addr.id) === String(shippingAddressId))
                                     .map(address => (
                                       <div key={address.id}>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.title}</p>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.address_line_1}</p>
+                                        <p className="text-sm text-Primarycolor font-StoryScript">{address.title}</p>
+                                        <p className="text-sm text-Primarycolor font-StoryScript">{address.address_line_1}</p>
                                         {address.landmark && <p>{address.landmark}</p>}
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.city}, {address.state} {address.zip_code}</p>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.country}</p>
-                                        {address.phone_number && <p className="text-sm text-Primarycolor font-Manrope">{address.phone_number}</p>}
+                                        <p className="text-sm text-Primarycolor font-StoryScript">{address.city}, {address.state} {address.zip_code}</p>
+                                        <p className="text-sm text-Primarycolor font-StoryScript">{address.country}</p>
+                                        {address.phone_number && <p className="text-sm text-Primarycolor font-StoryScript">{address.phone_number}</p>}
                                       </div>
                                     ))
                                   }
@@ -2293,7 +2293,7 @@ const CheckoutPage = () => {
                       ) : (
                         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                           <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No billing address found</p>
+                          <p className="text-lg font-medium text-Primarycolor mb-2 font-StoryScript">No billing address found</p>
                           <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your billing address for payment processing</p>
                           <button
                             onClick={handleAddNewBillingAddress}
@@ -2316,7 +2316,7 @@ const CheckoutPage = () => {
                 {/* Billing Address Form for Logged-in Users */}
                     {showBillingForm && (
                       <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
+                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Add Billing Address</h3>
                         <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
                           <BillingAddressForm
                             address={{ state: billingForm, setState: setBillingForm }}
@@ -2334,7 +2334,7 @@ const CheckoutPage = () => {
 
                     {/* Order Note */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Special Instructions (optional)</h3>
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-StoryScript">Special Instructions (optional)</h3>
                   <textarea
                     value={orderNote}
                     onChange={handleOrderNoteChange}
@@ -2347,7 +2347,7 @@ const CheckoutPage = () => {
                 
                 {/* Shipping Method */}
                 <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-StoryScript">
                     <Truck className="h-5 w-5 inline mr-2" />
                     Choose Delivery Method
                   </h3>
@@ -2388,7 +2388,7 @@ const CheckoutPage = () => {
                                       {getShippingIcon(option.icon)}
                                     </div>
                                     <div>
-                                      <h4 className="font-semibold text-Primarycolor text-sm sm:text-base font-Manrope">
+                                      <h4 className="font-semibold text-Primarycolor text-sm sm:text-base font-StoryScript">
                                         {option.method}
                                       </h4>
                                       <p className="text-xs sm:text-sm text-Accent font-PatrickHand">
@@ -2397,7 +2397,7 @@ const CheckoutPage = () => {
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <div className="font-bold text-Primarycolor text-lg font-Manrope">
+                                    <div className="font-bold text-Primarycolor text-lg font-StoryScript">
                                       {option.total_cost.toLocaleString('en-NG', {
                                         style: 'currency',
                                         currency: 'NGN',
@@ -2430,7 +2430,7 @@ const CheckoutPage = () => {
                           <MapPin className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-Primarycolor font-Manrope">
+                          <h4 className="font-semibold text-Primarycolor font-StoryScript">
                             International Shipping to {addressCountry}
                           </h4>
                         </div>
@@ -2454,7 +2454,7 @@ const CheckoutPage = () => {
               {/* Right Column - Order Summary */}
               <div className="lg:col-span-5 ">
                 <div className="p-6 bg-white rounded-lg shadow-md sticky top-24">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">Order Summary</h3>
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-StoryScript">Order Summary</h3>
                   <div className="space-y-4 mb-6">
                     {cart.items.map((cartItem, index) => {
                       const item = cartItem.item || {};
@@ -2478,7 +2478,7 @@ const CheckoutPage = () => {
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-Primarycolor text-sm sm:text-base truncate font-Manrope">
+                              <h4 className="font-medium text-Primarycolor text-sm sm:text-base truncate font-StoryScript">
                                 {item.name || 'Unknown Item'}
                               </h4>
                               {item.is_product && (item.color || item.size) && (
@@ -2528,7 +2528,7 @@ const CheckoutPage = () => {
                                     minimumFractionDigits: 2,
                                   })} each
                                 </span>
-                                <span className="font-semibold text-Primarycolor font-Manrope">
+                                <span className="font-semibold text-Primarycolor font-StoryScript">
                                   {itemTotal.toLocaleString('en-NG', {
                                     style: 'currency',
                                     currency: 'NGN',
@@ -2552,7 +2552,7 @@ const CheckoutPage = () => {
                   </div>
                   
                   <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-Primarycolor mb-3 font-Manrope">Payment Method</h4>
+                    <h4 className="text-sm font-semibold text-Primarycolor mb-3 font-StoryScript">Payment Method</h4>
                     <div className="space-y-2">
                       <label
                         className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
@@ -2683,7 +2683,7 @@ const CheckoutPage = () => {
                     </div>
                     
                     <div className="border-t border-gray-200 mt-3 pt-3">
-                      <div className="flex justify-between text-lg font-bold text-Primarycolor font-Manrope">
+                      <div className="flex justify-between text-lg font-bold text-Primarycolor font-StoryScript">
                         <span>Total</span>
                         <span>
                           {displayTotal.toLocaleString('en-NG', {
@@ -2744,7 +2744,7 @@ const CheckoutPage = () => {
                     {/* Updated Place Order Button */}
                     <button
                       onClick={handlePlaceOrder}
-                      className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-Manrope font-semibold"
+                      className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-StoryScript font-semibold"
                       disabled={isProcessing || loading || 
                         (!shippingForm.address_line_1 && !shippingAddressId) || 
                         (!billingForm.address_line_1 && !billingAddressId) || 

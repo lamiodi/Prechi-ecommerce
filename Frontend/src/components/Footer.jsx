@@ -103,7 +103,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="text-xs font-Manrope text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} Prechi Clothing. All rights reserved.</p>
+      <p className="text-xs font-StoryScript text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} Prechi Clothing. All rights reserved.</p>
     </div>
   );
 };
