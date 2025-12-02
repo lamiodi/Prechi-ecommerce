@@ -123,7 +123,7 @@ export default function Navbar2() {
               <div className="hidden lg:flex items-center gap-6 ml-6">
                 <Link 
                   to="/shop" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity ${
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-StoryScript ${
                     isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
                   }`}
                 >
@@ -131,7 +131,7 @@ export default function Navbar2() {
                 </Link>
                 <Link 
                   to="/help" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity ${
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-StoryScript ${
                     isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
                   }`}
                 >
@@ -139,7 +139,7 @@ export default function Navbar2() {
                 </Link>
                 <Link 
                   to="/more" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity ${
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-StoryScript ${
                     isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
                   }`}
                 >
@@ -159,7 +159,7 @@ export default function Navbar2() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                    className={`w-40 lg:w-60 xl:w-70 2xl:w-70 pl-2 pr-8 py-1 text-sm border-b bg-transparent focus:border-b-2 focus:outline-none ${
+                    className={`w-40 lg:w-60 xl:w-70 2xl:w-70 pl-2 pr-8 py-1 text-sm border-b bg-transparent focus:border-b-2 focus:outline-none font-PatrickHand ${
                       isWhiteBackgroundPage() 
                         ? 'text-Primarycolor border-Primarycolor focus:border-Primarycolor placeholder-Primarycolor/70' 
                         : 'text-Secondarycolor border-Secondarycolor focus:border-Secondarycolor placeholder-white/70'
@@ -295,7 +295,7 @@ export default function Navbar2() {
                     placeholder="Search products or categories..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 px-4 py-3 text-sm border rounded-l bg-white/10 backdrop-blur-sm text-white border-white/20 placeholder-white/70 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-200"
+                    className="flex-1 px-4 py-3 text-sm border rounded-l bg-white/10 backdrop-blur-sm text-white border-white/20 placeholder-white/70 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-200 font-PatrickHand"
                   />
                   <button
                     type="submit"
@@ -314,13 +314,13 @@ export default function Navbar2() {
               >
                 <Link 
                   to="/shop" 
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                 >
                   SHOP
                 </Link>
                 <Link 
                   to="/shop?category=briefs" 
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                 >
                   BRIEFS
                 </Link>
@@ -328,28 +328,28 @@ export default function Navbar2() {
                  {/* Additional Navigation Links */}
                  <Link 
                    to="/shop?category=bundles" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                  >
                    3 in 1 BUNDLES
                  </Link>
                  <Link 
                    to="/shop?category=gymwear" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                  >
                    GYMWEARS
                  </Link>
                  <Link 
                    to="/help" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                  >
                    CONTACT
                  </Link>
                  <Link 
                    to="/more" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20"
+                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-StoryScript"
                  >
                    MORE
-                 </Link>
+                </Link>
                </nav>
               
               {/* Enhanced Profile and Orders links (mobile only) */}
