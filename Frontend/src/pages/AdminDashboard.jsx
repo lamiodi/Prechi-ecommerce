@@ -123,7 +123,7 @@ const AdminDashboard = () => {
     <div className="space-y-6">
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4">
-          <p className="text-sm text-red-700 font-Jost">{error}</p>
+          <p className="text-sm text-red-700 font-PatrickHand">{error}</p>
         </div>
       )}
       {loading ? (
@@ -135,11 +135,11 @@ const AdminDashboard = () => {
           {/* Revenue */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 font-Jost">Total Revenue</p>
+              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Revenue</p>
               <p className="text-2xl font-bold text-gray-900 font-Manrope">
                 {formatCurrency(analytics.totalRevenue)}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-Jost">
+              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
                 <TrendingUp className="w-4 h-4" />
                 {analytics.revenueGrowth}% vs last month
               </p>
@@ -149,11 +149,11 @@ const AdminDashboard = () => {
           {/* Orders */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 font-Jost">Total Orders</p>
+              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Orders</p>
               <p className="text-2xl font-bold text-gray-900 font-Manrope">
                 {analytics.totalOrders}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-Jost">
+              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
                 <TrendingUp className="w-4 h-4" />
                 {analytics.orderGrowth}% vs last month
               </p>
@@ -163,11 +163,11 @@ const AdminDashboard = () => {
           {/* Customers */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 font-Jost">Total Customers</p>
+              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Customers</p>
               <p className="text-2xl font-bold text-gray-900 font-Manrope">
                 {analytics.totalCustomers}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-Jost">
+              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
                 <TrendingUp className="w-4 h-4" />
                 {analytics.customerGrowth}% vs last month
               </p>
@@ -177,7 +177,7 @@ const AdminDashboard = () => {
           {/* Avg Order */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 font-Jost">Avg. Order Value</p>
+              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Avg. Order Value</p>
               <p className="text-2xl font-bold text-gray-900 font-Manrope">
                 {formatCurrency(analytics.avgOrderValue)}
               </p>

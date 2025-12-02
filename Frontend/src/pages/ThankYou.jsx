@@ -236,9 +236,9 @@ const ThankYou = () => {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="h-12 w-12 md:h-16 md:w-16 animate-spin text-Primarycolor mx-auto mb-4" />
-          <p className="text-base md:text-lg text-Accent font-Jost">Verifying your payment...</p>
+          <p className="text-base md:text-lg text-Accent font-PatrickHand">Verifying your payment...</p>
           {retryCount > 0 && (
-            <p className="text-sm md:text-base text-Accent mt-2 font-Jost">
+            <p className="text-sm md:text-base text-Accent mt-2 font-PatrickHand">
               Retry attempt {retryCount} of 3
             </p>
           )}
@@ -256,7 +256,7 @@ const ThankYou = () => {
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
           '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-Jost': '"Jost", "sans-serif"'
+          '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
         <Navbar2 />
@@ -265,13 +265,13 @@ const ThankYou = () => {
             <AlertCircle className="h-12 w-12 md:h-16 md:w-16 text-red-600 mx-auto mb-4" />
             <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-Manrope">Payment Verification Issue</h2>
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 max-w-lg mx-auto">
-              <p className="text-sm md:text-base text-red-700 font-Jost">{error}</p>
+              <p className="text-sm md:text-base text-red-700 font-PatrickHand">{error}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <button
                 onClick={handleManualVerify}
                 disabled={verifying}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-Jost"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-PatrickHand"
               >
                 {verifying ? (
                   <>
@@ -288,7 +288,7 @@ const ThankYou = () => {
               
               <button
                 onClick={handleRefresh}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-Jost"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-PatrickHand"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Page
@@ -298,7 +298,7 @@ const ThankYou = () => {
             <div className="mt-6">
               <button
                 onClick={() => navigate('/')}
-                className="text-sm md:text-base text-Accent hover:text-Primarycolor font-Jost"
+                className="text-sm md:text-base text-Accent hover:text-Primarycolor font-PatrickHand"
               >
                 Return to Homepage
               </button>
@@ -319,7 +319,7 @@ const ThankYou = () => {
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
           '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-Jost': '"Jost", "sans-serif"'
+          '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
         <Navbar2 />
@@ -327,12 +327,12 @@ const ThankYou = () => {
           <div className="text-center">
             <AlertCircle className="h-12 w-12 md:h-16 md:w-16 text-red-600 mx-auto mb-4" />
             <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-Manrope">Order Not Found</h2>
-            <p className="text-sm md:text-base text-Accent mb-6 font-Jost">We couldn't find your order details. Please try verifying your payment manually.</p>
+            <p className="text-sm md:text-base text-Accent mb-6 font-PatrickHand">We couldn't find your order details. Please try verifying your payment manually.</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <button
                 onClick={handleManualVerify}
                 disabled={verifying}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-Jost"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-PatrickHand"
               >
                 {verifying ? (
                   <>
@@ -349,7 +349,7 @@ const ThankYou = () => {
               
               <button
                 onClick={handleRefresh}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-Jost"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-PatrickHand"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Page
@@ -359,7 +359,7 @@ const ThankYou = () => {
             <div className="mt-6">
               <button
                 onClick={() => navigate('/')}
-                className="text-sm md:text-base text-Accent hover:text-Primarycolor font-Jost"
+                className="text-sm md:text-base text-Accent hover:text-Primarycolor font-PatrickHand"
               >
                 Return to Homepage
               </button>
@@ -379,7 +379,7 @@ const ThankYou = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <Navbar2 />
@@ -399,7 +399,7 @@ const ThankYou = () => {
                   <Loader2 className="h-5 w-5 text-yellow-400 animate-spin" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm md:text-base text-yellow-700 font-Jost">
+                  <p className="text-sm md:text-base text-yellow-700 font-PatrickHand">
                     Payment is still being processed. This page will update automatically once payment is confirmed.
                   </p>
                 </div>
@@ -416,7 +416,7 @@ const ThankYou = () => {
                     <UserPlus className="h-6 w-6 text-blue-600" />
                   </div>
                   <h3 className="text-lg md:text-xl font-bold text-Primarycolor mb-2 font-Manrope">Create Your Permanent Account</h3>
-                  <p className="text-sm md:text-base text-Accent mb-6 max-w-md font-Jost">
+                  <p className="text-sm md:text-base text-Accent mb-6 max-w-md font-PatrickHand">
                     You're currently using a temporary account. Set up a password to convert it to a permanent account and unlock these benefits:
                   </p>
                   
@@ -443,7 +443,7 @@ const ThankYou = () => {
                     Set Up Password
                   </button>
                   
-                  <p className="text-xs md:text-sm text-Accent mt-3 font-Jost">
+                  <p className="text-xs md:text-sm text-Accent mt-3 font-PatrickHand">
                     This will convert your temporary account to a permanent one
                   </p>
                 </div>
@@ -452,14 +452,14 @@ const ThankYou = () => {
           )}
           
           <div className="max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-            <p className="text-sm md:text-base text-Accent mb-4 font-Jost">
+            <p className="text-sm md:text-base text-Accent mb-4 font-PatrickHand">
               {isInternational && !order.delivery_fee_paid
                 ? 'Thank you for your order! We will send you a delivery fee quote for your international order soon.'
                 : 'Thank you for your order! You\'ll receive a confirmation email soon.'}
             </p>
             
             {isInternational && !order.delivery_fee_paid && (
-              <p className="text-sm md:text-base text-Accent mb-6 font-Jost">
+              <p className="text-sm md:text-base text-Accent mb-6 font-PatrickHand">
                 Please check your email for the delivery fee payment link.
               </p>
             )}
@@ -468,22 +468,22 @@ const ThankYou = () => {
           <div className="bg-white p-4 md:p-6 rounded-lg shadow-md text-left w-full max-w-md sm:max-w-lg lg:max-w-2xl xl:max-w-3xl mx-auto mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-sm text-Accent font-Jost">Order ID</p>
-                <p className="text-sm md:text-base font-medium text-Primarycolor font-Jost">{order.id}</p>
+                <p className="text-sm text-Accent font-PatrickHand">Order ID</p>
+                <p className="text-sm md:text-base font-medium text-Primarycolor font-PatrickHand">{order.id}</p>
               </div>
               <div>
-                <p className="text-sm text-Accent font-Jost">Reference</p>
-                <p className="text-sm md:text-base font-medium text-Primarycolor font-Jost">{order.reference}</p>
+                <p className="text-sm text-Accent font-PatrickHand">Reference</p>
+                <p className="text-sm md:text-base font-medium text-Primarycolor font-PatrickHand">{order.reference}</p>
               </div>
               <div>
-                <p className="text-sm text-Accent font-Jost">Total</p>
-                <p className="text-sm md:text-base font-medium text-Primarycolor font-Jost">{formatTotal()}</p>
+                <p className="text-sm text-Accent font-PatrickHand">Total</p>
+                <p className="text-sm md:text-base font-medium text-Primarycolor font-PatrickHand">{formatTotal()}</p>
               </div>
               <div>
-                <p className="text-sm text-Accent font-Jost">Payment Status</p>
+                <p className="text-sm text-Accent font-PatrickHand">Payment Status</p>
                 <p className={`text-sm md:text-base font-medium ${
                   order.payment_status === 'completed' ? 'text-green-600' : 'text-yellow-600'
-                } font-Jost`}>
+                } font-PatrickHand`}>
                   {order.payment_status}
                   {polling && order.payment_status === 'pending' && (
                     <Loader2 className="h-3 w-3 ml-1 inline animate-spin text-Primarycolor" />
@@ -492,17 +492,17 @@ const ThankYou = () => {
               </div>
               {isInternational && (
                 <div>
-                  <p className="text-sm text-Accent font-Jost">Delivery Fee</p>
+                  <p className="text-sm text-Accent font-PatrickHand">Delivery Fee</p>
                   <p className={`text-sm md:text-base font-medium ${
                     order.delivery_fee_paid ? 'text-green-600' : 'text-yellow-600'
-                  } font-Jost`}>
+                  } font-PatrickHand`}>
                     {order.delivery_fee_paid ? 'Paid' : 'Pending'}
                   </p>
                 </div>
               )}
               <div>
-                <p className="text-sm text-Accent font-Jost">Shipping Country</p>
-                <p className="text-sm md:text-base font-medium text-Primarycolor font-Jost">{order.shipping_country}</p>
+                <p className="text-sm text-Accent font-PatrickHand">Shipping Country</p>
+                <p className="text-sm md:text-base font-medium text-Primarycolor font-PatrickHand">{order.shipping_country}</p>
               </div>
             </div>
           </div>
@@ -511,19 +511,19 @@ const ThankYou = () => {
             {user && !user.is_temporary && (
               <button
                 onClick={() => navigate(`/orders?orderId=${order.id}`)}
-                className="w-full bg-Primarycolor text-Secondarycolor py-2 px-4 sm:px-6 rounded-md hover:bg-gray-800 transition-colors font-Jost flex items-center justify-center text-sm md:text-base"
+                className="w-full bg-Primarycolor text-Secondarycolor py-2 px-4 sm:px-6 rounded-md hover:bg-gray-800 transition-colors font-PatrickHand flex items-center justify-center text-sm md:text-base"
               >
                 View Order Details
               </button>
             )}
             {user && user.is_temporary && (
               <div className="w-full bg-blue-50 border border-blue-200 rounded-md p-3 sm:p-4 text-center">
-                <p className="text-xs md:text-sm text-blue-800 font-Jost mb-2">
+                <p className="text-xs md:text-sm text-blue-800 font-PatrickHand mb-2">
                   To view your order details and track future orders, please convert your guest account to a permanent account.
                 </p>
                 <button
                   onClick={handleConvertAccount}
-                  className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors text-xs md:text-sm font-Jost"
+                  className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors text-xs md:text-sm font-PatrickHand"
                 >
                   Convert Account
                 </button>
@@ -531,12 +531,12 @@ const ThankYou = () => {
             )}
             {!user && (
               <div className="w-full bg-blue-50 border border-blue-200 rounded-md p-4 text-center">
-                <p className="text-sm md:text-base text-blue-800 font-Jost mb-4">
+                <p className="text-sm md:text-base text-blue-800 font-PatrickHand mb-4">
                   Made this order as a guest? Reset your password to convert your temporary account to a permanent one and access order history.
                 </p>
                 <button
                   onClick={() => navigate('/forgot-password')}
-                  className="w-full bg-blue-600 text-white py-2 px-4 sm:px-6 rounded-md hover:bg-blue-700 transition-colors text-sm md:text-base font-Jost mb-3"
+                  className="w-full bg-blue-600 text-white py-2 px-4 sm:px-6 rounded-md hover:bg-blue-700 transition-colors text-sm md:text-base font-PatrickHand mb-3"
                 >
                   Reset Password
                 </button>
@@ -544,7 +544,7 @@ const ThankYou = () => {
             )}
             <button
               onClick={() => navigate('/')}
-              className="w-full bg-white text-Primarycolor border border-gray-300 py-2 px-4 sm:px-6 rounded-md hover:bg-gray-50 transition-colors font-Jost flex items-center justify-center text-sm md:text-base"
+              className="w-full bg-white text-Primarycolor border border-gray-300 py-2 px-4 sm:px-6 rounded-md hover:bg-gray-50 transition-colors font-PatrickHand flex items-center justify-center text-sm md:text-base"
             >
               Continue Shopping
             </button>

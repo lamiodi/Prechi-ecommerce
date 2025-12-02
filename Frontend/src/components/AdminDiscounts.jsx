@@ -208,7 +208,7 @@ export default function AdminDiscounts() {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
@@ -221,7 +221,7 @@ export default function AdminDiscounts() {
         {/* Discount Form */}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-Jost">Discount Code</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-PatrickHand">Discount Code</label>
             <input
               type="text"
               placeholder="Enter discount code"
@@ -233,7 +233,7 @@ export default function AdminDiscounts() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-Jost">Discount Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-PatrickHand">Discount Type</label>
             <select
               value={form.discount_type}
               onChange={(e) => setForm({ ...form, discount_type: e.target.value })}
@@ -245,7 +245,7 @@ export default function AdminDiscounts() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-Jost">Discount Value</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-PatrickHand">Discount Value</label>
             <input
               type="number"
               placeholder="Enter value"
@@ -257,7 +257,7 @@ export default function AdminDiscounts() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-Jost">Start Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-PatrickHand">Start Date</label>
             <div className="relative">
               <input
                 type="date"
@@ -271,7 +271,7 @@ export default function AdminDiscounts() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1 font-Jost">End Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-PatrickHand">End Date</label>
             <div className="relative">
               <input
                 type="date"
@@ -291,7 +291,7 @@ export default function AdminDiscounts() {
               onChange={(e) => setForm({ ...form, active: e.target.checked })}
               className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <span className="text-sm font-medium text-gray-700 font-Jost">Active</span>
+            <span className="text-sm font-medium text-gray-700 font-PatrickHand">Active</span>
           </div>
           
           <div className="md:col-span-2 lg:col-span-3">
@@ -320,27 +320,27 @@ export default function AdminDiscounts() {
         
         {discounts.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 font-Jost">No discounts found.</p>
+            <p className="text-gray-500 font-PatrickHand">No discounts found.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Code</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Type</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Value</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Start Date</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">End Date</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Active</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Actions</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Code</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Type</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Value</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Start Date</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">End Date</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Active</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {discounts.map((d) => (
                   <tr key={d.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4 text-sm font-medium text-gray-900 font-Manrope">{d.code}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600 font-Jost capitalize">
+                    <td className="py-3 px-4 text-sm text-gray-600 font-PatrickHand capitalize">
                       {d.discount_type}
                     </td>
                     <td className="py-3 px-4 text-sm font-medium text-gray-900 font-Manrope">
@@ -348,10 +348,10 @@ export default function AdminDiscounts() {
                         ? `${d.discount_value}%` 
                         : `₦${d.discount_value}`}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 font-Jost">
+                    <td className="py-3 px-4 text-sm text-gray-600 font-PatrickHand">
                       {d.start_date ? format(new Date(d.start_date), 'MMM dd, yyyy') : 'N/A'}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600 font-Jost">
+                    <td className="py-3 px-4 text-sm text-gray-600 font-PatrickHand">
                       {d.end_date ? format(new Date(d.end_date), 'MMM dd, yyyy') : 'N/A'}
                     </td>
                     <td className="py-3 px-4 text-sm">
@@ -359,7 +359,7 @@ export default function AdminDiscounts() {
                         d.active 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
-                      } font-Jost`}>
+                      } font-PatrickHand`}>
                         {d.active ? 'Active' : 'Inactive'}
                       </span>
                     </td>

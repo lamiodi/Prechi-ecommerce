@@ -70,7 +70,7 @@ const HelpPage = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">3-Day Return Policy</h3>
-              <p className="font-Jost text-gray-600 leading-relaxed">
+              <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 All returns must be 2 to 3 days from the date of delivery. To be eligible for a return, your item must be unused, in the same condition that you received it, and in its original packaging. A receipt or proof of purchase is required.
               </p>
             </div>
@@ -80,7 +80,7 @@ const HelpPage = () => {
                   <Package className="w-6 h-6 text-green-600 mr-3" />
                   Returnable Items
                 </h4>
-                <ul className="space-y-2 font-Jost text-gray-600">
+                <ul className="space-y-2 font-PatrickHand text-gray-600">
                   <li>• Unworn items with original tags</li>
                   <li>• Items in original packaging</li>
                   <li>• Defective or damaged products</li>
@@ -93,7 +93,7 @@ const HelpPage = () => {
                   <Package className="w-6 h-6 text-red-600 mr-3" />
                   Non-Returnable Items
                 </h4>
-                <ul className="space-y-2 font-Jost text-gray-600">
+                <ul className="space-y-2 font-PatrickHand text-gray-600">
                   <li>• Worn or washed items</li>
                   <li>• Items without original tags</li>
                   <li>• Intimate apparel (for hygiene reasons)</li>
@@ -109,21 +109,21 @@ const HelpPage = () => {
                     <span className="text-blue-600 font-bold font-Manrope">1</span>
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Contact Us</h5>
-                  <p className="text-sm font-Jost text-gray-600">Email us your return request</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Email us your return request</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-blue-600 font-bold font-Manrope">2</span>
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Package Item</h5>
-                  <p className="text-sm font-Jost text-gray-600">Pack item in original condition</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Pack item in original condition</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-blue-600 font-bold font-Manrope">3</span>
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Ship Back</h5>
-                  <p className="text-sm font-Jost text-gray-600">Deliver within 3-days for Nigeria orders</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Deliver within 3-days for Nigeria orders</p>
                 </div>
               </div>
             </div>
@@ -134,7 +134,7 @@ const HelpPage = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Shipping Information</h3>
-              <p className="font-Jost text-gray-600 leading-relaxed">
+              <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 We offer fast and reliable shipping across Nigeria with multiple delivery options to suit your needs.
               </p>
             </div>
@@ -146,16 +146,16 @@ const HelpPage = () => {
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-Jost">3–5 business days</span>
+                    <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
+                    <span className="font-semibold font-PatrickHand">3–5 business days</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Cost:</span>
-                    <span className="font-semibold font-Jost">₦4,000</span>
+                    <span className="font-PatrickHand text-gray-600">Cost:</span>
+                    <span className="font-semibold font-PatrickHand">₦4,000</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Available:</span>
-                    <span className="font-semibold font-Jost">Lagos Island areas</span>
+                    <span className="font-PatrickHand text-gray-600">Available:</span>
+                    <span className="font-semibold font-PatrickHand">Lagos Island areas</span>
                   </div>
                 </div>
               </div>
@@ -166,16 +166,16 @@ const HelpPage = () => {
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-Jost">5–7 business days</span>
+                    <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
+                    <span className="font-semibold font-PatrickHand">5–7 business days</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Cost:</span>
-                    <span className="font-semibold font-Jost">₦6,000</span>
+                    <span className="font-PatrickHand text-gray-600">Cost:</span>
+                    <span className="font-semibold font-PatrickHand">₦6,000</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Available:</span>
-                    <span className="font-semibold font-Jost">Lagos Mainland areas</span>
+                    <span className="font-PatrickHand text-gray-600">Available:</span>
+                    <span className="font-semibold font-PatrickHand">Lagos Mainland areas</span>
                   </div>
                 </div>
               </div>
@@ -186,16 +186,16 @@ const HelpPage = () => {
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-Jost">7–10 business days</span>
+                    <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
+                    <span className="font-semibold font-PatrickHand">7–10 business days</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Cost:</span>
-                    <span className="font-semibold font-Jost">₦7,000</span>
+                    <span className="font-PatrickHand text-gray-600">Cost:</span>
+                    <span className="font-semibold font-PatrickHand">₦7,000</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-Jost text-gray-600">Available:</span>
-                    <span className="font-semibold font-Jost">All other Nigerian states</span>
+                    <span className="font-PatrickHand text-gray-600">Available:</span>
+                    <span className="font-semibold font-PatrickHand">All other Nigerian states</span>
                   </div>
                 </div>
               </div>
@@ -205,21 +205,21 @@ const HelpPage = () => {
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                 <div className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 1 - Lagos</h5>
-                  <p className="text-sm font-Jost text-gray-600">Same day delivery available</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Same day delivery available</p>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 2 - Major Cities</h5>
-                  <p className="text-sm font-Jost text-gray-600">Abuja, Port Harcourt, Kano</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Abuja, Port Harcourt, Kano</p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 3 - Other States</h5>
-                  <p className="text-sm font-Jost text-gray-600">All other Nigerian states</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">All other Nigerian states</p>
                 </div>
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
               <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Important Notes</h4>
-              <ul className="space-y-2 font-Jost text-gray-600">
+              <ul className="space-y-2 font-PatrickHand text-gray-600">
                 <li>• Orders placed before 2 PM are processed same day</li>
                 <li>• Weekend orders are processed on the next business day</li>
                 <li>• Remote areas may require additional 1-2 days</li>
@@ -233,7 +233,7 @@ const HelpPage = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Find Your Perfect Fit</h3>
-              <p className="font-Jost text-gray-600 leading-relaxed">
+              <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Our sizing is designed for comfort and style. Measure yourself accurately and refer to our charts below. 
                 All measurements are in inches.
               </p>
@@ -254,8 +254,8 @@ const HelpPage = () => {
                       {sizeChart.briefs.map((row, idx) => (
                         <tr key={idx} className="border-t border-gray-200 hover:bg-gray-100 transition-colors">
                           <td className="p-3 font-medium font-Manrope">{row.size}</td>
-                          <td className="p-3 font-Jost">{row.waist}"</td>
-                          <td className="p-3 font-Jost">{row.hip}"</td>
+                          <td className="p-3 font-PatrickHand">{row.waist}"</td>
+                          <td className="p-3 font-PatrickHand">{row.hip}"</td>
                         </tr>
                       ))}
                     </tbody>
@@ -278,9 +278,9 @@ const HelpPage = () => {
                       {sizeChart.gymwear.map((row, idx) => (
                         <tr key={idx} className="border-t border-gray-200 hover:bg-gray-100 transition-colors">
                           <td className="p-3 font-medium font-Manrope">{row.size}</td>
-                          <td className="p-3 font-Jost">{row.chest}"</td>
-                          <td className="p-3 font-Jost">{row.waist}"</td>
-                          <td className="p-3 font-Jost">{row.length}"</td>
+                          <td className="p-3 font-PatrickHand">{row.chest}"</td>
+                          <td className="p-3 font-PatrickHand">{row.waist}"</td>
+                          <td className="p-3 font-PatrickHand">{row.length}"</td>
                         </tr>
                       ))}
                     </tbody>
@@ -296,21 +296,21 @@ const HelpPage = () => {
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Chest</h5>
-                  <p className="text-sm font-Jost text-gray-600">Measure around the fullest part of your chest</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Measure around the fullest part of your chest</p>
                 </div>
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg transition-shadow">
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Waist</h5>
-                  <p className="text-sm font-Jost text-gray-600">Measure around your natural waistline</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Measure around your natural waistline</p>
                 </div>
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg transition-shadow">
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
                   <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Hip</h5>
-                  <p className="text-sm font-Jost text-gray-600">Measure around the fullest part of your hips</p>
+                  <p className="text-sm font-PatrickHand text-gray-600">Measure around the fullest part of your hips</p>
                 </div>
               </div>
             </div>
@@ -321,7 +321,7 @@ const HelpPage = () => {
           <div className="space-y-6 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Frequently Asked Questions</h3>
-              <p className="font-Jost text-gray-600 leading-relaxed">
+              <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Find quick answers to common questions about our products, shipping, and policies.
               </p>
             </div>
@@ -345,7 +345,7 @@ const HelpPage = () => {
                   </button>
                   {expandedFaq === idx && (
                     <div id={`faq-${idx}`} className="px-6 pb-6">
-                      <p className="font-Jost text-gray-600 leading-relaxed">{faq.answer}</p>
+                      <p className="font-PatrickHand text-gray-600 leading-relaxed">{faq.answer}</p>
                     </div>
                   )}
                 </div>
@@ -358,7 +358,7 @@ const HelpPage = () => {
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Get in Touch</h3>
-              <p className="font-Jost text-gray-600 leading-relaxed">
+              <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 We're here to help! Reach out to us through any of the channels below.
               </p>
             </div>
@@ -368,10 +368,10 @@ const HelpPage = () => {
                   <Mail className="w-8 h-8 text-blue-600" />
                 </div>
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Email Us</h4>
-                <p className="font-Jost text-gray-600 mb-4 text-sm">Get in touch via email</p>
+                <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Get in touch via email</p>
                 <a 
                   href="mailto:prechi.clothing@gmail.com"
-                  className="text-blue-600 hover:text-blue-800 font-medium font-Jost transition-colors"
+                  className="text-blue-600 hover:text-blue-800 font-medium font-PatrickHand transition-colors"
                 >
                   prechi.clothing@gmail.com
                 </a>
@@ -381,10 +381,10 @@ const HelpPage = () => {
                   <Phone className="w-8 h-8 text-green-600" />
                 </div>
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Call Us</h4>
-                <p className="font-Jost text-gray-600 mb-4 text-sm">Speak with our team</p>
+                <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Speak with our team</p>
                 <a 
                   href="tel:+2349016420903"
-                  className="text-green-600 hover:text-green-800 font-medium font-Jost transition-colors"
+                  className="text-green-600 hover:text-green-800 font-medium font-PatrickHand transition-colors"
                 >
                   +234 901 642 0903
                 </a>
@@ -394,9 +394,9 @@ const HelpPage = () => {
                   <Clock className="w-8 h-8 text-purple-600" />
                 </div>
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Business Hours</h4>
-                <p className="font-Jost text-gray-600 mb-4 text-sm">We're available</p>
-                <p className="text-purple-600 font-medium font-Jost">8:30am - 10:00pm</p>
-                <p className="text-xs font-Jost text-gray-500 mt-1">Monday - Sunday</p>
+                <p className="font-PatrickHand text-gray-600 mb-4 text-sm">We're available</p>
+                <p className="text-purple-600 font-medium font-PatrickHand">8:30am - 10:00pm</p>
+                <p className="text-xs font-PatrickHand text-gray-500 mt-1">Monday - Sunday</p>
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
@@ -417,7 +417,7 @@ const HelpPage = () => {
       '--color-Accent': '#6E6E6E',
       '--color-Softcolor': '#F5F5DC',
       '--font-Manrope': '"Manrope", "sans-serif"',
-      '--font-Jost': '"Jost", "sans-serif"'
+      '--font-PatrickHand': '"Jost", "sans-serif"'
     }}>
       <Navbar2 />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 flex-1">
@@ -427,7 +427,7 @@ const HelpPage = () => {
             <li>
               <Link
                 to="/home"
-                className="px-3 py-1 rounded-full bg-gray-100 text-Primarycolor hover:bg-gray-200 hover:text-blue-800 transition-all duration-200 font-Jost"
+                className="px-3 py-1 rounded-full bg-gray-100 text-Primarycolor hover:bg-gray-200 hover:text-blue-800 transition-all duration-200 font-PatrickHand"
               >
                 Home
               </Link>
@@ -436,7 +436,7 @@ const HelpPage = () => {
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </li>
             <li>
-              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-semibold font-Jost">
+              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-semibold font-PatrickHand">
                 Help
               </span>
             </li>
@@ -445,7 +445,7 @@ const HelpPage = () => {
             </li>
             <li>
               <span
-                className="px-3 py-1 rounded-full bg-accent text-black font-semibold font-Jost"
+                className="px-3 py-1 rounded-full bg-accent text-black font-semibold font-PatrickHand"
                 aria-current="page"
               >
                 {activeTabLabel}
@@ -465,7 +465,7 @@ const HelpPage = () => {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-2 rounded-full text-left transition-all duration-200 font-Jost ${
+                      className={`w-full flex items-center space-x-3 px-4 py-2 rounded-full text-left transition-all duration-200 font-PatrickHand ${
                         activeTab === item.id
                           ? 'bg-accent text-black border border-accent shadow-sm'
                           : 'text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800'

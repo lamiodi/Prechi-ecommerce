@@ -105,7 +105,7 @@ const NewReleaseGrid = () => {
           '--color-Accent': '#6E6E6E',
           '--color-Softcolor': '#F5F5DC',
           '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-Jost': '"Jost", "sans-serif"'
+          '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
         <div className="animate-pulse">
@@ -136,15 +136,15 @@ const NewReleaseGrid = () => {
           '--color-Accent': '#6E6E6E',
           '--color-Softcolor': '#F5F5DC',
           '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-Jost': '"Jost", "sans-serif"'
+          '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
         <h3 className="font-Manrope">New Release</h3>
         <div className="text-center py-8">
-          <p className="text-red-600 mb-4 font-Jost">Error: {error}</p>
+          <p className="text-red-600 mb-4 font-PatrickHand">Error: {error}</p>
           <button 
             onClick={fetchNewReleases}
-            className="bg-accent text-Primarycolor py-2 px-4 rounded hover:bg-accent-dark transition-colors font-Jost"
+            className="bg-accent text-Primarycolor py-2 px-4 rounded hover:bg-accent-dark transition-colors font-PatrickHand"
           >
             Try Again
           </button>
@@ -162,19 +162,19 @@ const NewReleaseGrid = () => {
         '--color-Accent': '#6E6E6E',
         '--color-Softcolor': '#F5F5DC',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <h3 className="text-2xl font-bold mb-2 font-Manrope">New Release</h3>
       <div className="flex flex-row justify-between items-center gap-y-4 mb-6">
         <h4 className="font-light text-gray-600 font-Manrope">Explore our latest products</h4>
         <Link to="/shop" className="text-black hover:text-accent transition-colors">
-          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-Jost'>ALL</span></h4>
+          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-PatrickHand'>ALL</span></h4>
         </Link>
       </div>
       {products.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500 font-Jost">No new releases available at the moment.</p>
+          <p className="text-gray-500 font-PatrickHand">No new releases available at the moment.</p>
         </div>
       ) : (
         <div className="overflow-x-auto pb-4 scrollbar-hide">
@@ -257,7 +257,7 @@ const ProductCard = ({ product, onImageError, priority }) => {
       <div className="p-3 sm:p-4 pt-1">
         <Link to={`/product/${productId}?variant=${variantId}`}>
           <button
-            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl font-Jost"
+            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl font-PatrickHand"
             aria-label={`Shop ${displayName} now`}
           >
             Shop Now

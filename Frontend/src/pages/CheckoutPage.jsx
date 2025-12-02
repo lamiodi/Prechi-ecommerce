@@ -40,10 +40,10 @@ const GuestCheckoutModal = React.memo(({
             <User className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-Primarycolor font-Inter">
+            <h3 className="text-xl font-bold text-Primarycolor font-Manrope">
               Complete Your Order
             </h3>
-            <p className="text-sm text-Accent font-Jost">
+            <p className="text-sm text-Accent font-PatrickHand">
               Enter your details to proceed
             </p>
           </div>
@@ -76,7 +76,7 @@ const GuestCheckoutModal = React.memo(({
                 existingUserType === 'temporary' 
                   ? 'text-blue-800' 
                   : 'text-yellow-800'
-              } font-Jost`}>
+              } font-PatrickHand`}>
                 {existingUserType === 'temporary' 
                   ? 'A temporary account with this email already exists' 
                   : 'An account with this email already exists'}
@@ -85,7 +85,7 @@ const GuestCheckoutModal = React.memo(({
                 existingUserType === 'temporary' 
                   ? 'text-blue-700' 
                   : 'text-yellow-700'
-              } font-Jost`}>
+              } font-PatrickHand`}>
                 {existingUserType === 'temporary' 
                   ? 'Please use a different email or log in if you have a password.' 
                   : 'Please log in to continue with your existing account.'}
@@ -100,10 +100,10 @@ const GuestCheckoutModal = React.memo(({
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-red-800 font-Jost">
+              <p className="text-sm font-medium text-red-800 font-PatrickHand">
                 Please fill in your details to continue
               </p>
-              <p className="text-xs mt-1 text-red-700 font-Jost">
+              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
                 All fields marked with * are required
               </p>
             </div>
@@ -114,7 +114,7 @@ const GuestCheckoutModal = React.memo(({
       <form onSubmit={onSubmitGuestForm} className="space-y-4">
         {/* Enhanced form fields with better styling */}
         <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-Jost flex items-center">
+          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
             <User className="h-4 w-4 mr-2 text-Accent" />
             Full Name *
           </label>
@@ -124,7 +124,7 @@ const GuestCheckoutModal = React.memo(({
               name="name"
               value={guestForm.name}
               onChange={(e) => onGuestFormChange('name', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-Jost transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
+              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
                 guestFormErrors.name 
                   ? 'border-red-400 bg-red-50 focus:border-red-500' 
                   : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
@@ -138,7 +138,7 @@ const GuestCheckoutModal = React.memo(({
             )}
           </div>
           {guestFormErrors.name && (
-            <p className="text-xs text-red-600 mt-1 font-Jost flex items-center">
+            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
               <AlertCircle className="h-3 w-3 mr-1" />
               {guestFormErrors.name}
             </p>
@@ -146,7 +146,7 @@ const GuestCheckoutModal = React.memo(({
         </div>
         
         <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-Jost flex items-center">
+          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
             <svg className="h-4 w-4 mr-2 text-Accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
             </svg>
@@ -158,7 +158,7 @@ const GuestCheckoutModal = React.memo(({
               name="email"
               value={guestForm.email}
               onChange={(e) => onGuestFormChange('email', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-Jost transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
+              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
                 guestFormErrors.email 
                   ? 'border-red-400 bg-red-50 focus:border-red-500' 
                   : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
@@ -172,7 +172,7 @@ const GuestCheckoutModal = React.memo(({
             )}
           </div>
           {guestFormErrors.email && (
-            <p className="text-xs text-red-600 mt-1 font-Jost flex items-center">
+            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
               <AlertCircle className="h-3 w-3 mr-1" />
               {guestFormErrors.email}
             </p>
@@ -180,7 +180,7 @@ const GuestCheckoutModal = React.memo(({
         </div>
         
         <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-Jost flex items-center">
+          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
             <Smartphone className="h-4 w-4 mr-2 text-Accent" />
             Phone Number *
           </label>
@@ -190,7 +190,7 @@ const GuestCheckoutModal = React.memo(({
               name="phone_number"
               value={guestForm.phone_number}
               onChange={(e) => onGuestFormChange('phone_number', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-Jost transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
+              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
                 guestFormErrors.phone_number 
                   ? 'border-red-400 bg-red-50 focus:border-red-500' 
                   : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
@@ -204,7 +204,7 @@ const GuestCheckoutModal = React.memo(({
             )}
           </div>
           {guestFormErrors.phone_number && (
-            <p className="text-xs text-red-600 mt-1 font-Jost flex items-center">
+            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
               <AlertCircle className="h-3 w-3 mr-1" />
               {guestFormErrors.phone_number}
             </p>
@@ -213,20 +213,20 @@ const GuestCheckoutModal = React.memo(({
         
         {/* Order details info */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-          <p className="text-sm text-blue-800 font-Jost leading-relaxed">
+          <p className="text-sm text-blue-800 font-PatrickHand leading-relaxed">
             Your order details will be saved automatically. We'll send you order updates via email.
           </p>
         </div>
         
         {existingUserType === 'permanent' && (
           <div className="bg-Secondarycolor/10 border border-Secondarycolor/20 rounded-xl p-3 text-center">
-            <p className="text-sm text-Secondarycolor font-Jost mb-2">
+            <p className="text-sm text-Secondarycolor font-PatrickHand mb-2">
               Account already exists with this email
             </p>
             <button
               type="button"
               onClick={onLoginRedirect}
-              className="inline-flex items-center px-3 py-2 bg-Secondarycolor text-white rounded-lg hover:bg-Secondarycolor/90 font-Jost font-medium transition-colors"
+              className="inline-flex items-center px-3 py-2 bg-Secondarycolor text-white rounded-lg hover:bg-Secondarycolor/90 font-PatrickHand font-medium transition-colors"
             >
               <User className="h-4 w-4 mr-2" />
               Log in to your existing account
@@ -240,7 +240,7 @@ const GuestCheckoutModal = React.memo(({
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 bg-Primarycolor text-white rounded-xl hover:bg-Primarycolor/90 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed font-Jost font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full px-4 py-2.5 bg-Primarycolor text-white rounded-xl hover:bg-Primarycolor/90 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed font-PatrickHand font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             {loading ? (
               <>
@@ -261,7 +261,7 @@ const GuestCheckoutModal = React.memo(({
           <button
             type="button"
             onClick={() => navigate('/cart')}
-            className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-Accent hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center font-Jost font-medium transition-all duration-200"
+            className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-Accent hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center font-PatrickHand font-medium transition-all duration-200"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Return to Cart
@@ -1681,7 +1681,7 @@ const CheckoutPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center text-Accent">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-Primarycolor"></div>
-          <p className="mt-2 text-sm font-Jost">Loading...</p>
+          <p className="mt-2 text-sm font-PatrickHand">Loading...</p>
         </div>
       </div>
     );
@@ -1752,7 +1752,7 @@ const CheckoutPage = () => {
     if (pendingOrderId) {
       return (
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center text-Accent py-8 font-Jost">
+          <div className="text-center text-Accent py-8 font-PatrickHand">
             <p>Your order is pending payment.</p>
             <Link to={`/orders/${pendingOrderId}`} className="mt-4 inline-flex items-center text-Accent hover:text-Primarycolor">
               View Order
@@ -1765,7 +1765,7 @@ const CheckoutPage = () => {
     // Original empty cart message
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-Accent py-8 font-Jost">
+        <div className="text-center text-Accent py-8 font-PatrickHand">
           Your cart is empty. Please add items to proceed.
           <Link to="/cart" className="mt-4 inline-flex items-center text-Accent hover:text-Primarycolor">
             <ArrowLeft className="h-5 w-5 mr-2" /> Go to Cart
@@ -1784,28 +1784,28 @@ const CheckoutPage = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Inter': '"Inter", sans-serif',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-Manrope': '"Inter", sans-serif',
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <Navbar2 />
       <div className="max-w-7xl mx-auto px-[0.4em] md:px-4 sm:px-6 lg:px-8 py-7 pt-20">
-        <Link to="/cart" className="inline-flex items-center text-Accent hover:text-Primarycolor mb-6 font-Jost">
+        <Link to="/cart" className="inline-flex items-center text-Accent hover:text-Primarycolor mb-6 font-PatrickHand">
           <ArrowLeft className="h-5 w-5 mr-1" /> Back to Cart
         </Link>
-        <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-Inter">Checkout</h2>
+        <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Checkout</h2>
         
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
             <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-            <span className="text-sm text-red-700 font-Jost">{error}</span>
+            <span className="text-sm text-red-700 font-PatrickHand">{error}</span>
           </div>
         )}
         
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
             <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-            <span className="text-sm text-green-600 font-Jost">{success}</span>
+            <span className="text-sm text-green-600 font-PatrickHand">{success}</span>
           </div>
         )}
         
@@ -1813,7 +1813,7 @@ const CheckoutPage = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-md w-full p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-Primarycolor flex items-center font-Inter">
+                <h3 className="text-xl font-bold text-Primarycolor flex items-center font-Manrope">
                   <Bitcoin className="h-5 w-5 mr-2 text-orange-500" />
                   Bitcoin Payment Instructions
                 </h3>
@@ -1827,12 +1827,12 @@ const CheckoutPage = () => {
               
               <div className="space-y-4">
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <p className="text-sm text-orange-800 font-Jost">
+                  <p className="text-sm text-orange-800 font-PatrickHand">
                     To complete your purchase with Bitcoin, please follow these steps:
                   </p>
                 </div>
                 
-                <ol className="list-decimal pl-5 space-y-2 text-sm text-Accent font-Jost">
+                <ol className="list-decimal pl-5 space-y-2 text-sm text-Accent font-PatrickHand">
                   <li>Take a screenshot of your checkout page showing the order total and items</li>
                   <li>Click the button below to open WhatsApp</li>
                   <li>Send the screenshot along with your order details</li>
@@ -1841,7 +1841,7 @@ const CheckoutPage = () => {
                 </ol>
                 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                  <p className="text-sm text-blue-800 font-Jost">
+                  <p className="text-sm text-blue-800 font-PatrickHand">
                     <strong>Note:</strong> Your order will be reserved for 2 hours to allow time for Bitcoin payment completion.
                   </p>
                 </div>
@@ -1849,14 +1849,14 @@ const CheckoutPage = () => {
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button
                     onClick={handleWhatsAppPayment}
-                    className="flex-1 flex items-center justify-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-Jost"
+                    className="flex-1 flex items-center justify-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-PatrickHand"
                   >
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Open WhatsApp
                   </button>
                   <button
                     onClick={() => setShowBitcoinInstructions(false)}
-                    className="flex-1 bg-gray-200 text-Primarycolor py-2 px-4 rounded-md hover:bg-gray-300 transition-colors font-Jost"
+                    className="flex-1 bg-gray-200 text-Primarycolor py-2 px-4 rounded-md hover:bg-gray-300 transition-colors font-PatrickHand"
                   >
                     Cancel
                   </button>
@@ -1894,17 +1894,17 @@ const CheckoutPage = () => {
                   <>
                     {/* Shipping Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Shipping Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
                       
                       {requiredForm === 'shipping' && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                           <div className="flex items-start">
                             <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
                             <div>
-                              <p className="text-sm font-medium text-red-800 font-Jost">
+                              <p className="text-sm font-medium text-red-800 font-PatrickHand">
                                 Please add a shipping address
                               </p>
-                              <p className="text-xs mt-1 text-red-700 font-Jost">
+                              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
                                 This information is required to deliver your order
                               </p>
                             </div>
@@ -1917,12 +1917,12 @@ const CheckoutPage = () => {
                           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <div className="flex items-start">
                               <div className="flex-1">
-                                <h4 className="font-medium text-Primarycolor font-Inter mb-2">Shipping Address</h4>
-                                <div className="text-sm text-black font-Jost">
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.address_line_1}</p>
+                                <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Shipping Address</h4>
+                                <div className="text-sm text-black font-PatrickHand">
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
                                   {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.country}</p>
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
                                 </div>
                               </div>
                               <button
@@ -1963,7 +1963,7 @@ const CheckoutPage = () => {
                     
                     {/* Billing Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Billing Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
                       
                       {/* Billing Address Option Selector */}
                       <div className="mb-6">
@@ -1977,7 +1977,7 @@ const CheckoutPage = () => {
                               onChange={() => setBillingAddressOption('same')}
                               className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
                             />
-                            <span className="text-sm font-medium text-Accent font-Jost">Use my shipping address for billing</span>
+                            <span className="text-sm font-medium text-Accent font-PatrickHand">Use my shipping address for billing</span>
                           </label>
                           <label className="flex items-center cursor-pointer">
                             <input
@@ -1988,7 +1988,7 @@ const CheckoutPage = () => {
                               onChange={() => setBillingAddressOption('different')}
                               className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
                             />
-                            <span className="text-sm font-medium text-Accent font-Jost">Enter a different billing address</span>
+                            <span className="text-sm font-medium text-Accent font-PatrickHand">Enter a different billing address</span>
                           </label>
                         </div>
                       </div>
@@ -1998,10 +1998,10 @@ const CheckoutPage = () => {
                           <div className="flex items-start">
                             <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
                             <div>
-                              <p className="text-sm font-medium text-red-800 font-Jost">
+                              <p className="text-sm font-medium text-red-800 font-PatrickHand">
                                 Please add a billing address
                               </p>
-                              <p className="text-xs mt-1 text-red-700 font-Jost">
+                              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
                                 This information is required to process your payment
                               </p>
                             </div>
@@ -2013,16 +2013,16 @@ const CheckoutPage = () => {
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                           <div className="flex items-start">
                             <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Inter mb-2">Billing Address (Same as Shipping)</h4>
+                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
                               {shippingForm.address_line_1 ? (
-                                <div className="text-sm text-black font-Jost">
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.address_line_1}</p>
+                                <div className="text-sm text-black font-PatrickHand">
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
                                   {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Inter">{shippingForm.country}</p>
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
+                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
                                 </div>
                               ) : (
-                                <p className="text-sm text-gray-500 font-Jost">Please enter a shipping address first</p>
+                                <p className="text-sm text-gray-500 font-PatrickHand">Please enter a shipping address first</p>
                               )}
                             </div>
                             <button
@@ -2056,20 +2056,20 @@ const CheckoutPage = () => {
                   <>
                     {/* Shipping Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Shipping Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
                       
                       {shippingAddresses.length > 0 ? (
                         <>
                           {/* Address Selection Dropdown */}
                           {shippingAddresses.length > 1 && (
                             <div className="mb-4">
-                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-Jost">
+                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
                                 Select Shipping Address
                               </label>
                               <select
                                 value={shippingAddressId || ''}
                                 onChange={(e) => setShippingAddressId(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-Jost"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
                               >
                                 {shippingAddresses.map(address => (
                                   <option key={address.id} value={String(address.id)}>
@@ -2116,7 +2116,7 @@ const CheckoutPage = () => {
                             <div className="mt-4 pt-4 border-t border-gray-200">
                               <button
                                 onClick={handleAddNewShippingAddress}
-                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-Jost"
+                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
                               >
                                 <Plus className="h-4 w-4 mr-1" />
                                 Add Another Address
@@ -2127,11 +2127,11 @@ const CheckoutPage = () => {
                       ) : (
                         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                           <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Inter">No shipping address found</p>
-                          <p className="text-sm text-gray-600 mb-6 font-Jost">Add your shipping address to continue with checkout</p>
+                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No shipping address found</p>
+                          <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your shipping address to continue with checkout</p>
                           <button
                             onClick={handleAddNewShippingAddress}
-                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-Jost"
+                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
                           >
                             <MapPin className="h-5 w-5 mr-2" />
                             Add Shipping Address
@@ -2145,7 +2145,7 @@ const CheckoutPage = () => {
                     {/* Shipping Address Form for Logged-in Users */}
                     {showShippingForm && (
                       <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">
+                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">
                           {editingShippingAddress ? 'Edit Shipping Address' : 'Add Shipping Address'}
                         </h3>
                         <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
@@ -2164,7 +2164,7 @@ const CheckoutPage = () => {
 
                     {/* Billing Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Billing Address</h3>
+                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
                       
                       {/* Billing Address Option Selector for Logged-in Users */}
                       <div className="mb-6">
@@ -2178,7 +2178,7 @@ const CheckoutPage = () => {
                               onChange={() => setBillingAddressOption('same')}
                               className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
                             />
-                            <span className="text-sm font-medium text-Accent font-Jost">Same as shipping address</span>
+                            <span className="text-sm font-medium text-Accent font-PatrickHand">Same as shipping address</span>
                           </label>
                           <label className="flex items-center cursor-pointer">
                             <input
@@ -2189,7 +2189,7 @@ const CheckoutPage = () => {
                               onChange={() => setBillingAddressOption('different')}
                               className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
                             />
-                            <span className="text-sm font-medium text-Accent font-Jost">Use a different billing address</span>
+                            <span className="text-sm font-medium text-Accent font-PatrickHand">Use a different billing address</span>
                           </label>
                         </div>
                       </div>
@@ -2199,25 +2199,25 @@ const CheckoutPage = () => {
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                           <div className="flex items-start">
                             <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Inter mb-2">Billing Address (Same as Shipping)</h4>
+                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
                               {shippingAddresses.length > 0 && shippingAddressId ? (
-                                <div className="text-sm text-black font-Jost">
+                                <div className="text-sm text-black font-PatrickHand">
                                   {shippingAddresses
                                     .filter(addr => String(addr.id) === String(shippingAddressId))
                                     .map(address => (
                                       <div key={address.id}>
-                                        <p className="text-sm text-Primarycolor font-Inter">{address.title}</p>
-                                        <p className="text-sm text-Primarycolor font-Inter">{address.address_line_1}</p>
+                                        <p className="text-sm text-Primarycolor font-Manrope">{address.title}</p>
+                                        <p className="text-sm text-Primarycolor font-Manrope">{address.address_line_1}</p>
                                         {address.landmark && <p>{address.landmark}</p>}
-                                        <p className="text-sm text-Primarycolor font-Inter">{address.city}, {address.state} {address.zip_code}</p>
-                                        <p className="text-sm text-Primarycolor font-Inter">{address.country}</p>
-                                        {address.phone_number && <p className="text-sm text-Primarycolor font-Inter">{address.phone_number}</p>}
+                                        <p className="text-sm text-Primarycolor font-Manrope">{address.city}, {address.state} {address.zip_code}</p>
+                                        <p className="text-sm text-Primarycolor font-Manrope">{address.country}</p>
+                                        {address.phone_number && <p className="text-sm text-Primarycolor font-Manrope">{address.phone_number}</p>}
                                       </div>
                                     ))
                                   }
                                 </div>
                               ) : (
-                                <p className="text-sm text-gray-500 font-Jost">Please select a shipping address first</p>
+                                <p className="text-sm text-gray-500 font-PatrickHand">Please select a shipping address first</p>
                               )}
                             </div>
                           </div>
@@ -2229,13 +2229,13 @@ const CheckoutPage = () => {
                           {/* Address Selection Dropdown */}
                           {billingAddresses.length > 1 && (
                             <div className="mb-4">
-                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-Jost">
+                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
                                 Select Billing Address
                               </label>
                               <select
                                 value={billingAddressId || ''}
                                 onChange={(e) => setBillingAddressId(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-Jost"
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
                               >
                                 {billingAddresses.map(address => (
                                   <option key={address.id} value={String(address.id)}>
@@ -2282,7 +2282,7 @@ const CheckoutPage = () => {
                             <div className="mt-4 pt-4 border-t border-gray-200">
                               <button
                                 onClick={handleAddNewBillingAddress}
-                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-Jost"
+                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
                               >
                                 <Plus className="h-4 w-4 mr-1" />
                                 Add Another Address
@@ -2293,11 +2293,11 @@ const CheckoutPage = () => {
                       ) : (
                         <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                           <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Inter">No billing address found</p>
-                          <p className="text-sm text-gray-600 mb-6 font-Jost">Add your billing address for payment processing</p>
+                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No billing address found</p>
+                          <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your billing address for payment processing</p>
                           <button
                             onClick={handleAddNewBillingAddress}
-                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-Jost"
+                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
                           >
                             <CreditCard className="h-5 w-5 mr-2" />
                             Add Billing Address
@@ -2316,7 +2316,7 @@ const CheckoutPage = () => {
                 {/* Billing Address Form for Logged-in Users */}
                     {showBillingForm && (
                       <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Add Billing Address</h3>
+                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
                         <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
                           <BillingAddressForm
                             address={{ state: billingForm, setState: setBillingForm }}
@@ -2334,20 +2334,20 @@ const CheckoutPage = () => {
 
                     {/* Order Note */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Inter">Special Instructions (optional)</h3>
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Special Instructions (optional)</h3>
                   <textarea
                     value={orderNote}
                     onChange={handleOrderNoteChange}
                     maxLength={500}
                     placeholder="Add special delivery instructions, gift message, or other notes for your order"
-                    className="w-full p-2 border border-gray-300 rounded-md font-Jost"
+                    className="w-full p-2 border border-gray-300 rounded-md font-PatrickHand"
                   />
-                  <p className="text-sm text-Accent font-Jost">Characters left: {500 - orderNote.length}/500</p>
+                  <p className="text-sm text-Accent font-PatrickHand">Characters left: {500 - orderNote.length}/500</p>
                 </div>
                 
                 {/* Shipping Method */}
                 <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Inter">
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">
                     <Truck className="h-5 w-5 inline mr-2" />
                     Choose Delivery Method
                   </h3>
@@ -2388,16 +2388,16 @@ const CheckoutPage = () => {
                                       {getShippingIcon(option.icon)}
                                     </div>
                                     <div>
-                                      <h4 className="font-semibold text-Primarycolor text-sm sm:text-base font-Inter">
+                                      <h4 className="font-semibold text-Primarycolor text-sm sm:text-base font-Manrope">
                                         {option.method}
                                       </h4>
-                                      <p className="text-xs sm:text-sm text-Accent font-Jost">
+                                      <p className="text-xs sm:text-sm text-Accent font-PatrickHand">
                                         {option.description}
                                       </p>
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <div className="font-bold text-Primarycolor text-lg font-Inter">
+                                    <div className="font-bold text-Primarycolor text-lg font-Manrope">
                                       {option.total_cost.toLocaleString('en-NG', {
                                         style: 'currency',
                                         currency: 'NGN',
@@ -2406,7 +2406,7 @@ const CheckoutPage = () => {
                                     </div>
                                   </div>
                                 </div>
-                                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm text-Accent font-Jost">
+                                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm text-Accent font-PatrickHand">
                                   <Clock className="h-4 w-4" />
                                   <span>{option.estimated_delivery}</span>
                                 </div>
@@ -2430,23 +2430,23 @@ const CheckoutPage = () => {
                           <MapPin className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-Primarycolor font-Inter">
+                          <h4 className="font-semibold text-Primarycolor font-Manrope">
                             International Shipping to {addressCountry}
                           </h4>
                         </div>
                       </div>
-                      <p className="text-sm text-Accent font-Jost mb-2">
+                      <p className="text-sm text-Accent font-PatrickHand mb-2">
                         You will receive a separate email with payment instructions for international shipping fees.
                         Note: Payments are processed in NGN due to current system limitations.
                       </p>
-                      <div className="flex items-center gap-2 text-xs text-blue-600 font-Jost">
+                      <div className="flex items-center gap-2 text-xs text-blue-600 font-PatrickHand">
                         <Clock className="h-3 w-3" />
                         <span>Estimated delivery: 10-21 business days</span>
                       </div>
                     </div>
                   )}
                   {formErrors.shippingMethod && (
-                    <p className="text-sm text-red-600 mt-2 font-Jost">{formErrors.shippingMethod}</p>
+                    <p className="text-sm text-red-600 mt-2 font-PatrickHand">{formErrors.shippingMethod}</p>
                   )}
                 </div>
               </div>
@@ -2454,7 +2454,7 @@ const CheckoutPage = () => {
               {/* Right Column - Order Summary */}
               <div className="lg:col-span-5 ">
                 <div className="p-6 bg-white rounded-lg shadow-md sticky top-24">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Inter">Order Summary</h3>
+                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">Order Summary</h3>
                   <div className="space-y-4 mb-6">
                     {cart.items.map((cartItem, index) => {
                       const item = cartItem.item || {};
@@ -2478,18 +2478,18 @@ const CheckoutPage = () => {
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-Primarycolor text-sm sm:text-base truncate font-Inter">
+                              <h4 className="font-medium text-Primarycolor text-sm sm:text-base truncate font-Manrope">
                                 {item.name || 'Unknown Item'}
                               </h4>
                               {item.is_product && (item.color || item.size) && (
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   {item.color && (
-                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-Accent font-Jost">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-Accent font-PatrickHand">
                                       {item.color || item.color_name}
                                     </span>
                                   )}
                                   {item.size && (
-                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-Accent font-Jost">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-Accent font-PatrickHand">
                                       {item.size || item.size_name}
                                     </span>
                                   )}
@@ -2497,7 +2497,7 @@ const CheckoutPage = () => {
                               )}
                               {!item.is_product && Array.isArray(item.items) && item.items.length > 0 && (
                                 <div className="mt-2">
-                                  <p className="text-xs text-Accent mb-1 font-Jost">Bundle includes:</p>
+                                  <p className="text-xs text-Accent mb-1 font-PatrickHand">Bundle includes:</p>
                                   <div className="grid grid-cols-3 gap-1">
                                     {item.items.map((bundleItem, idx) => (
                                       <div key={bundleItem.id || idx} className="flex flex-col items-center">
@@ -2509,10 +2509,10 @@ const CheckoutPage = () => {
                                             e.target.src = 'https://via.placeholder.com/40x40'; 
                                           }}
                                         />
-                                        <span className="text-xs text-Accent font-Jost truncate w-full text-center">
+                                        <span className="text-xs text-Accent font-PatrickHand truncate w-full text-center">
                                           {bundleItem.color_name}
                                         </span>
-                                        <span className="text-xs text-Accent font-Jost truncate w-full text-center">
+                                        <span className="text-xs text-Accent font-PatrickHand truncate w-full text-center">
                                           {bundleItem.size_name}
                                         </span>
                                       </div>
@@ -2521,14 +2521,14 @@ const CheckoutPage = () => {
                                 </div>
                               )}
                               <div className="mt-2 flex items-center justify-between">
-                                <span className="text-xs text-Accent font-Jost">
+                                <span className="text-xs text-Accent font-PatrickHand">
                                   {price.toLocaleString('en-NG', {
                                     style: 'currency',
                                     currency: 'NGN',
                                     minimumFractionDigits: 2,
                                   })} each
                                 </span>
-                                <span className="font-semibold text-Primarycolor font-Inter">
+                                <span className="font-semibold text-Primarycolor font-Manrope">
                                   {itemTotal.toLocaleString('en-NG', {
                                     style: 'currency',
                                     currency: 'NGN',
@@ -2552,7 +2552,7 @@ const CheckoutPage = () => {
                   </div>
                   
                   <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-Primarycolor mb-3 font-Inter">Payment Method</h4>
+                    <h4 className="text-sm font-semibold text-Primarycolor mb-3 font-Manrope">Payment Method</h4>
                     <div className="space-y-2">
                       <label
                         className={`flex items-center p-3 border rounded-lg cursor-pointer transition-all ${
@@ -2568,8 +2568,8 @@ const CheckoutPage = () => {
                           className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-3"
                         />
                         <div className="flex flex-col">
-                          <span className="text-sm text-Accent font-Jost font-medium">Debit/Credit Card</span>
-                          <span className="text-xs text-gray-500 font-Jost">Pay securely with Visa, Mastercard, or Verve</span>
+                          <span className="text-sm text-Accent font-PatrickHand font-medium">Debit/Credit Card</span>
+                          <span className="text-xs text-gray-500 font-PatrickHand">Pay securely with Visa, Mastercard, or Verve</span>
                         </div>
                       </label>
                       <label
@@ -2586,8 +2586,8 @@ const CheckoutPage = () => {
                           className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-3"
                         />
                         <div className="flex flex-col">
-                          <span className="text-sm text-Accent font-Jost font-medium">Bank Transfer</span>
-                          <span className="text-xs text-gray-500 font-Jost">Direct transfer from your bank account</span>
+                          <span className="text-sm text-Accent font-PatrickHand font-medium">Bank Transfer</span>
+                          <span className="text-xs text-gray-500 font-PatrickHand">Direct transfer from your bank account</span>
                         </div>
                       </label>
                       <label
@@ -2606,8 +2606,8 @@ const CheckoutPage = () => {
                         <div className="flex items-center">
                           <Bitcoin className="h-4 w-4 text-orange-500 mr-2" />
                           <div className="flex flex-col">
-                            <span className="text-sm text-Accent font-Jost font-medium">Bitcoin/Crypto</span>
-                            <span className="text-xs text-gray-500 font-Jost">Pay with Bitcoin or other cryptocurrencies</span>
+                            <span className="text-sm text-Accent font-PatrickHand font-medium">Bitcoin/Crypto</span>
+                            <span className="text-xs text-gray-500 font-PatrickHand">Pay with Bitcoin or other cryptocurrencies</span>
                           </div>
                         </div>
                       </label>
@@ -2616,7 +2616,7 @@ const CheckoutPage = () => {
                   
                   <div className="border-t border-gray-200 pt-4">
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm text-Accent font-Jost">
+                      <div className="flex justify-between text-sm text-Accent font-PatrickHand">
                         <span>Subtotal</span>
                         <span>
                           {displaySubtotal.toLocaleString('en-NG', {
@@ -2628,7 +2628,7 @@ const CheckoutPage = () => {
                       </div>
                       
                       {displayFirstOrderDiscount > 0 && (
-                        <div className="flex justify-between text-sm text-green-600 font-Jost">
+                        <div className="flex justify-between text-sm text-green-600 font-PatrickHand">
                           <span>First Order Discount (5%)</span>
                           <span>
                             -{displayFirstOrderDiscount.toLocaleString('en-NG', {
@@ -2641,7 +2641,7 @@ const CheckoutPage = () => {
                       )}
                       
                       {displayCouponDiscount > 0 && (
-                        <div className="flex justify-between text-sm text-green-600 font-Jost">
+                        <div className="flex justify-between text-sm text-green-600 font-PatrickHand">
                           <span>Coupon Discount</span>
                           <span>
                             -{displayCouponDiscount.toLocaleString('en-NG', {
@@ -2653,7 +2653,7 @@ const CheckoutPage = () => {
                         </div>
                       )}
                       
-                      <div className="flex justify-between text-sm text-Accent font-Jost">
+                      <div className="flex justify-between text-sm text-Accent font-PatrickHand">
                         <span>Shipping</span>
                         <span>
                           {isNigeria ? (
@@ -2669,7 +2669,7 @@ const CheckoutPage = () => {
                       </div>
                       
                       {!isNigeria && (
-                        <div className="flex justify-between text-sm text-Accent font-Jost">
+                        <div className="flex justify-between text-sm text-Accent font-PatrickHand">
                           <span>Tax (5%)</span>
                           <span>
                             {displayTax.toLocaleString('en-NG', {
@@ -2683,7 +2683,7 @@ const CheckoutPage = () => {
                     </div>
                     
                     <div className="border-t border-gray-200 mt-3 pt-3">
-                      <div className="flex justify-between text-lg font-bold text-Primarycolor font-Inter">
+                      <div className="flex justify-between text-lg font-bold text-Primarycolor font-Manrope">
                         <span>Total</span>
                         <span>
                           {displayTotal.toLocaleString('en-NG', {
@@ -2697,7 +2697,7 @@ const CheckoutPage = () => {
                     
                     {!isNigeria && (
                       <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <p className="text-xs text-blue-700 font-Jost">
+                        <p className="text-xs text-blue-700 font-PatrickHand">
                           <strong>Note:</strong> International shipping fees will be calculated and invoiced separately. All payments are processed in NGN.
                         </p>
                       </div>
@@ -2705,7 +2705,7 @@ const CheckoutPage = () => {
                     
                     {displayFirstOrderDiscount > 0 && (
                       <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                        <p className="text-xs text-green-700 font-Jost">
+                        <p className="text-xs text-green-700 font-PatrickHand">
                           🎉 <strong>Congratulations!</strong> You've received a 5% discount on your first order.
                         </p>
                       </div>
@@ -2713,7 +2713,7 @@ const CheckoutPage = () => {
                     
                     {appliedCoupon && (
                       <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                        <p className="text-xs text-green-700 font-Jost">
+                        <p className="text-xs text-green-700 font-PatrickHand">
                           🎁 <strong>Coupon Applied!</strong> You saved {appliedCoupon.type === 'percentage' 
                             ? `${appliedCoupon.value}%` 
                             : `₦${appliedCoupon.amount.toFixed(2)}`} with coupon code {appliedCoupon.code}.
@@ -2726,12 +2726,12 @@ const CheckoutPage = () => {
                         <div className="flex items-start">
                           <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-yellow-800 font-Jost">
+                            <p className="text-sm font-medium text-yellow-800 font-PatrickHand">
                               {requiredForm === 'guest' && 'Complete Your Details'}
                               {requiredForm === 'shipping' && 'Add Shipping Address'}
                               {requiredForm === 'billing' && 'Add Billing Address'}
                             </p>
-                            <p className="text-xs mt-1 text-yellow-700 font-Jost">
+                            <p className="text-xs mt-1 text-yellow-700 font-PatrickHand">
                               {requiredForm === 'guest' && 'Fill in your name, email, and phone number above to continue'}
                               {requiredForm === 'shipping' && 'Add your shipping address to proceed with checkout'}
                               {requiredForm === 'billing' && 'Add your billing address or use same as shipping address'}
@@ -2744,7 +2744,7 @@ const CheckoutPage = () => {
                     {/* Updated Place Order Button */}
                     <button
                       onClick={handlePlaceOrder}
-                      className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-Inter font-semibold"
+                      className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-Manrope font-semibold"
                       disabled={isProcessing || loading || 
                         (!shippingForm.address_line_1 && !shippingAddressId) || 
                         (!billingForm.address_line_1 && !billingAddressId) || 
@@ -2766,7 +2766,7 @@ const CheckoutPage = () => {
                       <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
                         <div className="flex items-center gap-2">
                           <Bitcoin className="h-4 w-4 text-orange-600" />
-                          <p className="text-xs text-orange-800 font-Jost">
+                          <p className="text-xs text-orange-800 font-PatrickHand">
                             <strong>Bitcoin Payment:</strong> After placing your order, you'll receive detailed payment instructions via email.
                           </p>
                         </div>

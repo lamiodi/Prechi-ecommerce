@@ -252,7 +252,7 @@ const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="typography flex flex-col w-full items-center lgx:items-start space-y-3 md:space-y-4 min-lgx:space-y-[3rem] z-20">
-        <h1 className="text-center lgx:text-left text-nowrap lgx:text-5xl">
+        <h1 className="text-center lgx:text-left text-nowrap lgx:text-5xl font-UnifrakturCook">
           Unmatched Comfort.
           <span className="max-sm:hidden"> Bold Performance.</span>
           <br />
@@ -264,7 +264,7 @@ const HeroSection = () => {
             variant="primary"
             size="medium"
             stateProp="default"
-            className="w-44"
+            className="w-44 font-UnifrakturCook"
             divClassName=""
           />
         </Link>

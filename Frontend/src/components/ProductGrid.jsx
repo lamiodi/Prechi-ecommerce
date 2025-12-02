@@ -120,7 +120,7 @@ const ProductGrid = () => {
             Premium comfort, tailored for everyday movement.
           </h4>
           <Link to="/shop" className="text-black hover:text-accent transition-colors">
-          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-Jost'>ALL</span></h4>
+          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-PatrickHand'>ALL</span></h4>
           </Link>
         </div>
       </div>

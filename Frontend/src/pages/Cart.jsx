@@ -805,7 +805,7 @@ const Cart = () => {
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h3 className="text-base md:text-lg font-semibold font-Inter text-gray-900 line-clamp-2">
+                        <h3 className="text-base md:text-lg font-semibold font-Manrope text-gray-900 line-clamp-2">
                           {item.item.name}
                           {!item.item.is_product && (
                             <span className="inline-flex items-center ml-2 px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
@@ -910,8 +910,8 @@ const Cart = () => {
                   {/* Price Section */}
                   <div className="flex-shrink-0 text-right">
                     <div className="space-y-1">
-                      <p className="text-sm text-gray-500 font-Jost">{formattedPrice} each</p>
-                      <p className="text-lg md:text-xl font-bold text-gray-900 font-Jost">{formattedTotalPrice}</p>
+                      <p className="text-sm text-gray-500 font-PatrickHand">{formattedPrice} each</p>
+                      <p className="text-lg md:text-xl font-bold text-gray-900 font-PatrickHand">{formattedTotalPrice}</p>
                     </div>
                   </div>
                 </div>
@@ -919,7 +919,7 @@ const Cart = () => {
                 {/* Quantity Controls */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t border-gray-200 gap-3">
                   <div className="flex items-center">
-                    <label className="text-sm text-gray-600 font-Jost mr-3">Quantity:</label>
+                    <label className="text-sm text-gray-600 font-PatrickHand mr-3">Quantity:</label>
                     <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                       <button
                         onClick={() => debouncedUpdateQuantity(item.id, item.quantity - 1)}
@@ -932,7 +932,7 @@ const Cart = () => {
                         {isUpdating === item.id ? (
                           <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-Primarycolor mx-auto" />
                         ) : (
-                          <span className="text-xs sm:text-sm font-semibold font-Jost">{item.quantity}</span>
+                          <span className="text-xs sm:text-sm font-semibold font-PatrickHand">{item.quantity}</span>
                         )}
                       </div>
                       <button
@@ -948,7 +948,7 @@ const Cart = () => {
                   {/* Delete Button - Bottom */}
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-Jost transition-colors"
+                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-PatrickHand transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                     Remove
@@ -972,14 +972,14 @@ const Cart = () => {
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
           '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-Jost': '"Jost", "sans-serif"',
+          '--font-PatrickHand': '"Jost", "sans-serif"',
         }}
       >
         <Navbar2 />
         <div className="min-h-screen flex items-center justify-center">
           <div className="flex flex-col items-center justify-center text-gray-600">
             <Loader2 className="animate-spin h-8 w-8 text-Primarycolor" />
-            <p className="mt-2 text-sm font-Jost">Loading cart...</p>
+            <p className="mt-2 text-sm font-PatrickHand">Loading cart...</p>
           </div>
         </div>
         <Suspense fallback={null}>
@@ -996,7 +996,7 @@ const Cart = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"',
+        '--font-PatrickHand': '"Jost", "sans-serif"',
       }}
     >
       <Navbar2 />
@@ -1006,11 +1006,11 @@ const Cart = () => {
           <div className="mb-6 md:mb-8">
             <div className="flex flex-col gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-Inter text-gray-900">Shopping Cart</h1>
-                <p className="font-Jost text-gray-600 text-sm md:text-base mt-1">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold font-Manrope text-gray-900">Shopping Cart</h1>
+                <p className="font-PatrickHand text-gray-600 text-sm md:text-base mt-1">
                   {cart.items.length} {cart.items.length === 1 ? 'item' : 'items'} in your cart
                   {isGuest && (
-                    <span className="ml-2 text-sm font-Jost text-gray-500 flex items-center">
+                    <span className="ml-2 text-sm font-PatrickHand text-gray-500 flex items-center">
                       <User className="h-4 w-4 mr-1" />
                       Guest Cart
                     </span>
@@ -1021,7 +1021,7 @@ const Cart = () => {
               {/* Continue Shopping Button - Better Position */}
               {cart.items.length > 0 && (
                 <Link to="/shop" className="self-start">
-                  <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium font-Jost flex items-center gap-2 transition-colors">
+                  <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium font-PatrickHand flex items-center gap-2 transition-colors">
                     <ArrowRight className="h-4 w-4 rotate-180" />
                     Continue Shopping
                   </button>
@@ -1034,7 +1034,7 @@ const Cart = () => {
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <span className="text-red-700 font-Jost text-sm">{error}</span>
+              <span className="text-red-700 font-PatrickHand text-sm">{error}</span>
             </div>
           )}
           
@@ -1045,10 +1045,10 @@ const Cart = () => {
               <div className="space-y-4">
                 {/* Your Items Header with Clear All Items Button */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-                  <h2 className="text-lg md:text-xl font-semibold font-Inter text-gray-900">Your Items</h2>
+                  <h2 className="text-lg md:text-xl font-semibold font-Manrope text-gray-900">Your Items</h2>
                   <button
                     onClick={clearCart}
-                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium font-Jost flex items-center justify-center gap-2 transition-colors"
+                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium font-PatrickHand flex items-center justify-center gap-2 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
                     Clear All Items
@@ -1068,21 +1068,21 @@ const Cart = () => {
                           <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-full mb-4">
                             <ShoppingBag className="h-10 w-10 md:h-12 md:w-12 text-gray-400" />
                           </div>
-                          <h2 className="text-xl md:text-2xl font-bold font-Inter text-gray-900 mb-3">Your cart is empty</h2>
-                          <p className="font-Jost text-gray-600 mb-8 text-sm md:text-base">
+                          <h2 className="text-xl md:text-2xl font-bold font-Manrope text-gray-900 mb-3">Your cart is empty</h2>
+                          <p className="font-PatrickHand text-gray-600 mb-8 text-sm md:text-base">
                             Looks like you haven't added anything to your cart yet. Start shopping to fill it up!
                           </p>
                         </div>
                         <div className="space-y-3">
                           <Link to="/shop">
-                            <button className="w-full bg-gray-900 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-medium font-Jost">
+                            <button className="w-full bg-gray-900 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-medium font-PatrickHand">
                               Continue Shopping
                             </button>
                           </Link>
                           
                           {isGuest && (
                             <div className="bg-blue-50 rounded-lg p-4 mt-4">
-                              <p className="text-sm text-blue-700 font-Jost">
+                              <p className="text-sm text-blue-700 font-PatrickHand">
                                 <span className="font-medium">Shopping as a guest?</span> Your cart will be saved until you complete your purchase.
                               </p>
                             </div>
@@ -1105,15 +1105,15 @@ const Cart = () => {
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm sticky top-6">
                 {/* Header */}
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold font-Inter text-gray-900">Order Summary</h2>
+                  <h2 className="text-xl font-semibold font-Manrope text-gray-900">Order Summary</h2>
                 </div>
                 
                 {/* Summary Details */}
                 <div className="p-6 space-y-4">
                   {/* Items Count */}
                   <div className="flex justify-between text-sm">
-                    <span className="font-Jost text-gray-600">Items ({cart.items.length})</span>
-                    <span className="font-medium font-Jost text-gray-900">
+                    <span className="font-PatrickHand text-gray-600">Items ({cart.items.length})</span>
+                    <span className="font-medium font-PatrickHand text-gray-900">
                       {displaySubtotal.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
                         style: 'currency',
                         currency: currency,
@@ -1124,8 +1124,8 @@ const Cart = () => {
                   
                   {/* Shipping Info */}
                   <div className="flex justify-between text-sm">
-                    <span className="font-Jost text-gray-600">Shipping</span>
-                    <span className="font-medium font-Jost text-gray-900">Calculated at checkout</span>
+                    <span className="font-PatrickHand text-gray-600">Shipping</span>
+                    <span className="font-medium font-PatrickHand text-gray-900">Calculated at checkout</span>
                   </div>
                   
 
@@ -1133,8 +1133,8 @@ const Cart = () => {
                   {/* Tax (for international) */}
                   {displayTax > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="font-Jost text-gray-600">Tax (5%)</span>
-                      <span className="font-medium font-Jost text-gray-900">
+                      <span className="font-PatrickHand text-gray-600">Tax (5%)</span>
+                      <span className="font-medium font-PatrickHand text-gray-900">
                         {displayTax.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
                           style: 'currency',
                           currency: currency,
@@ -1147,8 +1147,8 @@ const Cart = () => {
                   {/* Divider */}
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-lg font-bold">
-                      <span className="font-Inter text-gray-900">Total</span>
-                      <span className="font-Jost text-gray-900">
+                      <span className="font-Manrope text-gray-900">Total</span>
+                      <span className="font-PatrickHand text-gray-900">
                         {displayTotal.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
                           style: 'currency',
                           currency: currency,
@@ -1162,7 +1162,7 @@ const Cart = () => {
                   {cart.warning || cart.items.some((item) => item.item.stock_quantity === 0) ? (
                     <div className="relative">
                       <button
-                        className="w-full mt-6 bg-gray-400 text-white py-4 px-6 rounded-lg font-semibold font-Inter cursor-not-allowed flex items-center justify-center gap-2 opacity-50"
+                        className="w-full mt-6 bg-gray-400 text-white py-4 px-6 rounded-lg font-semibold font-Manrope cursor-not-allowed flex items-center justify-center gap-2 opacity-50"
                         disabled
                         title={cart.warning || "Remove out of stock items to continue checkout"}
                       >
@@ -1180,7 +1180,7 @@ const Cart = () => {
                   ) : (
                     <Link to="/checkout">
                       <button
-                        className="w-full mt-6 bg-gray-900 text-white py-4 px-6 rounded-lg font-semibold font-Inter hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                        className="w-full mt-6 bg-gray-900 text-white py-4 px-6 rounded-lg font-semibold font-Manrope hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
                       >
                         <span>Proceed to Checkout</span>
                         <ArrowRight className="h-5 w-5" />
@@ -1194,9 +1194,9 @@ const Cart = () => {
                       <div className="flex items-start gap-3">
                         <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-orange-800 font-Inter mb-1">Minimum Order Requirement</p>
-                          <p className="text-xs text-orange-700 font-Jost">{cart.warning}</p>
-                          <p className="text-xs text-orange-600 font-Jost mt-1">
+                          <p className="text-sm font-semibold text-orange-800 font-Manrope mb-1">Minimum Order Requirement</p>
+                          <p className="text-xs text-orange-700 font-PatrickHand">{cart.warning}</p>
+                          <p className="text-xs text-orange-600 font-PatrickHand mt-1">
                             You can continue shopping to add more briefs to your cart.
                           </p>
                         </div>
@@ -1209,7 +1209,7 @@ const Cart = () => {
                     <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-orange-600 flex-shrink-0" />
-                        <p className="text-xs text-orange-700 font-Jost">{cart.warning}</p>
+                        <p className="text-xs text-orange-700 font-PatrickHand">{cart.warning}</p>
                       </div>
                     </div>
                   )}
@@ -1219,7 +1219,7 @@ const Cart = () => {
                     <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
                       <div className="flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
-                        <p className="text-xs text-red-700 font-Jost">Remove out of stock items to continue checkout</p>
+                        <p className="text-xs text-red-700 font-PatrickHand">Remove out of stock items to continue checkout</p>
                       </div>
                     </div>
                   )}
@@ -1229,7 +1229,7 @@ const Cart = () => {
                     <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <p className="text-xs text-blue-700 font-Jost">
+                        <p className="text-xs text-blue-700 font-PatrickHand">
                           You're shopping as a guest. You'll have the option to create an account during checkout.
                         </p>
                       </div>
@@ -1238,7 +1238,7 @@ const Cart = () => {
                   
                   {/* Shipping Note */}
                   <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-600 font-Jost text-center">
+                    <p className="text-xs text-gray-600 font-PatrickHand text-center">
                       {country === 'Nigeria'
                         ? '🚚 Local delivery fees will be calculated at checkout based on your location.'
                         : '✈️ International shipping fees will be provided via email after order confirmation.'}
@@ -1249,7 +1249,7 @@ const Cart = () => {
                   <div className="flex items-center justify-center gap-2 pt-2">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="font-Jost">Secure Checkout</span>
+                      <span className="font-PatrickHand">Secure Checkout</span>
                     </div>
                   </div>
                 </div>

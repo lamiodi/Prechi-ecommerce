@@ -490,7 +490,7 @@ const ProductCard = ({ product, onImageError }) => {
           <h3 className="text-sm sm:text-base font-semibold text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200">
             {displayName}
           </h3>
-          <p className="text-lg sm:text-xl font-semibold font-Jost text-Accent">
+          <p className="text-lg sm:text-xl font-semibold font-PatrickHand text-Accent">
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,

@@ -93,7 +93,7 @@
   - [ ] Configure base currency
   - [ ] Set up tax rates
   - [ ] Configure shipping costs
-  - [ ] Set free shipping threshold
+  - [ ] Set Shipping threshold
 
 ## 📧 Email Configuration
 

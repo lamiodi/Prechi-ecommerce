@@ -39,7 +39,7 @@ class CartErrorBoundary extends React.Component {
             '--color-Secondarycolor': '#ffffff',
             '--color-Accent': '#6E6E6E',
             '--font-Manrope': '"Manrope", "sans-serif"',
-            '--font-Jost': '"Jost", "sans-serif"',
+            '--font-PatrickHand': '"Jost", "sans-serif"',
           }}
         >
           <Navbar2 />
@@ -52,20 +52,20 @@ class CartErrorBoundary extends React.Component {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4 font-Manrope">
                   Cart Loading Error
                 </h2>
-                <p className="text-gray-600 mb-6 font-Jost">
+                <p className="text-gray-600 mb-6 font-PatrickHand">
                   We encountered an issue while loading your cart. This might be due to a temporary problem.
                 </p>
                 <div className="space-y-4">
                   <button
                     onClick={this.handleRetry}
-                    className="w-full bg-Primarycolor text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2 font-Jost"
+                    className="w-full bg-Primarycolor text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2 font-PatrickHand"
                   >
                     <RefreshCw className="h-4 w-4" />
                     Retry Loading Cart
                   </button>
                   <button
                     onClick={() => window.location.href = '/'}
-                    className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-medium hover:bg-gray-300 transition-colors font-Jost"
+                    className="w-full bg-gray-200 text-gray-800 py-3 px-6 rounded-lg font-medium hover:bg-gray-300 transition-colors font-PatrickHand"
                   >
                     Go to Homepage
                   </button>

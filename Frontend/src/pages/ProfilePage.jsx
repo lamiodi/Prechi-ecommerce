@@ -197,18 +197,18 @@ const ProfilePage = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-Inter': '"Inter", sans-serif',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-Manrope': '"Inter", sans-serif',
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <Navbar2 />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-Primarycolor mb-8 font-Inter">Edit Profile</h1>
+        <h1 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Edit Profile</h1>
 
         {/* Profile Update Section */}
         <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Inter">
+            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Manrope">
               <User className="h-5 w-5 mr-2" /> Profile Information
             </h2>
           </div>
@@ -216,18 +216,18 @@ const ProfilePage = () => {
             {profileSuccess && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center">
                 <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-sm text-green-700 font-Jost">Profile updated successfully!</span>
+                <span className="text-sm text-green-700 font-PatrickHand">Profile updated successfully!</span>
               </div>
             )}
             {profileError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-Jost">{profileError}</span>
+                <span className="text-sm text-red-700 font-PatrickHand">{profileError}</span>
               </div>
             )}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">First Name</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">First Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <User className="h-5 w-5 text-gray-400" />
@@ -237,13 +237,13 @@ const ProfilePage = () => {
                     name="first_name"
                     value={profileForm.first_name}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">Last Name</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Last Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <User className="h-5 w-5 text-gray-400" />
@@ -253,14 +253,14 @@ const ProfilePage = () => {
                     name="last_name"
                     value={profileForm.last_name}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">Email Address</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-gray-400" />
@@ -270,13 +270,13 @@ const ProfilePage = () => {
                     name="email"
                     value={profileForm.email}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">Phone Number</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Phone Number</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Phone className="h-5 w-5 text-gray-400" />
@@ -286,7 +286,7 @@ const ProfilePage = () => {
                     name="phone_number"
                     value={profileForm.phone_number}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                   />
                 </div>
               </div>
@@ -295,7 +295,7 @@ const ProfilePage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-Jost"
+                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-PatrickHand"
               >
                 {loading ? (
                   <>
@@ -316,7 +316,7 @@ const ProfilePage = () => {
         {/* Change Password Section */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Inter">
+            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Manrope">
               <Lock className="h-5 w-5 mr-2" /> Change Password
             </h2>
           </div>
@@ -324,18 +324,18 @@ const ProfilePage = () => {
             {passwordSuccess && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center">
                 <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-sm text-green-700 font-Jost">Password updated successfully!</span>
+                <span className="text-sm text-green-700 font-PatrickHand">Password updated successfully!</span>
               </div>
             )}
             {passwordError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-Jost">{passwordError}</span>
+                <span className="text-sm text-red-700 font-PatrickHand">{passwordError}</span>
               </div>
             )}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">Current Password</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Current Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -345,7 +345,7 @@ const ProfilePage = () => {
                     name="currentPassword"
                     value={passwordForm.currentPassword}
                     onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                   <button
@@ -358,7 +358,7 @@ const ProfilePage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">New Password</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">New Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -368,7 +368,7 @@ const ProfilePage = () => {
                     name="newPassword"
                     value={passwordForm.newPassword}
                     onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                   <button
@@ -379,10 +379,10 @@ const ProfilePage = () => {
                     {showPassword.new ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                   </button>
                 </div>
-                <p className="mt-1 text-xs text-Accent font-Jost">Must be at least 6 characters</p>
+                <p className="mt-1 text-xs text-Accent font-PatrickHand">Must be at least 6 characters</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-Jost">Confirm New Password</label>
+                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Confirm New Password</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -392,7 +392,7 @@ const ProfilePage = () => {
                     name="confirmPassword"
                     value={passwordForm.confirmPassword}
                     onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-Jost"
+                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
                     required
                   />
                   <button
@@ -409,7 +409,7 @@ const ProfilePage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-Jost"
+                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-PatrickHand"
               >
                 {loading ? (
                   <>

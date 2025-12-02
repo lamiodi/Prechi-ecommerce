@@ -81,7 +81,7 @@ const UserOrders = () => {
     if (imageArray.length === 0) {
       return (
         <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
-          <span className="text-gray-400 text-xs font-Jost">No Image</span>
+          <span className="text-gray-400 text-xs font-PatrickHand">No Image</span>
         </div>
       );
     }
@@ -105,7 +105,7 @@ const UserOrders = () => {
             >
               <ChevronDown className="w-3 h-3" />
             </button>
-            <span className="text-xs flex items-center px-1 font-Jost">
+            <span className="text-xs flex items-center px-1 font-PatrickHand">
               {currentImageIndex + 1}/{imageArray.length}
             </span>
             <button
@@ -132,7 +132,7 @@ const UserOrders = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <Navbar2 />
@@ -149,7 +149,7 @@ const UserOrders = () => {
             {ordersError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
                 <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-Jost">{ordersError}</span>
+                <span className="text-sm text-red-700 font-PatrickHand">{ordersError}</span>
               </div>
             )}
             {ordersLoading ? (
@@ -157,34 +157,34 @@ const UserOrders = () => {
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
               </div>
             ) : orders.length === 0 ? (
-              <p className="text-gray-600 text-center font-Jost">No orders found.</p>
+              <p className="text-gray-600 text-center font-PatrickHand">No orders found.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-Jost">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-Jost">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-Jost">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-Jost">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-Jost">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Order ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Total</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {orders.map((order) => (
                       <tr key={order.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-Jost">#{order.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-Jost">{formatDate(order.created_at)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-Jost">{formatCurrency(order.total, order.currency)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-Jost">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-PatrickHand">#{order.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-PatrickHand">{formatDate(order.created_at)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-PatrickHand">{formatCurrency(order.total, order.currency)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-PatrickHand">
                           {order.payment_status}
                           {order.shipping_country !== 'Nigeria' && (
-                            <span className="ml-2 font-Jost">
+                            <span className="ml-2 font-PatrickHand">
                               ({order.delivery_fee_paid ? 'Delivery Fee Paid' : 'Delivery Fee Pending'})
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium font-Jost">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium font-PatrickHand">
                           <button
                             onClick={() => {
                               setSelectedOrder(order);
@@ -225,38 +225,38 @@ const UserOrders = () => {
                   <h3 className="text-lg font-medium text-gray-900 font-Manrope">Order Summary</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 text-sm">
                     <div>
-                      <p className="text-gray-500 font-Jost">Order ID</p>
-                      <p className="font-medium font-Jost">{selectedOrder.id}</p>
+                      <p className="text-gray-500 font-PatrickHand">Order ID</p>
+                      <p className="font-medium font-PatrickHand">{selectedOrder.id}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-Jost">Reference</p>
-                      <p className="font-medium font-Jost">{selectedOrder.reference}</p>
+                      <p className="text-gray-500 font-PatrickHand">Reference</p>
+                      <p className="font-medium font-PatrickHand">{selectedOrder.reference}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-Jost">Total</p>
-                      <p className="font-medium font-Jost">{formatCurrency(selectedOrder.total, selectedOrder.currency)}</p>
+                      <p className="text-gray-500 font-PatrickHand">Total</p>
+                      <p className="font-medium font-PatrickHand">{formatCurrency(selectedOrder.total, selectedOrder.currency)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-Jost">Payment Status</p>
-                      <p className={`font-medium ${selectedOrder.payment_status === 'completed' ? 'text-green-600' : 'text-yellow-600'} font-Jost`}>
+                      <p className="text-gray-500 font-PatrickHand">Payment Status</p>
+                      <p className={`font-medium ${selectedOrder.payment_status === 'completed' ? 'text-green-600' : 'text-yellow-600'} font-PatrickHand`}>
                         {selectedOrder.payment_status}
                       </p>
                     </div>
                     {selectedOrder.shipping_country !== 'Nigeria' && (
                       <div>
-                        <p className="text-gray-500 font-Jost">Delivery Fee</p>
-                        <p className={`font-medium ${selectedOrder.delivery_fee_paid ? 'text-green-600' : 'text-yellow-600'} font-Jost`}>
+                        <p className="text-gray-500 font-PatrickHand">Delivery Fee</p>
+                        <p className={`font-medium ${selectedOrder.delivery_fee_paid ? 'text-green-600' : 'text-yellow-600'} font-PatrickHand`}>
                           {selectedOrder.delivery_fee_paid ? formatCurrency(selectedOrder.delivery_fee, selectedOrder.currency) : 'Pending'}
                         </p>
                       </div>
                     )}
                     <div>
-                      <p className="text-gray-500 font-Jost">Shipping Country</p>
-                      <p className="font-medium font-Jost">{selectedOrder.shipping_country}</p>
+                      <p className="text-gray-500 font-PatrickHand">Shipping Country</p>
+                      <p className="font-medium font-PatrickHand">{selectedOrder.shipping_country}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-Jost">Order Date</p>
-                      <p className="font-medium font-Jost">{formatDate(selectedOrder.created_at)}</p>
+                      <p className="text-gray-500 font-PatrickHand">Order Date</p>
+                      <p className="font-medium font-PatrickHand">{formatDate(selectedOrder.created_at)}</p>
                     </div>
                   </div>
                 </div>
@@ -264,7 +264,7 @@ const UserOrders = () => {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 font-Manrope">Shipping Address</h3>
                   {selectedOrder.shipping_address_title ? (
-                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-Jost">
+                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
                       <p>{selectedOrder.shipping_address_title}</p>
                       <p>{selectedOrder.shipping_address_line_1}</p>
                       {selectedOrder.shipping_address_landmark && <p>Landmark: {selectedOrder.shipping_address_landmark}</p>}
@@ -275,14 +275,14 @@ const UserOrders = () => {
                       <p>{selectedOrder.shipping_address_country}</p>
                     </div>
                   ) : (
-                    <p className="mt-2 text-sm text-gray-500 font-Jost">No shipping address provided</p>
+                    <p className="mt-2 text-sm text-gray-500 font-PatrickHand">No shipping address provided</p>
                   )}
                 </div>
                 {/* Billing Address */}
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 font-Manrope">Billing Address</h3>
                   {selectedOrder.billing_address_full_name ? (
-                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-Jost">
+                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
                       <p>{selectedOrder.billing_address_full_name}</p>
                       <p>{selectedOrder.billing_address_line_1}</p>
                       <p>
@@ -294,7 +294,7 @@ const UserOrders = () => {
                       <p>Phone: {selectedOrder.billing_address_phone_number}</p>
                     </div>
                   ) : (
-                    <p className="mt-2 text-sm text-gray-500 font-Jost">No billing address provided</p>
+                    <p className="mt-2 text-sm text-gray-500 font-PatrickHand">No billing address provided</p>
                   )}
                 </div>
                 {/* Items */}
@@ -305,8 +305,8 @@ const UserOrders = () => {
                       <div key={item.id} className="flex items-start p-2 bg-gray-50 rounded">
                         {renderImageGallery([item.image_url], `order-item-${selectedOrder.id}-${item.id}`, item.product_name)}
                         <div className="flex-1 ml-4">
-                          <p className="text-sm font-medium text-gray-900 font-Jost">{item.product_name}</p>
-                          <div className="text-xs text-gray-600 space-y-1 font-Jost">
+                          <p className="text-sm font-medium text-gray-900 font-PatrickHand">{item.product_name}</p>
+                          <div className="text-xs text-gray-600 space-y-1 font-PatrickHand">
                             <p>Quantity: {item.quantity}</p>
                             <p>Price: {formatCurrency(item.price, selectedOrder.currency)}</p>
                             <p>Total: {formatCurrency(item.price * item.quantity, selectedOrder.currency)}</p>
@@ -314,8 +314,8 @@ const UserOrders = () => {
                             {item.size_name && <p>Size: {item.size_name}</p>}
                             {item.bundle_id && item.bundle_details && (
                               <div className="mt-2">
-                                <p className="text-xs font-medium text-gray-700 font-Jost">Bundle Contents:</p>
-                                <ul className="pl-4 list-disc text-xs text-gray-600 font-Jost">
+                                <p className="text-xs font-medium text-gray-700 font-PatrickHand">Bundle Contents:</p>
+                                <ul className="pl-4 list-disc text-xs text-gray-600 font-PatrickHand">
                                   {item.bundle_details.map((bundleItem, bIndex) => (
                                     <li key={bIndex} className="flex items-start mt-1">
                                       {renderImageGallery(

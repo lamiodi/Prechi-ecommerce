@@ -341,7 +341,7 @@ const Orders = () => {
           <h3 className="text-lg font-semibold font-Manrope">Update Order Status</h3>
         </div>
         <div className="p-6">
-          <p className="mb-4 font-Jost">Update status for order #{selectedOrder.id}</p>
+          <p className="mb-4 font-PatrickHand">Update status for order #{selectedOrder.id}</p>
           <div className="space-y-3">
             {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map(status => (
               <label key={status} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
@@ -355,13 +355,13 @@ const Orders = () => {
                 />
                 <div className="ml-3 flex items-center">
                   {getStatusIcon(status)}
-                  <span className="ml-2 text-sm font-medium capitalize font-Jost">{status}</span>
+                  <span className="ml-2 text-sm font-medium capitalize font-PatrickHand">{status}</span>
                 </div>
               </label>
             ))}
           </div>
           <div className="mt-6 flex justify-end space-x-3">
-            <button onClick={() => setShowStatusModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-Jost">
+            <button onClick={() => setShowStatusModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-PatrickHand">
               Cancel
             </button>
             <button onClick={updateOrderStatus} disabled={newStatus === selectedOrder.status} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 font-Manrope">
@@ -380,9 +380,9 @@ const Orders = () => {
           <h3 className="text-lg font-semibold font-Manrope">Delete Order</h3>
         </div>
         <div className="p-6">
-          <p className="mb-4 font-Jost">Are you sure you want to delete order #{selectedOrder.id}?</p>
+          <p className="mb-4 font-PatrickHand">Are you sure you want to delete order #{selectedOrder.id}?</p>
           <div className="mt-6 flex justify-end space-x-3">
-            <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-Jost">
+            <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-PatrickHand">
               Cancel
             </button>
             <button onClick={deleteOrder} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-Manrope">
@@ -395,7 +395,7 @@ const Orders = () => {
   );
   
   if (loading || adminLoading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div></div>;
-  if (error) return <div className="bg-red-50 border-l-4 border-red-500 p-4"><div className="flex"><XCircle className="h-5 w-5 text-red-400" /><p className="ml-3 text-sm text-red-700 font-Jost">{error}</p></div></div>;
+  if (error) return <div className="bg-red-50 border-l-4 border-red-500 p-4"><div className="flex"><XCircle className="h-5 w-5 text-red-400" /><p className="ml-3 text-sm text-red-700 font-PatrickHand">{error}</p></div></div>;
   
   return (
     <div 
@@ -405,7 +405,7 @@ const Orders = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
@@ -417,14 +417,14 @@ const Orders = () => {
               <input
                 type="text"
                 placeholder="Search by ID, reference, or customer..."
-                className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-Jost"
+                className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-PatrickHand"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="relative">
               <Filter className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-Jost" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-PatrickHand" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                 <option value="all">All Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="processing">Processing</option>
@@ -435,7 +435,7 @@ const Orders = () => {
             </div>
             <div className="relative">
               <CreditCard className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-Jost" value={paymentStatusFilter} onChange={(e) => setPaymentStatusFilter(e.target.value)}>
+              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-PatrickHand" value={paymentStatusFilter} onChange={(e) => setPaymentStatusFilter(e.target.value)}>
                 <option value="all">All Payment Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
@@ -444,7 +444,7 @@ const Orders = () => {
             </div>
             <div className="relative">
               <Globe className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-Jost" value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)}>
+              <select className="pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-PatrickHand" value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)}>
                 <option value="all">All Countries</option>
                 {countries.map(country => <option key={country} value={country}>{country}</option>)}
               </select>
@@ -452,21 +452,21 @@ const Orders = () => {
           </div>
         </div>
         {orders.length === 0 ? (
-          <div className="text-center py-8"><p className="text-gray-500 font-Jost">No orders found.</p></div>
+          <div className="text-center py-8"><p className="text-gray-500 font-PatrickHand">No orders found.</p></div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px]">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Order ID</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Customer</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Date</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Country</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Total</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Payment Status</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Order Status</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Actions</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Order ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Customer</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Date</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Country</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Total</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Payment Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Order Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -474,9 +474,9 @@ const Orders = () => {
                     <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
                       <td className="py-3 px-4 text-sm">
                         <div className="font-medium text-gray-900 font-Manrope">#{order.id}</div>
-                        <div className="text-gray-600 font-Jost">{order.reference}</div>
+                        <div className="text-gray-600 font-PatrickHand">{order.reference}</div>
                         {order.shipping_country !== 'Nigeria' && (
-                          <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 font-Jost">
+                          <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 font-PatrickHand">
                             <Globe className="w-3 h-3 mr-1" /> International
                           </div>
                         )}
@@ -485,24 +485,24 @@ const Orders = () => {
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-gray-900 font-Manrope">{order.first_name} {order.last_name}</div>
                           {order.is_temporary && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-Jost">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-PatrickHand">
                               Guest
                             </span>
                           )}
                         </div>
-                        <div className="text-gray-600 font-Jost">{order.user_email}</div>
+                        <div className="text-gray-600 font-PatrickHand">{order.user_email}</div>
                       </td>
-                      <td className="py-3 px-4 text-gray-600 text-sm font-Jost">{formatDate(order.created_at)}</td>
-                      <td className="py-3 px-4 text-gray-600 text-sm font-Jost">{order.shipping_country}</td>
+                      <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">{formatDate(order.created_at)}</td>
+                      <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">{order.shipping_country}</td>
                       <td className="py-3 px-4 font-medium text-sm font-Manrope">{formatCurrency(order.total, order.currency)}</td>
                       <td className="py-3 px-4 text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)} font-Jost`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)} font-PatrickHand`}>
                           {getPaymentStatusIcon(order.payment_status)}
                           <span className="ml-1 capitalize">{order.payment_status}</span>
                         </span>
                       </td>
                       <td className="py-3 px-4 text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)} font-Jost`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)} font-PatrickHand`}>
                           {getStatusIcon(order.status)}
                           <span className="ml-1 capitalize">{order.status}</span>
                         </span>
@@ -536,14 +536,14 @@ const Orders = () => {
             {totalPages > 1 && (
               <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 mt-4">
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <p className="text-sm text-gray-700 font-Jost">
+                  <p className="text-sm text-gray-700 font-PatrickHand">
                     Showing <span className="font-medium">{(currentPage - 1) * ordersPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * ordersPerPage, totalOrders)}</span> of <span className="font-medium">{totalOrders}</span> orders
                   </p>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                     <button 
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
                       disabled={currentPage === 1} 
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand disabled:opacity-50"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
@@ -564,7 +564,7 @@ const Orders = () => {
                         <button 
                           key={pageNumber} 
                           onClick={() => setCurrentPage(pageNumber)} 
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-Jost ${currentPage === pageNumber ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-PatrickHand ${currentPage === pageNumber ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
                         >
                           {pageNumber}
                         </button>
@@ -573,7 +573,7 @@ const Orders = () => {
                     <button 
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
                       disabled={currentPage === totalPages} 
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand disabled:opacity-50"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>

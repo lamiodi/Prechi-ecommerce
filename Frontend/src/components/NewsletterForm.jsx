@@ -62,7 +62,7 @@ const NewsletterForm = () => {
         
         {/* Text + Form */}
         <div className="relative mb-1 z-10 text-Secondarycolor text-right max-w-2xl mx-auto md:ml-auto 2xl:ml-115">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-extrabold font-Jost tracking-tight leading-snug [text-shadow:-2px_0px_10px_#f5f5dc80] [-webkit-text-stroke:1px_#6e6e6e] sm:[-webkit-text-stroke:1.5px_#6e6e6e] md:[-webkit-text-stroke:2px_#6e6e6e] lg:text-nowrap lg:ms-10 lg:max-w-sm">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-extrabold font-PatrickHand tracking-tight leading-snug [text-shadow:-2px_0px_10px_#f5f5dc80] [-webkit-text-stroke:1px_#6e6e6e] sm:[-webkit-text-stroke:1.5px_#6e6e6e] md:[-webkit-text-stroke:2px_#6e6e6e] lg:text-nowrap lg:ms-10 lg:max-w-sm">
             SUBSCRIBE TO OUR NEWSLETTER
           </h2>
           <p className="mt-3 sm:mt-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-Manrope font-bold lg:ms-[30vw] lg:text-nowrap">

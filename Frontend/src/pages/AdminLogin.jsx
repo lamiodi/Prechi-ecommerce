@@ -116,7 +116,7 @@ const AdminLogin = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center text-gray-600">
           <Loader2 className="w-8 h-8 animate-spin text-Primarycolor" />
-          <p className="mt-2 text-sm font-Jost">Loading...</p>
+          <p className="mt-2 text-sm font-PatrickHand">Loading...</p>
         </div>
       </div>
     );
@@ -130,7 +130,7 @@ const AdminLogin = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-8">
@@ -138,27 +138,27 @@ const AdminLogin = () => {
           <h1 className="text-4xl font-bold mb-1 text-center font-Manrope" style={{ color: '#1E1E1E' }}>
             Admin Login
           </h1>
-          <p className="text-base text-center font-Jost mb-4" style={{ color: '#6E6E6E' }}>
+          <p className="text-base text-center font-PatrickHand mb-4" style={{ color: '#6E6E6E' }}>
             Sign in to access the admin dashboard
           </p>
           
           {successMsg && (
             <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mt-6 mb-6 flex items-center gap-3">
               <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm font-Jost">{successMsg}</span>
+              <span className="text-sm font-PatrickHand">{successMsg}</span>
             </div>
           )}
           
           {errorMsg && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mt-6 mb-6 flex items-center gap-3">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm font-Jost">{errorMsg}</span>
+              <span className="text-sm font-PatrickHand">{errorMsg}</span>
             </div>
           )}
           
           <div className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+              <label htmlFor="email" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                 Email Address
               </label>
               <div className="relative">
@@ -169,7 +169,7 @@ const AdminLogin = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                     formErrors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
                   }`}
                   style={{ 
@@ -181,7 +181,7 @@ const AdminLogin = () => {
                 />
               </div>
               {formErrors.email && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                   <AlertCircle className="w-4 h-4" />
                   {formErrors.email}
                 </p>
@@ -189,7 +189,7 @@ const AdminLogin = () => {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+              <label htmlFor="password" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                 Password
               </label>
               <div className="relative">
@@ -200,7 +200,7 @@ const AdminLogin = () => {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                     formErrors.password ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
                   }`}
                   style={{ 
@@ -212,7 +212,7 @@ const AdminLogin = () => {
                 />
               </div>
               {formErrors.password && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                   <AlertCircle className="w-4 h-4" />
                   {formErrors.password}
                 </p>

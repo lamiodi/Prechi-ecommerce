@@ -186,13 +186,13 @@ const Customers = () => {
                           <Users className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-Jost">Full Name</p>
+                          <p className="text-sm text-gray-500 font-PatrickHand">Full Name</p>
                           <div className="flex items-center">
                             <p className="font-medium font-Manrope">
                               {selectedCustomer.first_name} {selectedCustomer.last_name}
                             </p>
                             {selectedCustomer.is_temporary && (
-                              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-Jost">
+                              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-PatrickHand">
                                 <User className="w-3 h-3 mr-1" /> Guest
                               </span>
                             )}
@@ -204,7 +204,7 @@ const Customers = () => {
                           <Mail className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-Jost">Email</p>
+                          <p className="text-sm text-gray-500 font-PatrickHand">Email</p>
                           <p className="font-medium font-Manrope">{selectedCustomer.email}</p>
                         </div>
                       </div>
@@ -213,7 +213,7 @@ const Customers = () => {
                           <Phone className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-Jost">Phone</p>
+                          <p className="text-sm text-gray-500 font-PatrickHand">Phone</p>
                           <p className="font-medium font-Manrope">
                             {selectedCustomer.phone_number || 'N/A'}
                           </p>
@@ -224,7 +224,7 @@ const Customers = () => {
                           <Calendar className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-Jost">Joined</p>
+                          <p className="text-sm text-gray-500 font-PatrickHand">Joined</p>
                           <p className="font-medium font-Manrope">
                             {formatDate(selectedCustomer.created_at)}
                           </p>
@@ -235,14 +235,14 @@ const Customers = () => {
                           <Users className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 font-Jost">Account Type</p>
+                          <p className="text-sm text-gray-500 font-PatrickHand">Account Type</p>
                           <p className="font-medium font-Manrope">
                             {selectedCustomer.is_admin ? 'Administrator' : 'Customer'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                        <span className="text-sm text-gray-500 font-Jost">Total Spent</span>
+                        <span className="text-sm text-gray-500 font-PatrickHand">Total Spent</span>
                         <span className="text-lg font-semibold text-green-600 font-Manrope">
                           {formatCurrency(selectedCustomer.total_spent)}
                         </span>
@@ -265,11 +265,11 @@ const Customers = () => {
                             <p className="font-medium text-gray-900 font-Manrope">
                               {address.title || 'Default'}
                             </p>
-                            <span className="text-xs px-2 py-1 bg-gray-200 rounded-full font-Jost">
+                            <span className="text-xs px-2 py-1 bg-gray-200 rounded-full font-PatrickHand">
                               {address.country}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-600 space-y-1 font-Jost">
+                          <div className="text-sm text-gray-600 space-y-1 font-PatrickHand">
                             <div className="flex items-start">
                               <MapPin className="w-4 h-4 mr-1 mt-0.5 text-gray-500 flex-shrink-0" />
                               <div>
@@ -292,7 +292,7 @@ const Customers = () => {
                     </div>
                   ) : (
                     <div className="text-center py-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-500 font-Jost">No shipping addresses found.</p>
+                      <p className="text-sm text-gray-500 font-PatrickHand">No shipping addresses found.</p>
                     </div>
                   )}
                 </div>
@@ -312,7 +312,7 @@ const Customers = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-Jost': '"Jost", "sans-serif"'
+        '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       {loading && (
@@ -327,7 +327,7 @@ const Customers = () => {
               <XCircle className="h-5 w-5 text-red-400" />
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700 font-Jost">{error}</p>
+              <p className="text-sm text-red-700 font-PatrickHand">{error}</p>
             </div>
           </div>
         </div>
@@ -344,7 +344,7 @@ const Customers = () => {
                 <input
                   type="text"
                   placeholder="Search by name or email..."
-                  className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-Jost"
+                  className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-PatrickHand"
                   value={customerSearchTerm}
                   onChange={(e) => setCustomerSearchTerm(e.target.value)}
                 />
@@ -352,7 +352,7 @@ const Customers = () => {
             </div>
             {filteredCustomers.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 font-Jost">No customers found.</p>
+                <p className="text-gray-500 font-PatrickHand">No customers found.</p>
               </div>
             ) : (
               <>
@@ -360,12 +360,12 @@ const Customers = () => {
                   <table className="w-full min-w-[640px]">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Name</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Email</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Phone</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Total Spent</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Joined</th>
-                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-Jost">Actions</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Name</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Email</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Phone</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Total Spent</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Joined</th>
+                        <th className="text-left py-3 px-4 font-medium text-gray-700 text-sm font-PatrickHand">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -386,25 +386,25 @@ const Customers = () => {
                                     {customer.first_name} {customer.last_name}
                                   </div>
                                   {customer.is_temporary && (
-                                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-Jost">
+                                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-PatrickHand">
                                       <User className="w-3 h-3 mr-1" /> Guest
                                     </span>
                                   )}
                                 </div>
                                 {customer.is_admin && (
-                                  <div className="text-xs text-blue-600 font-Jost">Admin</div>
+                                  <div className="text-xs text-blue-600 font-PatrickHand">Admin</div>
                                 )}
                               </div>
                             </div>
                           </td>
-                          <td className="py-3 px-4 text-gray-600 text-sm font-Jost">{customer.email}</td>
-                          <td className="py-3 px-4 text-gray-600 text-sm font-Jost">
+                          <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">{customer.email}</td>
+                          <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">
                             {customer.phone_number || 'N/A'}
                           </td>
                           <td className="py-3 px-4 font-medium text-sm font-Manrope">
                             {formatCurrency(customer.total_spent)}
                           </td>
-                          <td className="py-3 px-4 text-gray-600 text-sm font-Jost">
+                          <td className="py-3 px-4 text-gray-600 text-sm font-PatrickHand">
                             {formatDate(customer.created_at)}
                           </td>
                           <td className="py-3 px-4">
@@ -427,21 +427,21 @@ const Customers = () => {
                       <button
                         onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
                         disabled={currentPage === 1}
-                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 font-Jost"
+                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 font-PatrickHand"
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
                         disabled={currentPage === totalPages}
-                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 font-Jost"
+                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 font-PatrickHand"
                       >
                         Next
                       </button>
                     </div>
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm text-gray-700 font-Jost">
+                        <p className="text-sm text-gray-700 font-PatrickHand">
                           Showing <span className="font-medium">{indexOfFirstCustomer + 1}</span> to{' '}
                           <span className="font-medium">
                             {Math.min(indexOfLastCustomer, filteredCustomers.length)}
@@ -454,7 +454,7 @@ const Customers = () => {
                           <button
                             onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
                             disabled={currentPage === 1}
-                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost"
+                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand"
                           >
                             <span className="sr-only">Previous</span>
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -476,7 +476,7 @@ const Customers = () => {
                               <button
                                 key={pageNumber}
                                 onClick={() => paginate(pageNumber)}
-                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-Jost ${
+                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-PatrickHand ${
                                   currentPage === pageNumber
                                     ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
                                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
@@ -489,7 +489,7 @@ const Customers = () => {
                           <button
                             onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
                             disabled={currentPage === totalPages}
-                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-Jost"
+                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand"
                           >
                             <span className="sr-only">Next</span>
                             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

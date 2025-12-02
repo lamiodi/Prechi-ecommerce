@@ -526,7 +526,7 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center text-gray-600">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-Primarycolor"></div>
-          <p className="mt-2 text-sm font-Jost">Loading...</p>
+          <p className="mt-2 text-sm font-PatrickHand">Loading...</p>
         </div>
       </div>
     )
@@ -536,8 +536,8 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😔</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-Inter">Oops! Product Not Found</h2>
-          <p className="text-gray-600 font-Jost">{error || "Failed to load product"}</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-Manrope">Oops! Product Not Found</h2>
+          <p className="text-gray-600 font-PatrickHand">{error || "Failed to load product"}</p>
         </div>
       </div>
     )
@@ -660,7 +660,7 @@ const ProductDetails = () => {
 </div>
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-24 py-4">
         {/* Breadcrumb */}
-        <nav className="flex mb-8 text-sm font-Jost">
+        <nav className="flex mb-8 text-sm font-PatrickHand">
           <a href="/home" className="text-gray-500 hover:text-Primarycolor">
             Home
           </a>
@@ -669,7 +669,7 @@ const ProductDetails = () => {
             Products
           </a>
           <span className="mx-2 text-gray-400">/</span>
-          <span className="text-Primarycolor font-medium font-Jost">{name}</span>
+          <span className="text-Primarycolor font-medium font-PatrickHand">{name}</span>
         </nav>
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
@@ -706,7 +706,7 @@ const ProductDetails = () => {
 
                     {/* Bundle Badge */}
                     {!isProduct && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Inter from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
+                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Manrope from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
                         <Package className="w-4 h-4" />
                         <span>Bundle</span>
                       </div>
@@ -732,7 +732,7 @@ const ProductDetails = () => {
 
                     {/* Counter */}
                     {(images.length + videos.length) > 1 && (
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-Jost z-10">
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-PatrickHand z-10">
                         {selectedImage + 1} / {images.length + videos.length}
                       </div>
                     )}
@@ -792,14 +792,14 @@ const ProductDetails = () => {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-Inter">
+                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-Manrope">
                         {name}
                       </h1>
                     </div>
 
                   </div>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="text-3xl font-bold text-gray-900 font-Inter">
+                    <p className="text-3xl font-bold text-gray-900 font-Manrope">
                       {Number.parseFloat(displayPrice).toLocaleString(country === "Nigeria" ? "en-NG" : "en-US", {
                         style: "currency",
                         currency: displayCurrency,
@@ -807,16 +807,16 @@ const ProductDetails = () => {
                       })}
                     </p>
                     <div className="flex items-center gap-2 flex-nowrap min-w-0">
-                    <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-Jost whitespace-nowrap">
+                    <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
                         In Stock
                       </span>
                       {!isProduct && (
-                        <span className="text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-Jost whitespace-nowrap">
+                        <span className="text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
                           {bundleType} Bundle
                         </span>
                       )}
                       {isGuest && (
-                        <span className="text-sm hidden  text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-Jost lg:flex items-center whitespace-nowrap">
+                        <span className="text-sm hidden  text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-PatrickHand lg:flex items-center whitespace-nowrap">
                           <User className="w-3 h-3 mr-1" />
                           Guest Shopping
                         </span>
@@ -829,8 +829,8 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Inter">
-                        Color: <span className="font-normal font-Inter text-gray-600">{selectedColor}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
+                        Color: <span className="font-normal font-Manrope text-gray-600">{selectedColor}</span>
                       </h3>
                       <div className="flex flex-wrap gap-3">
                         {colorOptions.map((color) => (
@@ -847,7 +847,7 @@ const ProductDetails = () => {
                               className={`w-6 h-6 rounded-full shadow-sm ${color === "White" ? "border border-gray-300" : ""}`}
                               style={{ backgroundColor: colorMap[color] || "#cccccc" }}
                             ></div>
-                            <span className="text-sm font-medium text-center font-Jost">{color}</span>
+                            <span className="text-sm font-medium text-center font-PatrickHand">{color}</span>
                             {color === selectedColor && <Check className="w-4 h-4 text-gray-900" />}
                           </button>
                         ))}
@@ -855,8 +855,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-Primarycolor font-Inter mb-4">
-                        Size: <span className="font-normal text-gray-600 font-Inter">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-Primarycolor font-Manrope mb-4">
+                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((s) => (
@@ -864,7 +864,7 @@ const ProductDetails = () => {
                             key={s.size_name}
                             onClick={() => handleSizeChange(s.size_name)}
                             disabled={s.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-Inter font-medium border-2 rounded-xl transition-all duration-200 ${
+                            className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${
                               selectedSize === s.size_name
                                 ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
                                 : s.stock_quantity > 0
@@ -874,8 +874,8 @@ const ProductDetails = () => {
                           >
                             {s.size_name}
                             {s.stock_quantity === 0 && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-full h-0.5 bg-gray-300 rotate-45"></div>
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-UnifrakturCook font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
+                                Sold Out
                               </div>
                             )}
                           </button>
@@ -889,13 +889,13 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Bundle Type Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Inter">Bundle Type</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">Bundle Type</h3>
                       <div className="flex space-x-4">
                         {bundleTypes.map((type) => (
                           <button
                             key={type}
                             onClick={() => handleBundleTypeChange(type)}
-                            className={`px-6 py-3 border-2 rounded-xl text-sm font-medium font-Jost transition-all duration-200 ${
+                            className={`px-6 py-3 border-2 rounded-xl text-sm font-medium font-PatrickHand transition-all duration-200 ${
                               bundleType === type
                                 ? "border-gray-900 bg-gray-900 text-white shadow-lg"
                                 : "border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md"
@@ -908,8 +908,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection for Bundle */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Inter">
-                        Size: <span className="font-normal text-gray-600 font-Inter">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
+                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((size) => (
@@ -917,7 +917,7 @@ const ProductDetails = () => {
                             key={size.size_name}
                             onClick={() => handleSizeChange(size.size_name)}
                             disabled={size.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-medium font-Jost border-2 rounded-xl transition-all duration-200 ${
+                            className={`relative py-3 px-2 text-sm font-medium font-PatrickHand border-2 rounded-xl transition-all duration-200 ${
                               selectedSize === size.size_name
                                 ? "border-gray-900 bg-gray-900 text-white shadow-lg"
                                 : size.stock_quantity > 0
@@ -927,8 +927,8 @@ const ProductDetails = () => {
                           >
                             {size.size_name}
                             {size.stock_quantity === 0 && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-full h-0.5 bg-gray-300 rotate-45"></div>
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-UnifrakturCook font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
+                                Sold Out
                               </div>
                             )}
                           </button>
@@ -937,16 +937,16 @@ const ProductDetails = () => {
                     </div>
                     {/* Bundle Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Inter">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
                         Select Items
-                        <span className="text-sm font-normal text-gray-600 ml-2 font-Jost">
+                        <span className="text-sm font-normal text-gray-600 ml-2 font-PatrickHand">
                           ({Object.keys(selectedBundleVariants).length}/{bundleType === "3-in-1" ? "3" : "5"})
                         </span>
                       </h3>
                       <div className="p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50">
                         {/* Available Colors */}
                         <div className="mb-6">
-                          <h4 className="font-medium text-gray-900 mb-3 font-Inter">Available Colors</h4>
+                          <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Available Colors</h4>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {(Array.isArray(data?.items?.[0]?.all_variants) ? data.items[0].all_variants : []).map(
                               (variant) => {
@@ -975,7 +975,7 @@ const ProductDetails = () => {
                                       }`}
                                       style={{ backgroundColor: colorMap[variant.color_name] || "#cccccc" }}
                                     />
-                                    <span className="text-sm font-medium text-center font-Jost">
+                                    <span className="text-sm font-medium text-center font-PatrickHand">
                                       {variant.color_name}
                                     </span>
                                     {colorCount > 0 && (
@@ -997,7 +997,7 @@ const ProductDetails = () => {
                         {/* Selected Items Display */}
                         {Object.keys(selectedBundleVariants).length > 0 && (
                           <div className="mb-6">
-                            <h4 className="font-medium text-gray-900 mb-3 font-Inter">Selected Items</h4>
+                            <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Selected Items</h4>
                             <div className="flex flex-wrap gap-3">
                               {Object.entries(selectedBundleVariants).map(([index, selection]) => (
                                 <div
@@ -1011,10 +1011,10 @@ const ProductDetails = () => {
                                       }`}
                                       style={{ backgroundColor: colorMap[selection.colorName] || "#cccccc" }}
                                     />
-                                    <span className="text-sm font-medium text-gray-900 font-Jost">
+                                    <span className="text-sm font-medium text-gray-900 font-PatrickHand">
                                       {selection.colorName}
                                     </span>
-                                    <span className="text-xs text-gray-500 font-Jost">
+                                    <span className="text-xs text-gray-500 font-PatrickHand">
                                       #{Number.parseInt(index) + 1}
                                     </span>
                                   </div>
@@ -1032,8 +1032,8 @@ const ProductDetails = () => {
                         {/* Progress Indicator */}
                         <div className="pt-4 border-t border-gray-200">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 font-Jost">Bundle Progress</span>
-                            <span className="font-medium text-purple-600 font-Jost">
+                            <span className="text-gray-600 font-PatrickHand">Bundle Progress</span>
+                            <span className="font-medium text-purple-600 font-PatrickHand">
                               {Object.keys(selectedBundleVariants).length}/{bundleType === "3-in-1" ? "3" : "5"} items
                               selected
                             </span>
@@ -1054,7 +1054,7 @@ const ProductDetails = () => {
                 {/* Quantity and Add to Cart */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <span className="text-sm font-medium font-Inter text-gray-900">Quantity:</span>
+                    <span className="text-sm font-medium font-Manrope text-gray-900">Quantity:</span>
                     <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -1062,7 +1062,7 @@ const ProductDetails = () => {
                       >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="px-4 py-3 font-medium min-w-[60px] text-center font-Jost">{quantity}</span>
+                      <span className="px-4 py-3 font-medium min-w-[60px] text-center font-PatrickHand">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
                         className="p-3 hover:bg-gray-50 transition-colors duration-200"
@@ -1078,7 +1078,7 @@ const ProductDetails = () => {
                       className="flex-1 py-4 bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-gray-800 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart className="h-5 w-5 " />
-                      <span className="font-Inter">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+                      <span className="font-Manrope">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
                     </button>
                     <button className="p-4 border-2 border-gray-200 rounded-xl hover:border-gray-300 transition-all duration-200 hover:shadow-md">
                       <Share2 className="h-5 w-5" />
@@ -1089,7 +1089,7 @@ const ProductDetails = () => {
                     <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <p className="text-xs text-blue-700 font-Jost">
+                        <p className="text-xs text-blue-700 font-PatrickHand">
                           You're shopping as a guest. Your cart will be saved until you complete your purchase.
                         </p>
                       </div>
@@ -1100,15 +1100,15 @@ const ProductDetails = () => {
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-100">
                   <div className="text-center space-y-2">
                     <Truck className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-Jost">Free Shipping</p>
+                    <p className="text-xs text-gray-600 font-PatrickHand">Shipping</p>
                   </div>
                   <div className="text-center space-y-2">
                     <RotateCcw className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-Jost">Easy Returns</p>
+                    <p className="text-xs text-gray-600 font-PatrickHand">Easy Returns</p>
                   </div>
                   <div className="text-center space-y-2">
                     <Shield className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-Jost">2 Year Warranty</p>
+                    <p className="text-xs text-gray-600 font-PatrickHand">2 Year Warranty</p>
                   </div>
                 </div>
               </div>

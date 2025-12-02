@@ -148,8 +148,8 @@ const LandingPage = () => {
                 </span>
                 <br className="max-sm:hidden" />
                 <span className="max-sm:text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl block mt-1 sm:mt-0 md:mt-1">
-                  <span className="sm:hidden text-sm font-light font-Jost">STYLE FOR ALL</span>
-                  <span className="hidden font-Jost sm:inline">EVERYDAY STYLE</span>
+                  <span className="sm:hidden text-sm font-light font-PatrickHand">STYLE FOR ALL</span>
+                  <span className="hidden font-PatrickHand sm:inline">EVERYDAY STYLE</span>
                 </span>
               </h1>
               <Link to="/shop">

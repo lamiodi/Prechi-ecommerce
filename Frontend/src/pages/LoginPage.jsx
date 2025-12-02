@@ -200,28 +200,28 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex bg-white font-Jost">
+    <div className="min-h-screen flex bg-white font-PatrickHand">
       {/* Left Side - Login Form */}
       <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-8">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-Inter" style={{ color: '#1E1E1E' }}>
+            <h1 className="text-4xl font-bold mb-2 font-Manrope" style={{ color: '#1E1E1E' }}>
               Welcome Back
             </h1>
-            <p className="text-base font-Jost" style={{ color: '#6E6E6E' }}>
+            <p className="text-base font-PatrickHand" style={{ color: '#6E6E6E' }}>
               Sign in to your account to continue
             </p>
           </div>
           {/* Messages */}
           {successMsg && (
-            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-Jost">
+            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
               <CheckCircle className="w-5 h-5 flex-shrink-0" />
               <span className="text-sm">{successMsg}</span>
             </div>
           )}
           {errorMsg && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-Jost">
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <span className="text-sm">{errorMsg}</span>
             </div>
@@ -232,7 +232,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold mb-2 font-Jost"
+                className="block text-sm font-semibold mb-2 font-PatrickHand"
                 style={{ color: '#1E1E1E' }}
               >
                 Email Address
@@ -248,7 +248,7 @@ const Login = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                     formErrors.email
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-gray-300'
@@ -262,7 +262,7 @@ const Login = () => {
                 />
               </div>
               {formErrors.email && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                   <AlertCircle className="w-4 h-4" />
                   {formErrors.email}
                 </p>
@@ -272,7 +272,7 @@ const Login = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold mb-2 font-Jost"
+                className="block text-sm font-semibold mb-2 font-PatrickHand"
                 style={{ color: '#1E1E1E' }}
               >
                 Password
@@ -288,7 +288,7 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                     formErrors.password
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-gray-300'
@@ -316,14 +316,14 @@ const Login = () => {
                 </button>
               </div>
               {formErrors.password && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                   <AlertCircle className="w-4 h-4" />
                   {formErrors.password}
                 </p>
               )}
             </div>
             {/* Remember Me & Forgot Password */}
-            <div className="flex justify-between items-center text-sm font-Jost">
+            <div className="flex justify-between items-center text-sm font-PatrickHand">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -339,7 +339,7 @@ const Login = () => {
                 onClick={() =>
                   navigate('/forgot-password', { state: { email: formData.email } })
                 }
-                className="font-medium hover:underline transition-all font-Inter"
+                className="font-medium hover:underline transition-all font-Manrope"
                 style={{ color: '#1E1E1E' }}
               >
                 Forgot password?
@@ -350,7 +350,7 @@ const Login = () => {
               type="submit"
               disabled={loading}
               onClick={handleLogin}
-              className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Inter"
+              className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Manrope"
               style={{
                 backgroundColor: '#1E1E1E',
                 color: '#ffffff',
@@ -367,11 +367,11 @@ const Login = () => {
             </button>
           </div>
           {/* Sign Up Link */}
-          <div className="mt-8 text-center text-sm font-Jost">
+          <div className="mt-8 text-center text-sm font-PatrickHand">
             <span style={{ color: '#6E6E6E' }}>Don't have an account? </span>
             <Link
               to="/signup"
-              className="font-semibold hover:underline transition-all font-Inter"
+              className="font-semibold hover:underline transition-all font-Manrope"
               style={{ color: '#1E1E1E' }}
             >
               Create account
@@ -404,13 +404,13 @@ const Login = () => {
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 z-0">
                 <div className="max-w-md">
                   <h2
-                    className="text-3xl font-bold mb-4 transition-all duration-500 font-Inter"
+                    className="text-3xl font-bold mb-4 transition-all duration-500 font-Manrope"
                     style={{ color: '#ffffff' }}
                   >
                     {image.title}
                   </h2>
                   <p
-                    className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-Jost"
+                    className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-PatrickHand"
                     style={{ color: '#F5F5DC' }}
                   >
                     {image.description}

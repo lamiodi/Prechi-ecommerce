@@ -77,7 +77,7 @@ function ForgotPassword() {
                     <UserPlus className="h-5 w-5 text-blue-400" />
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-blue-700 font-Jost">
+                    <p className="text-sm text-blue-700 font-PatrickHand">
                       You're using a temporary guest account. Enter your email and we'll send you a password reset link. When you create your new password, your account will automatically be converted to a permanent account with full access.
                     </p>
                   </div>
@@ -86,9 +86,9 @@ function ForgotPassword() {
             )}
           </div>
           
-          {error && <div className="bg-red-100 text-red-600 p-3 rounded-lg text-sm font-Jost">{error}</div>}
+          {error && <div className="bg-red-100 text-red-600 p-3 rounded-lg text-sm font-PatrickHand">{error}</div>}
           {success && (
-            <div className="bg-green-100 text-green-600 p-3 rounded-lg text-sm font-Jost flex items-center">
+            <div className="bg-green-100 text-green-600 p-3 rounded-lg text-sm font-PatrickHand flex items-center">
               <CheckCircle className="h-4 w-4 mr-2" />
               {success}
             </div>
@@ -96,11 +96,11 @@ function ForgotPassword() {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-1 block font-Jost">Email Address</label>
+              <label className="text-sm font-medium mb-1 block font-PatrickHand">Email Address</label>
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="w-full border px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black font-Jost"
+                className="w-full border px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black font-PatrickHand"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -119,7 +119,7 @@ function ForgotPassword() {
             {/* Guest Conversion Button - only show if not already in temporary account mode */}
             {!isTemporaryAccount && (
               <div className="border-t pt-4">
-                <p className="text-sm text-gray-600 mb-3 font-Jost">
+                <p className="text-sm text-gray-600 mb-3 font-PatrickHand">
                   Made a purchase as a guest?
                 </p>
                 <button
@@ -134,7 +134,7 @@ function ForgotPassword() {
             
             <button
               onClick={() => navigate('/login')}
-              className="text-Accent hover:text-Primarycolor font-Jost flex items-center justify-center"
+              className="text-Accent hover:text-Primarycolor font-PatrickHand flex items-center justify-center"
             >
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Login

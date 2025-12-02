@@ -67,7 +67,7 @@ INSERT INTO product_variants (product_id, color_id, sku, price_adjustment, stock
 INSERT INTO shipping_methods (name, description, cost, estimated_days) VALUES
 ('Standard Shipping', 'Regular delivery', 500, 3),
 ('Express Shipping', 'Fast delivery', 1200, 1),
-('Free Shipping', 'Free delivery on orders over $50', 0, 5);
+('Shipping', 'Free delivery on orders over $50', 0, 5);
 ```
 
 ## 4. Client Customization Script (customize_client.sql)

@@ -123,7 +123,7 @@ const SignupPage = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 relative overflow-hidden font-Jost">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 relative overflow-hidden font-PatrickHand">
       {/* Subtle background patterns */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-black/5 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
@@ -167,7 +167,7 @@ const SignupPage = () => {
                       {image.title}
                     </h2>
                     <p 
-                      className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-Jost"
+                      className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-PatrickHand"
                       style={{ color: '#6E6E6E' }}
                     >
                       {image.description}
@@ -213,19 +213,19 @@ const SignupPage = () => {
               <h1 className="text-4xl font-bold mb-2 font-Manrope" style={{ color: '#1E1E1E' }}>
                 Create Your Account
               </h1>
-              <p className="text-base font-Jost" style={{ color: '#6E6E6E' }}>
+              <p className="text-base font-PatrickHand" style={{ color: '#6E6E6E' }}>
                 Sign up to unlock exclusive access
               </p>
             </div>
             {/* Messages */}
             {successMsg && (
-              <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-Jost">
+              <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
                 <CheckCircle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm">{successMsg}</span>
               </div>
             )}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-Jost">
+              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm">{error}</span>
               </div>
@@ -234,7 +234,7 @@ const SignupPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* First Name */}
               <div>
-                <label htmlFor="first_name" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="first_name" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   First Name
                 </label>
                 <div className="relative">
@@ -245,7 +245,7 @@ const SignupPage = () => {
                     type="text"
                     value={formData.first_name}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                       formErrors.first_name 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
@@ -259,7 +259,7 @@ const SignupPage = () => {
                   />
                 </div>
                 {formErrors.first_name && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.first_name}
                   </p>
@@ -267,7 +267,7 @@ const SignupPage = () => {
               </div>
               {/* Last Name */}
               <div>
-                <label htmlFor="last_name" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="last_name" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   Last Name
                 </label>
                 <div className="relative">
@@ -278,7 +278,7 @@ const SignupPage = () => {
                     type="text"
                     value={formData.last_name}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                       formErrors.last_name 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
@@ -292,7 +292,7 @@ const SignupPage = () => {
                   />
                 </div>
                 {formErrors.last_name && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.last_name}
                   </p>
@@ -301,7 +301,7 @@ const SignupPage = () => {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="email" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   Email Address
                 </label>
                 <div className="relative">
@@ -312,7 +312,7 @@ const SignupPage = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                       formErrors.email 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
@@ -326,7 +326,7 @@ const SignupPage = () => {
                   />
                 </div>
                 {formErrors.email && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.email}
                   </p>
@@ -334,7 +334,7 @@ const SignupPage = () => {
               </div>
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="password" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   Password
                 </label>
                 <div className="relative">
@@ -345,7 +345,7 @@ const SignupPage = () => {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                       formErrors.password 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
@@ -367,7 +367,7 @@ const SignupPage = () => {
                   </button>
                 </div>
                 {formErrors.password && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.password}
                   </p>
@@ -375,7 +375,7 @@ const SignupPage = () => {
               </div>
               {/* Confirm Password */}
               <div>
-                <label htmlFor="confirm_password" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="confirm_password" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   Confirm Password
                 </label>
                 <div className="relative">
@@ -386,7 +386,7 @@ const SignupPage = () => {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.confirm_password}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-Jost ${
+                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
                       formErrors.confirm_password 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-300'
@@ -408,7 +408,7 @@ const SignupPage = () => {
                   </button>
                 </div>
                 {formErrors.confirm_password && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-Jost">
+                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.confirm_password}
                   </p>
@@ -416,7 +416,7 @@ const SignupPage = () => {
               </div>
               {/* Phone */}
               <div>
-                <label htmlFor="phone_number" className="block text-sm font-semibold mb-2 font-Jost" style={{ color: '#1E1E1E' }}>
+                <label htmlFor="phone_number" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
                   Phone Number (Optional)
                 </label>
                 <div className="relative">
@@ -427,7 +427,7 @@ const SignupPage = () => {
                     type="tel"
                     value={formData.phone_number}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl border border-gray-300 transition-all focus:outline-none focus:ring-2 font-Jost"
+                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl border border-gray-300 transition-all focus:outline-none focus:ring-2 font-PatrickHand"
                     style={{ 
                       color: '#1E1E1E',
                       '--tw-ring-color': '#1E1E1E'
@@ -457,7 +457,7 @@ const SignupPage = () => {
                 )}
               </button>
               {/* Login Link */}
-              <div className="mt-8 text-center text-sm font-Jost">
+              <div className="mt-8 text-center text-sm font-PatrickHand">
                 <span style={{ color: '#6E6E6E' }}>Already have an account? </span>
                 <Link 
                   to="/login"

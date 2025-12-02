@@ -61,14 +61,14 @@ const Footer = () => {
               alt="Line"
               className="mb-4"
             />
-            <p className="text-black text-xl font-Jost font-light mb-4 text-center">
+            <p className="text-black text-xl font-PatrickHand font-light mb-4 text-center">
               Be the first to know about new drops<span className='max-md:hidden'>, exclusive deals, and more.</span>
             </p>
             <div className="text-center mb-4">
               <div className="text-black text-[25px] font-bold">
                 GET<br />10% OFF
               </div>
-              <div className="text-xl font-Jost">your first order!</div>
+              <div className="text-xl font-PatrickHand">your first order!</div>
             </div>
             <div className="text-center">
              <Link to='/signup' > <Button className="w-full" label="SIGN UP" /></Link>
