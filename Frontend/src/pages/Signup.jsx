@@ -161,7 +161,7 @@ const SignupPage = () => {
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 bg-opacity-10">
                   <div className="max-w-md">
                     <h2 
-                      className="text-3xl font-bold mb-4 transition-all duration-500 font-StoryScript"
+                      className="text-3xl font-bold mb-4 transition-all duration-500 font-Manrope"
                       style={{ color: '#ffffff' }}
                     >
                       {image.title}
@@ -210,7 +210,7 @@ const SignupPage = () => {
           <div className="w-full max-w-md">
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2 font-StoryScript" style={{ color: '#1E1E1E' }}>
+              <h1 className="text-4xl font-bold mb-2 font-Manrope" style={{ color: '#1E1E1E' }}>
                 Create Your Account
               </h1>
               <p className="text-base font-PatrickHand" style={{ color: '#6E6E6E' }}>
@@ -441,7 +441,7 @@ const SignupPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-StoryScript"
+                className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Manrope"
                 style={{ 
                   backgroundColor: '#1E1E1E', 
                   color: '#ffffff'
@@ -461,7 +461,7 @@ const SignupPage = () => {
                 <span style={{ color: '#6E6E6E' }}>Already have an account? </span>
                 <Link 
                   to="/login"
-                  className="font-semibold hover:underline transition-all font-StoryScript"
+                  className="font-semibold hover:underline transition-all font-Manrope"
                   style={{ color: '#1E1E1E' }}
                 >
                   Log in here

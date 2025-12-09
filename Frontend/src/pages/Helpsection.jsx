@@ -69,14 +69,14 @@ const HelpPage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">3-Day Return Policy</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">3-Day Return Policy</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 All returns must be 2 to 3 days from the date of delivery. To be eligible for a return, your item must be unused, in the same condition that you received it, and in its original packaging. A receipt or proof of purchase is required.
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Package className="w-6 h-6 text-green-600 mr-3" />
                   Returnable Items
                 </h4>
@@ -89,7 +89,7 @@ const HelpPage = () => {
                 </ul>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Package className="w-6 h-6 text-red-600 mr-3" />
                   Non-Returnable Items
                 </h4>
@@ -102,27 +102,27 @@ const HelpPage = () => {
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Return Process</h4>
+              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Return Process</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-blue-600 font-bold font-StoryScript">1</span>
+                    <span className="text-blue-600 font-bold font-Manrope">1</span>
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Contact Us</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Contact Us</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Email us your return request</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-blue-600 font-bold font-StoryScript">2</span>
+                    <span className="text-blue-600 font-bold font-Manrope">2</span>
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Package Item</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Package Item</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Pack item in original condition</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-blue-600 font-bold font-StoryScript">3</span>
+                    <span className="text-blue-600 font-bold font-Manrope">3</span>
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Ship Back</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Ship Back</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Deliver within 3-days for Nigeria orders</p>
                 </div>
               </div>
@@ -133,14 +133,14 @@ const HelpPage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Shipping Information</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Shipping Information</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 We offer fast and reliable shipping across Nigeria with multiple delivery options to suit your needs.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-blue-600 mr-3" />
                   Delivery within Lagos Island
                 </h4>
@@ -160,7 +160,7 @@ const HelpPage = () => {
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-purple-600 mr-3" />
                   Delivery within Lagos Mainland
                 </h4>
@@ -180,7 +180,7 @@ const HelpPage = () => {
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-4 flex items-center">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-green-600 mr-3" />
                   Outside Lagos
                 </h4>
@@ -201,24 +201,24 @@ const HelpPage = () => {
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Shipping Locations for Nigeria</h4>
+              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Shipping Locations for Nigeria</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                 <div className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Zone 1 - Lagos</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 1 - Lagos</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Same day delivery available</p>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Zone 2 - Major Cities</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 2 - Major Cities</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Abuja, Port Harcourt, Kano</p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Zone 3 - Other States</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Zone 3 - Other States</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">All other Nigerian states</p>
                 </div>
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Important Notes</h4>
+              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Important Notes</h4>
               <ul className="space-y-2 font-PatrickHand text-gray-600">
                 <li>• Orders placed before 2 PM are processed same day</li>
                 <li>• Weekend orders are processed on the next business day</li>
@@ -232,7 +232,7 @@ const HelpPage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Find Your Perfect Fit</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Find Your Perfect Fit</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Our sizing is designed for comfort and style. Measure yourself accurately and refer to our charts below. 
                 All measurements are in inches.
@@ -240,20 +240,20 @@ const HelpPage = () => {
             </div>
             <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Briefs Size Chart</h4>
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Briefs Size Chart</h4>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 text-Primarycolor">
-                        <th className="text-left p-3 font-semibold font-StoryScript">Size</th>
-                        <th className="text-left p-3 font-semibold font-StoryScript">Waist</th>
-                        <th className="text-left p-3 font-semibold font-StoryScript">Hip</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Size</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Waist</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Hip</th>
                       </tr>
                     </thead>
                     <tbody>
                       {sizeChart.briefs.map((row, idx) => (
                         <tr key={idx} className="border-t border-gray-200 hover:bg-gray-100 transition-colors">
-                          <td className="p-3 font-medium font-StoryScript">{row.size}</td>
+                          <td className="p-3 font-medium font-Manrope">{row.size}</td>
                           <td className="p-3 font-PatrickHand">{row.waist}"</td>
                           <td className="p-3 font-PatrickHand">{row.hip}"</td>
                         </tr>
@@ -263,21 +263,21 @@ const HelpPage = () => {
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Gymwear Size Chart</h4>
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Gymwear Size Chart</h4>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-gray-50 text-Primarycolor">
-                        <th className="text-left p-3 font-semibold font-StoryScript">Size</th>
-                        <th className="text-left p-3 font-semibold font-StoryScript">Chest</th>
-                        <th className="text-left p-3 font-semibold font-StoryScript">Waist</th>
-                        <th className="text-left p-3 font-semibold font-StoryScript">Length</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Size</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Chest</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Waist</th>
+                        <th className="text-left p-3 font-semibold font-Manrope">Length</th>
                       </tr>
                     </thead>
                     <tbody>
                       {sizeChart.gymwear.map((row, idx) => (
                         <tr key={idx} className="border-t border-gray-200 hover:bg-gray-100 transition-colors">
-                          <td className="p-3 font-medium font-StoryScript">{row.size}</td>
+                          <td className="p-3 font-medium font-Manrope">{row.size}</td>
                           <td className="p-3 font-PatrickHand">{row.chest}"</td>
                           <td className="p-3 font-PatrickHand">{row.waist}"</td>
                           <td className="p-3 font-PatrickHand">{row.length}"</td>
@@ -289,27 +289,27 @@ const HelpPage = () => {
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">How to Measure</h4>
+              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">How to Measure</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg transition-shadow">
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Chest</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Chest</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Measure around the fullest part of your chest</p>
                 </div>
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg transition-shadow">
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Waist</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Waist</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Measure around your natural waistline</p>
                 </div>
                 <div className="text-center group hover:scale-105 transition-transform duration-300">
                   <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-lg transition-shadow">
                     <Ruler className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h5 className="font-semibold font-StoryScript text-Primarycolor mb-2">Hip</h5>
+                  <h5 className="font-semibold font-Manrope text-Primarycolor mb-2">Hip</h5>
                   <p className="text-sm font-PatrickHand text-gray-600">Measure around the fullest part of your hips</p>
                 </div>
               </div>
@@ -320,7 +320,7 @@ const HelpPage = () => {
         return (
           <div className="space-y-6 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Frequently Asked Questions</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Frequently Asked Questions</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 Find quick answers to common questions about our products, shipping, and policies.
               </p>
@@ -336,7 +336,7 @@ const HelpPage = () => {
                     aria-expanded={expandedFaq === idx}
                     aria-controls={`faq-${idx}`}
                   >
-                    <h4 className="font-semibold font-StoryScript text-Primarycolor">{faq.question}</h4>
+                    <h4 className="font-semibold font-Manrope text-Primarycolor">{faq.question}</h4>
                     {expandedFaq === idx ? (
                       <ChevronUp className="w-4 h-4 text-gray-400" />
                     ) : (
@@ -357,7 +357,7 @@ const HelpPage = () => {
         return (
           <div className="space-y-8 animate-fade-in">
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
-              <h3 className="text-3xl font-bold font-StoryScript text-Primarycolor mb-4">Get in Touch</h3>
+              <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Get in Touch</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
                 We're here to help! Reach out to us through any of the channels below.
               </p>
@@ -367,7 +367,7 @@ const HelpPage = () => {
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-8 h-8 text-blue-600" />
                 </div>
-                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Email Us</h4>
+                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Email Us</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Get in touch via email</p>
                 <a 
                   href="mailto:prechi.clothing@gmail.com"
@@ -380,7 +380,7 @@ const HelpPage = () => {
                 <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="w-8 h-8 text-green-600" />
                 </div>
-                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Call Us</h4>
+                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Call Us</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Speak with our team</p>
                 <a 
                   href="tel:+2349016420903"
@@ -393,14 +393,14 @@ const HelpPage = () => {
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Clock className="w-8 h-8 text-purple-600" />
                 </div>
-                <h4 className="font-semibold font-StoryScript text-Primarycolor mb-2">Business Hours</h4>
+                <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Business Hours</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">We're available</p>
                 <p className="text-purple-600 font-medium font-PatrickHand">8:30am - 10:00pm</p>
                 <p className="text-xs font-PatrickHand text-gray-500 mt-1">Monday - Sunday</p>
               </div>
             </div>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
-              <h4 className="text-xl font-semibold font-StoryScript text-Primarycolor mb-6">Send us a Message</h4>
+              <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Send us a Message</h4>
               <ContactWhatsAppWidget />
             </div>
           </div>
@@ -416,7 +416,7 @@ const HelpPage = () => {
       '--color-Secondarycolor': '#ffffff',
       '--color-Accent': '#6E6E6E',
       '--color-Softcolor': '#F5F5DC',
-      '--font-StoryScript': '"Story Script", "sans-serif"',
+      '--font-Manrope': '"Manrope", sans-serif',
       '--font-PatrickHand': '"Jost", "sans-serif"'
     }}>
       <Navbar2 />
@@ -457,7 +457,7 @@ const HelpPage = () => {
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-8">
-              <h2 className="text-lg font-semibold font-StoryScript text-Primarycolor mb-6">Help Topics</h2>
+              <h2 className="text-lg font-semibold font-Manrope text-Primarycolor mb-6">Help Topics</h2>
               <nav className="space-y-2">
                 {helpItems.map((item) => {
                   const Icon = item.icon;

@@ -129,13 +129,13 @@ const AdminLogin = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-StoryScript': '"Story Script", "sans-serif"',
+        '--font-Manrope': '"Manrope", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-8">
         <div className="w-full max-w-md">
-          <h1 className="text-4xl font-bold mb-1 text-center font-StoryScript" style={{ color: '#1E1E1E' }}>
+          <h1 className="text-4xl font-bold mb-1 text-center font-Manrope" style={{ color: '#1E1E1E' }}>
             Admin Login
           </h1>
           <p className="text-base text-center font-PatrickHand mb-4" style={{ color: '#6E6E6E' }}>
@@ -223,7 +223,7 @@ const AdminLogin = () => {
               type="submit"
               disabled={loading}
               onClick={handleSubmit}
-              className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-StoryScript"
+              className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Manrope"
               style={{ backgroundColor: '#1E1E1E', color: '#ffffff' }}
             >
               {loading ? (

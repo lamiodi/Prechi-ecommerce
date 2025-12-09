@@ -536,7 +536,7 @@ const ProductDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😔</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-StoryScript">Oops! Product Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-Manrope">Oops! Product Not Found</h2>
           <p className="text-gray-600 font-PatrickHand">{error || "Failed to load product"}</p>
         </div>
       </div>
@@ -706,7 +706,7 @@ const ProductDetails = () => {
 
                     {/* Bundle Badge */}
                     {!isProduct && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r font-StoryScript from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
+                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Manrope from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
                         <Package className="w-4 h-4" />
                         <span>Bundle</span>
                       </div>
@@ -792,14 +792,14 @@ const ProductDetails = () => {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-StoryScript">
+                      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight font-Manrope">
                         {name}
                       </h1>
                     </div>
 
                   </div>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="text-3xl font-bold text-gray-900 font-StoryScript">
+                    <p className="text-3xl font-bold text-gray-900 font-Manrope">
                       {Number.parseFloat(displayPrice).toLocaleString(country === "Nigeria" ? "en-NG" : "en-US", {
                         style: "currency",
                         currency: displayCurrency,
@@ -829,8 +829,8 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
-                        Color: <span className="font-normal font-StoryScript text-gray-600">{selectedColor}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
+                        Color: <span className="font-normal font-Manrope text-gray-600">{selectedColor}</span>
                       </h3>
                       <div className="flex flex-wrap gap-3">
                         {colorOptions.map((color) => (
@@ -855,8 +855,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-Primarycolor font-StoryScript mb-4">
-                        Size: <span className="font-normal text-gray-600 font-StoryScript">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-Primarycolor font-Manrope mb-4">
+                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((s) => (
@@ -864,7 +864,7 @@ const ProductDetails = () => {
                             key={s.size_name}
                             onClick={() => handleSizeChange(s.size_name)}
                             disabled={s.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-StoryScript font-medium border-2 rounded-xl transition-all duration-200 ${
+                            className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${
                               selectedSize === s.size_name
                                 ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
                                 : s.stock_quantity > 0
@@ -874,7 +874,7 @@ const ProductDetails = () => {
                           >
                             {s.size_name}
                             {s.stock_quantity === 0 && (
-                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-UnifrakturCook font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-Manrope font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
                                 Sold Out
                               </div>
                             )}
@@ -889,7 +889,7 @@ const ProductDetails = () => {
                   <div className="space-y-6">
                     {/* Bundle Type Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">Bundle Type</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">Bundle Type</h3>
                       <div className="flex space-x-4">
                         {bundleTypes.map((type) => (
                           <button
@@ -908,8 +908,8 @@ const ProductDetails = () => {
                     </div>
                     {/* Size Selection for Bundle */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
-                        Size: <span className="font-normal text-gray-600 font-StoryScript">{selectedSize}</span>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
+                        Size: <span className="font-normal text-gray-600 font-Manrope">{selectedSize}</span>
                       </h3>
                       <div className="grid grid-cols-4 gap-3">
                         {sizeOptions.map((size) => (
@@ -927,7 +927,7 @@ const ProductDetails = () => {
                           >
                             {size.size_name}
                             {size.stock_quantity === 0 && (
-                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-UnifrakturCook font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[10px] font-Manrope font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap z-10">
                                 Sold Out
                               </div>
                             )}
@@ -937,7 +937,7 @@ const ProductDetails = () => {
                     </div>
                     {/* Bundle Color Selection */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-StoryScript">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 font-Manrope">
                         Select Items
                         <span className="text-sm font-normal text-gray-600 ml-2 font-PatrickHand">
                           ({Object.keys(selectedBundleVariants).length}/{bundleType === "3-in-1" ? "3" : "5"})
@@ -946,7 +946,7 @@ const ProductDetails = () => {
                       <div className="p-6 border border-gray-200 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50">
                         {/* Available Colors */}
                         <div className="mb-6">
-                          <h4 className="font-medium text-gray-900 mb-3 font-StoryScript">Available Colors</h4>
+                          <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Available Colors</h4>
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                             {(Array.isArray(data?.items?.[0]?.all_variants) ? data.items[0].all_variants : []).map(
                               (variant) => {
@@ -997,125 +997,112 @@ const ProductDetails = () => {
                         {/* Selected Items Display */}
                         {Object.keys(selectedBundleVariants).length > 0 && (
                           <div className="mb-6">
-                            <h4 className="font-medium text-gray-900 mb-3 font-StoryScript">Selected Items</h4>
-                            <div className="flex flex-wrap gap-3">
-                              {Object.entries(selectedBundleVariants).map(([index, selection]) => (
+                            <h4 className="font-medium text-gray-900 mb-3 font-Manrope">Selected Items</h4>
+                            <div className="grid grid-cols-1 gap-3">
+                              {Object.entries(selectedBundleVariants).map(([key, selection]) => (
                                 <div
-                                  key={index}
+                                  key={key}
                                   className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
                                 >
-                                  <div className="flex items-center space-x-2">
+                                  <div className="flex items-center space-x-3">
                                     <div
-                                      className={`w-5 h-5 rounded-full shadow-sm ${
+                                      className={`w-6 h-6 rounded-full shadow-sm ${
                                         selection.colorName === "White" ? "border border-gray-300" : ""
                                       }`}
                                       style={{ backgroundColor: colorMap[selection.colorName] || "#cccccc" }}
                                     />
-                                    <span className="text-sm font-medium text-gray-900 font-PatrickHand">
-                                      {selection.colorName}
-                                    </span>
-                                    <span className="text-xs text-gray-500 font-PatrickHand">
-                                      #{Number.parseInt(index) + 1}
-                                    </span>
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-medium text-gray-900 font-PatrickHand">
+                                        {selection.colorName}
+                                      </span>
+                                      <span className="text-xs text-gray-500 font-PatrickHand">
+                                        Size: {selection.sizeName}
+                                      </span>
+                                    </div>
                                   </div>
                                   <button
-                                    onClick={() => removeBundleColor(Number.parseInt(index))}
-                                    className="text-red-400 hover:text-red-600 transition-colors ml-2"
+                                    onClick={() => removeBundleColor(Number.parseInt(key))}
+                                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                                   >
-                                    ×
+                                    <Minus className="w-4 h-4" />
                                   </button>
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
-                        {/* Progress Indicator */}
-                        <div className="pt-4 border-t border-gray-200">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600 font-PatrickHand">Bundle Progress</span>
-                            <span className="font-medium text-purple-600 font-PatrickHand">
-                              {Object.keys(selectedBundleVariants).length}/{bundleType === "3-in-1" ? "3" : "5"} items
-                              selected
-                            </span>
-                          </div>
-                          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
-                              style={{
-                                width: `${(Object.keys(selectedBundleVariants).length / (bundleType === "3-in-1" ? 3 : 5)) * 100}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
                 )}
                 {/* Quantity and Add to Cart */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm font-medium font-StoryScript text-gray-900">Quantity:</span>
-                    <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <span className="text-sm font-medium text-gray-900 font-PatrickHand">Quantity:</span>
+                    <div className="flex items-center border border-gray-300 rounded-lg">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-3 hover:bg-gray-50 transition-colors duration-200"
+                        className="p-2 hover:bg-gray-100 transition-colors"
                       >
-                        <Minus className="h-4 w-4" />
+                        <Minus className="w-4 h-4" />
                       </button>
-                      <span className="px-4 py-3 font-medium min-w-[60px] text-center font-PatrickHand">{quantity}</span>
+                      <span className="w-12 text-center font-medium font-PatrickHand">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="p-3 hover:bg-gray-50 transition-colors duration-200"
+                        className="p-2 hover:bg-gray-100 transition-colors"
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                  <div className="flex space-x-4">
+                  <div className="flex gap-4">
                     <button
                       onClick={handleAddToCart}
                       disabled={isAddingToCart}
-                      className="flex-1 py-4 bg-gray-900 text-white rounded-xl font-semibold flex items-center justify-center space-x-2 hover:bg-gray-800 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-Primarycolor text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      <ShoppingCart className="h-5 w-5 " />
-                      <span className="font-StoryScript">{isAddingToCart ? "Adding..." : "Add to Cart"}</span>
+                      {isAddingToCart ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-5 h-5" />
+                          <span>Add to Cart</span>
+                        </>
+                      )}
                     </button>
-                    <button className="p-4 border-2 border-gray-200 rounded-xl hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                      <Share2 className="h-5 w-5" />
+                    <button className="p-4 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+                      <Share2 className="w-5 h-5 text-gray-600" />
                     </button>
                   </div>
-                  {/* Guest Notice */}
-                  {isGuest && (
-                    <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <p className="text-xs text-blue-700 font-PatrickHand">
-                          You're shopping as a guest. Your cart will be saved until you complete your purchase.
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 {/* Features */}
-                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-100">
-                  <div className="text-center space-y-2">
-                    <Truck className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-PatrickHand">Shipping</p>
+                <div className="grid grid-cols-2 gap-4 pt-6">
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <Truck className="w-5 h-5 text-Primarycolor" />
+                    <span className="font-PatrickHand">Fast Delivery</span>
                   </div>
-                  <div className="text-center space-y-2">
-                    <RotateCcw className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-PatrickHand">Easy Returns</p>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <Shield className="w-5 h-5 text-Primarycolor" />
+                    <span className="font-PatrickHand">Secure Payment</span>
                   </div>
-                  <div className="text-center space-y-2">
-                    <Shield className="h-6 w-6 mx-auto text-gray-600" />
-                    <p className="text-xs text-gray-600 font-PatrickHand">2 Year Warranty</p>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <RotateCcw className="w-5 h-5 text-Primarycolor" />
+                    <span className="font-PatrickHand">Easy Returns</span>
                   </div>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <Check className="w-5 h-5 text-Primarycolor" />
+                    <span className="font-PatrickHand">Quality Guaranteed</span>
+                  </div>
+                </div>
+                {/* Description */}
+                <div className="pt-8 border-t border-gray-200">
+                  <DescriptionSection description={description} />
                 </div>
               </div>
             </div>
           </div>
-          <DescriptionSection isProduct={isProduct} description={description} data={data} />
-          <ReviewSection productId={isProduct ? id : null} bundleId={isProduct ? null : id} productName={name} />
+          {/* Reviews Section */}
+          <ReviewSection productId={id} />
         </div>
       </div>
       <Footer />

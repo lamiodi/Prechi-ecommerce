@@ -207,13 +207,13 @@ export default function AdminDiscounts() {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-StoryScript': '"Story Script", "sans-serif"',
+        '--font-Manrope': '"Manrope", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 className="text-xl font-semibold text-gray-900 font-StoryScript">
+          <h2 className="text-xl font-semibold text-gray-900 font-Manrope">
             Discounts Management
           </h2>
         </div>
@@ -338,14 +338,14 @@ export default function AdminDiscounts() {
               </thead>
               <tbody>
                 {discounts.map((d) => (
-                  <tr key={d.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900 font-StoryScript">{d.code}</td>
+                  <tr key={d.id} className="border-b border-gray-100 hover:bg-gray-50">      
+                    <td className="py-3 px-4 text-sm font-medium text-gray-900 font-Manrope">{d.code}</td>
                     <td className="py-3 px-4 text-sm text-gray-600 font-PatrickHand capitalize">
                       {d.discount_type}
                     </td>
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900 font-StoryScript">
-                      {d.discount_type === 'percentage' 
-                        ? `${d.discount_value}%` 
+                    <td className="py-3 px-4 text-sm font-medium text-gray-900 font-Manrope">
+                      {d.discount_type === 'percentage'
+                        ? `${d.discount_value}%`
                         : `₦${d.discount_value}`}
                     </td>
                     <td className="py-3 px-4 text-sm text-gray-600 font-PatrickHand">

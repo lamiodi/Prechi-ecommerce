@@ -104,7 +104,7 @@ const NewReleaseGrid = () => {
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
           '--color-Softcolor': '#F5F5DC',
-          '--font-StoryScript': '"Story Script", "sans-serif"',
+          '--font-Manrope': '"Manrope", "sans-serif"',
           '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
@@ -135,11 +135,11 @@ const NewReleaseGrid = () => {
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
           '--color-Softcolor': '#F5F5DC',
-          '--font-StoryScript': '"Story Script", "sans-serif"',
+          '--font-Manrope': '"Manrope", "sans-serif"',
           '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
-        <h3 className="font-StoryScript">New Release</h3>
+        <h3 className="font-Manrope">New Release</h3>
         <div className="text-center py-8">
           <p className="text-red-600 mb-4 font-PatrickHand">Error: {error}</p>
           <button 
@@ -161,15 +161,15 @@ const NewReleaseGrid = () => {
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--color-Softcolor': '#F5F5DC',
-        '--font-StoryScript': '"Story Script", "sans-serif"',
+        '--font-Manrope': '"Manrope", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
-      <h3 className="text-2xl font-bold mb-2 font-StoryScript">New Release</h3>
+      <h3 className="text-2xl font-bold mb-2 font-Manrope">New Release</h3>
       <div className="flex flex-row justify-between items-center gap-y-4 mb-6">
-        <h4 className="font-light text-gray-600 font-StoryScript">Explore our latest products</h4>
+        <h4 className="font-light text-gray-600 font-Manrope">Explore our latest products</h4>
         <Link to="/shop" className="text-black hover:text-accent transition-colors">
-          <h4 className="font-semibold font-StoryScript">SHOP <span className='hidden font-semibold sm:inline font-PatrickHand'>ALL</span></h4>
+          <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-Manrope'>ALL</span></h4>
         </Link>
       </div>
       {products.length === 0 ? (
@@ -242,10 +242,10 @@ const ProductCard = ({ product, onImageError, priority }) => {
           />
         </div>
         <div className="p-3 sm:p-4 flex-1 flex flex-col">
-          <h3 className="text-sm sm:text-base font-semibold text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200 font-StoryScript">
+          <h3 className="text-sm sm:text-base font-semibold text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200 font-Manrope">
             {displayName}
           </h3>
-          <p className="text-lg sm:text-xl font-semibold font-StoryScript text-Accent mt-auto">
+          <p className="text-lg sm:text-xl font-semibold font-Manrope text-Accent mt-auto">
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,

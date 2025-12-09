@@ -19,7 +19,7 @@ const Footer = () => {
     <div className="container-padding typography relative bg-Primarycolor  py-6 ">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5   mb-8">
       <div>
-          <h3 className="text-white font-bold text-base mb-4 font-StoryScript">HELP CENTER</h3>
+          <h3 className="text-white font-bold text-base mb-4 font-Manrope">HELP CENTER</h3>
           <ul className="space-y-2 text-white text-base opacity-75 adjust font-PatrickHand">
             <Link to="/help">
             <li>Return Policy</li>
@@ -37,7 +37,7 @@ const Footer = () => {
           </ul>
         </div>
         <div>
-          <h3 className="text-white font-bold text-base mb-4 font-StoryScript">MORE</h3>
+          <h3 className="text-white font-bold text-base mb-4 font-Manrope">MORE</h3>
           <Link to="/more">
           <ul className="space-y-2 text-white text-base opacity-75 adjust font-PatrickHand">
             <li>About Us</li>
@@ -55,7 +55,7 @@ const Footer = () => {
             className="absolute left-0 top-0 w-1/2 h-full  object-cover "
           />
           <div className="ml-auto w-1/2 pl-4 ">
-            <h3 className="text-black text-center  underline underline-offset-8 font-semibold text-2xl mb-2 font-StoryScript">Sign Up Now</h3>
+            <h3 className="text-black text-center  underline underline-offset-8 font-semibold text-2xl mb-2 font-Manrope">Sign Up Now</h3>
             <img
               src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
               alt="Line"
@@ -65,13 +65,13 @@ const Footer = () => {
               Be the first to know about new drops<span className='max-md:hidden'>, exclusive deals, and more.</span>
             </p>
             <div className="text-center mb-4">
-              <div className="text-black text-[25px] font-bold font-StoryScript">
+              <div className="text-black text-[25px] font-bold font-Manrope">
                 GET<br />10% OFF
               </div>
               <div className="text-xl font-PatrickHand">your first order!</div>
             </div>
             <div className="text-center">
-             <Link to='/signup' > <Button className="w-full font-StoryScript" label="SIGN UP" /></Link>
+             <Link to='/signup' > <Button className="w-full font-Manrope" label="SIGN UP" /></Link>
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="text-xs font-StoryScript text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} Prechi Clothing. All rights reserved.</p>
+      <p className="text-xs font-Manrope text-white text-right max-md:text-center mt-4">&copy; {new Date().getFullYear()} Prechi Clothing. All rights reserved.</p>
     </div>
   );
 };

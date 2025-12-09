@@ -65,7 +65,7 @@ const NewsletterForm = () => {
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-extrabold font-PatrickHand tracking-tight leading-snug lg:text-nowrap lg:ms-10 lg:max-w-sm">
             SUBSCRIBE TO OUR NEWSLETTER
           </h2>
-          <p className="mt-3 sm:mt-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-StoryScript font-bold lg:ms-[30vw] lg:text-nowrap">
+          <p className="mt-3 sm:mt-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-Manrope font-bold lg:ms-[30vw] lg:text-nowrap">
             Get 10% Off Your First Order
           </p>
 
@@ -85,7 +85,7 @@ const NewsletterForm = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 w-full max-w-[95vw] sm:max-w-[75vw] md:max-w-[50vw] lg:max-w-[40vw] xl:max-w-[35vw] ml-auto lg:ml-48 xl:ml-60 2xl:ml-130">
-            <div className="flex bg-Secondarycolor font-StoryScript rounded-md overflow-hidden shadow-sm">
+            <div className="flex bg-Secondarycolor font-Manrope rounded-md overflow-hidden shadow-sm">
               <input
                 type="email"
                 value={email}

@@ -255,7 +255,7 @@ const ThankYou = () => {
           '--color-Primarycolor': '#1E1E1E',
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
-          '--font-StoryScript': '"Story Script", "sans-serif"',
+          '--font-Manrope': '"Manrope", "sans-serif"',
           '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
@@ -263,7 +263,7 @@ const ThankYou = () => {
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 md:h-16 md:w-16 text-red-600 mx-auto mb-4" />
-            <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-StoryScript">Payment Verification Issue</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-Manrope">Payment Verification Issue</h2>
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 max-w-lg mx-auto">
               <p className="text-sm md:text-base text-red-700 font-PatrickHand">{error}</p>
             </div>
@@ -318,7 +318,7 @@ const ThankYou = () => {
           '--color-Primarycolor': '#1E1E1E',
           '--color-Secondarycolor': '#ffffff',
           '--color-Accent': '#6E6E6E',
-          '--font-StoryScript': '"Story Script", "sans-serif"',
+          '--font-Manrope': '"Manrope", "sans-serif"',
           '--font-PatrickHand': '"Jost", "sans-serif"'
         }}
       >
@@ -326,7 +326,7 @@ const ThankYou = () => {
         <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           <div className="text-center">
             <AlertCircle className="h-12 w-12 md:h-16 md:w-16 text-red-600 mx-auto mb-4" />
-            <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-StoryScript">Order Not Found</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-Manrope">Order Not Found</h2>
             <p className="text-sm md:text-base text-Accent mb-6 font-PatrickHand">We couldn't find your order details. Please try verifying your payment manually.</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <button
@@ -378,7 +378,7 @@ const ThankYou = () => {
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
-        '--font-StoryScript': '"Story Script", "sans-serif"',
+        '--font-Manrope': '"Manrope", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"'
       }}
     >
@@ -386,7 +386,7 @@ const ThankYou = () => {
       <div className="max-w-7xl xl:max-w-[90rem] 2xl:max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-8 md:pb-12">
         <div className="text-center">
           <CheckCircle className="h-12 w-12 md:h-16 md:w-16 text-green-600 mx-auto mb-4" />
-          <h2 className="text-2xl md:text-3xl font-bold text-Primarycolor mb-4 font-StoryScript">
+          <h2 className="text-2xl md:text-3xl font-bold text-Primarycolor mb-4 font-Manrope">
             {isInternational && !order.delivery_fee_paid
               ? 'Order Received - Awaiting Delivery Fee Email'
               : 'Order Confirmed'}
@@ -415,7 +415,7 @@ const ThankYou = () => {
                   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-4">
                     <UserPlus className="h-6 w-6 text-blue-600" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-bold text-Primarycolor mb-2 font-StoryScript">Create Your Permanent Account</h3>
+                  <h3 className="text-lg md:text-xl font-bold text-Primarycolor mb-2 font-Manrope">Create Your Permanent Account</h3>
                   <p className="text-sm md:text-base text-Accent mb-6 max-w-md font-PatrickHand">
                     You're currently using a temporary account. Set up a password to convert it to a permanent account and unlock these benefits:
                   </p>
@@ -423,21 +423,21 @@ const ThankYou = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 w-full">
                     <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
                       <Shield className="h-8 w-8 text-blue-600 mb-2" />
-                      <span className="text-sm font-medium text-Primarycolor font-StoryScript">Secure Access</span>
+                      <span className="text-sm font-medium text-Primarycolor font-Manrope">Secure Access</span>
                     </div>
                     <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
                       <Clock className="h-8 w-8 text-blue-600 mb-2" />
-                      <span className="text-sm font-medium text-Primarycolor font-StoryScript">Order History</span>
+                      <span className="text-sm font-medium text-Primarycolor font-Manrope">Order History</span>
                     </div>
                     <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
                       <Gift className="h-8 w-8 text-blue-600 mb-2" />
-                      <span className="text-sm font-medium text-Primarycolor font-StoryScript">Exclusive Offers</span>
+                      <span className="text-sm font-medium text-Primarycolor font-Manrope">Exclusive Offers</span>
                     </div>
                   </div>
                   
                   <button
                     onClick={handleConvertAccount}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all shadow-lg flex items-center justify-center font-StoryScript"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all shadow-lg flex items-center justify-center font-Manrope"
                   >
                     <Lock className="h-5 w-5 mr-2" />
                     Set Up Password

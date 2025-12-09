@@ -87,17 +87,17 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
       <div className="relative z-10 flex flex-col justify-center items-start w-full lg:w-1/2 px-4 py-3 sm:px-8 h-full ">
         {/* Badge */}
         <div className="inline-flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-4">
-          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-StoryScript">New Collection</span>
+          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-Manrope">New Collection</span>
           <div className="ml-2 w-2 h-2 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full animate-pulse"></div>
         </div>
         <h2 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-Secondarycolor mt-2 mb-4 leading-tight whitespace-nowrap">
-          <span className="inline font-StoryScript">HIS AND HERS </span>
+          <span className="inline font-Manrope">HIS AND HERS </span>
           <span className="bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
             SETS
           </span>
         </h2>
         
-        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-StoryScript mb-6 max-w-md">
+        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-Manrope mb-6 max-w-md">
           Your favourite style for every move.
         </p>
         
@@ -108,7 +108,7 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
               variant="primary"
               size="medium"
               stateProp="default"
-              className="w-full sm:w-48 md:w-52 lg:w-56 xl:w-60 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-StoryScript px-4"
+              className="w-full sm:w-48 md:w-52 lg:w-56 xl:w-60 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-Manrope px-4"
             />
           </Link>
         </div>
@@ -154,22 +154,22 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
       <div className="relative z-10 flex flex-col justify-center items-start w-full lg:w-1/2 px-4 py-3 sm:px-8 h-full ">
         {/* Badge */}
         <div className="inline-flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-4">
-          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-StoryScript">Exclusive Offer</span>
+          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-Manrope">Exclusive Offer</span>
           <div className="ml-2 w-2 h-2 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full animate-pulse"></div>
         </div>
         <h2 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-Secondarycolor mt-2 mb-4 leading-tight whitespace-nowrap">
-          <span className="inline font-StoryScript">SIGN UP </span>
+          <span className="inline font-Manrope">SIGN UP </span>
           <span className="bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
             NOW
           </span>
         </h2>
         
-        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-StoryScript mb-6 max-w-md">
+        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-Manrope mb-6 max-w-md">
           Be the first to know about new drops, exclusive deals.
         </p>
         
         <div className="flex flex-col gap-3">
-          <div className="text-2xl sm:text-3xl font-bold text-white mb-2 font-StoryScript">
+          <div className="text-2xl sm:text-3xl font-bold text-white mb-2 font-Manrope">
             GET <span className="text-yellow-300">10% OFF</span> YOUR FIRST ORDER!
           </div>
           <Button
@@ -177,7 +177,7 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
             variant="primary"
             size="medium"
             stateProp="default"
-            className="w-44 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-StoryScript"
+            className="w-44 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-Manrope"
           />
         </div>
       </div>
@@ -222,22 +222,22 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
       <div className="relative z-10 flex flex-col justify-center items-start w-full lg:w-1/2 px-4 py-3 sm:px-8 h-full ">
         {/* Badge */}
         <div className="inline-flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-4">
-          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-StoryScript">Bundle Deal</span>
+          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-Manrope">Bundle Deal</span>
           <div className="ml-2 w-2 h-2 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full animate-pulse"></div>
         </div>
         <h2 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-Secondarycolor mt-2 mb-4 leading-tight whitespace-nowrap">
-          <span className="inline font-StoryScript">3-IN-1 </span>
+          <span className="inline font-Manrope">3-IN-1 </span>
           <span className="bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
             BUNDLE
           </span>
         </h2>
         
-        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-StoryScript mb-6 max-w-md">
+        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-Manrope mb-6 max-w-md">
           Get three products for the price of two. Limited time offer.
         </p>
         
         <div className="flex flex-col gap-3">
-          <div className="text-2xl sm:text-3xl font-bold text-white mb-2 font-StoryScript">
+          <div className="text-2xl sm:text-3xl font-bold text-white mb-2 font-Manrope">
             SAVE <span className="text-yellow-300">33%</span> ON BUNDLES
           </div>
           {/* 3-in-1 Bundle Button */}
@@ -247,7 +247,7 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
               variant="primary"
               size="medium"
               stateProp="default"
-              className="w-44 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-StoryScript"
+              className="w-44 transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl font-Manrope"
             />
           </Link>
         </div>
@@ -293,17 +293,17 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
       <div className="relative z-10 flex flex-col justify-center items-start w-full lg:w-1/2 px-4 py-3 sm:px-8 h-full ">
         {/* Badge */}
         <div className="inline-flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-4">
-          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-StoryScript">Newsletter</span>
+          <span className="text-xs font-medium text-white/80 uppercase tracking-wider font-Manrope">Newsletter</span>
           <div className="ml-2 w-2 h-2 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full animate-pulse"></div>
         </div>
         <h2 className="text-xs sm:text-4xl lg:text-6xl font-extrabold text-Secondarycolor mt-2 mb-4 leading-tight whitespace-nowrap">
-          <span className="text-xl sm:text-4xl lg:text-6xl font-extrabold inline font-StoryScript">SUBSCRIBE TO </span>
+          <span className="text-xl sm:text-4xl lg:text-6xl font-extrabold inline font-Manrope">SUBSCRIBE TO </span>
           <span className="text-xl sm:text-4xl lg:text-6xl font-extrabold bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
             NEWSLETTER
           </span>
         </h2>
         
-        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-StoryScript mb-6 max-w-md">
+        <p className="text-base sm:text-lg lg:text-xl text-Secondarycolor/90 font-medium leading-relaxed font-Manrope mb-6 max-w-md">
           Get 10% Off Your First Order
         </p>
         
@@ -324,7 +324,7 @@ const signup = "https://res.cloudinary.com/dgcwviufp/image/upload/f_auto,q_auto,
           
           {/* Form */}
           <form onSubmit={handleSubmit} className="w-full max-w-md lg:max-w-lg xl:max-w-xl">
-            <div className="flex bg-Secondarycolor font-StoryScript rounded-md overflow-hidden shadow-sm">
+            <div className="flex bg-Secondarycolor font-Manrope rounded-md overflow-hidden shadow-sm">
               <input
                 type="email"
                 value={email}
