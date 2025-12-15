@@ -164,7 +164,7 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
       sql`
         SELECT 
           o.id, o.reference, o.payment_status, o.payment_method, o.shipping_method, o.shipping_cost,
-          o.delivery_fee, o.delivery_fee_paid, o.created_at, o.shipping_country,
+          o.delivery_fee, o.delivery_fee_paid, o.created_at, a.country AS shipping_country,
           a.title AS shipping_address_title, a.address_line_1 AS shipping_address_line_1, 
           a.landmark AS shipping_address_landmark, a.city AS shipping_address_city, 
           a.state AS shipping_address_state, a.zip_code AS shipping_address_zip_code, 

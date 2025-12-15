@@ -520,19 +520,22 @@ export const createOrder = async (req, res) => {
         throw new Error(`Base currency total mismatch: expected ${expectedBaseTotal} NGN, got ${base_currency_total} NGN`);
       }
       
+      // Resolve shipping method string
+      const shippingOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
+      const shippingMethodName = shippingOption ? shippingOption.method : 'Standard Delivery';
+
       // Try to insert order with idempotency key
       let order;
       try {
         [order] = await sql`
           INSERT INTO orders (
-            user_id, address_id, billing_address_id, cart_id, total, discount, tax, shipping_method_id, shipping_cost,
-            shipping_country, payment_method, payment_status, status, currency, reference, note, exchange_rate,
-            base_currency_total, converted_total, delivery_fee_paid, idempotency_key
+            user_id, address_id, billing_address_id, cart_id, total, discount, tax, shipping_method, shipping_cost,
+            payment_method, payment_status, status, currency, reference, note,
+            delivery_fee_paid, idempotency_key
           ) VALUES (
             ${user_id}, ${finalAddressId}, ${finalBillingAddressId}, ${finalCartId}, ${total}, ${discount}, 
-            ${calculatedTax}, ${shipping_method_id}, ${shipping_cost},
-            ${address.country}, ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note}, 
-            ${exchange_rate}, ${base_currency_total}, ${converted_total}, 
+            ${calculatedTax}, ${shippingMethodName}, ${shipping_cost},
+            ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note}, 
             ${address.country.toLowerCase() === 'nigeria' ? true : false}, ${idempotencyKey || null}
           )
           RETURNING id
@@ -746,10 +749,11 @@ export const verifyOrderByReference = async (req, res) => {
     // First try without deleted_at
     let [order] = await sql`
       SELECT 
-        o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method_id, o.shipping_cost, o.shipping_country, 
+        o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, a.country as shipping_country, 
         o.payment_method, o.payment_status, o.status, o.created_at, o.reference, o.note, o.currency,
         o.delivery_fee_paid
       FROM orders o
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.reference = ${reference}
     `;
     
@@ -757,10 +761,11 @@ export const verifyOrderByReference = async (req, res) => {
     if (order && 'deleted_at' in order) {
       [order] = await sql`
         SELECT 
-          o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method_id, o.shipping_cost, o.shipping_country, 
+          o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, a.country as shipping_country, 
           o.payment_method, o.payment_status, o.status, o.created_at, o.reference, o.note, o.currency,
           o.delivery_fee_paid
         FROM orders o
+        LEFT JOIN addresses a ON o.address_id = a.id
         WHERE o.reference = ${reference} AND o.deleted_at IS NULL
       `;
     }
@@ -883,9 +888,10 @@ export const getOrdersByUser = async (req, res) => {
     // First try without deleted_at
     let orders = await sql`
       SELECT 
-        o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, o.shipping_country, 
+        o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, a.country as shipping_country, 
         o.payment_method, o.payment_status, o.status, o.created_at, o.reference, o.note, o.currency
       FROM orders o
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.user_id = ${userId}
       ORDER BY o.created_at DESC
     `;
@@ -894,9 +900,10 @@ export const getOrdersByUser = async (req, res) => {
     if (orders.length > 0 && 'deleted_at' in orders[0]) {
       orders = await sql`
         SELECT 
-          o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, o.shipping_country, 
+          o.id, o.user_id, o.total, o.discount, o.tax, o.shipping_method, o.shipping_cost, a.country as shipping_country, 
           o.payment_method, o.payment_status, o.status, o.created_at, o.reference, o.note, o.currency
         FROM orders o
+        LEFT JOIN addresses a ON o.address_id = a.id
         WHERE o.user_id = ${userId} AND o.deleted_at IS NULL
         ORDER BY o.created_at DESC
       `;
@@ -940,9 +947,11 @@ export const getOrderById = async (req, res) => {
     let [order] = await sql`
       SELECT 
         o.*, 
-        u.first_name, u.last_name, u.email
+        u.first_name, u.last_name, u.email,
+        a.country as shipping_country
       FROM orders o
       JOIN users u ON o.user_id = u.id
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.id = ${id}
     `;
     
@@ -951,9 +960,11 @@ export const getOrderById = async (req, res) => {
       [order] = await sql`
         SELECT 
           o.*, 
-          u.first_name, u.last_name, u.email
+          u.first_name, u.last_name, u.email,
+          a.country as shipping_country
         FROM orders o
         JOIN users u ON o.user_id = u.id
+        LEFT JOIN addresses a ON o.address_id = a.id
         WHERE o.id = ${id} AND o.deleted_at IS NULL
       `;
     }

@@ -166,7 +166,7 @@ async function handleSuccessfulPayment(reference, res) {
         o.cart_id,
         o.delivery_fee,
         o.delivery_fee_paid,
-        o.shipping_country,
+        a.country as shipping_country,
         u.email as user_email,
         u.first_name as user_first_name,
         u.last_name as user_last_name,

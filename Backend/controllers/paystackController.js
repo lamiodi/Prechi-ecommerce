@@ -220,7 +220,8 @@ export const initializeDeliveryFeePayment = async (req, res) => {
     
     const orderCheck = await sql`
       SELECT 
-        o.id, o.total, o.currency, o.payment_status, o.shipping_country, 
+        o.id, o.total, o.currency, o.payment_status, 
+        a.country as shipping_country,
         o.delivery_fee, o.delivery_fee_paid,
         u.email as user_email, u.first_name as user_first_name, u.is_temporary,
         ba.email as billing_email, ba.full_name as billing_full_name,
@@ -229,6 +230,7 @@ export const initializeDeliveryFeePayment = async (req, res) => {
       FROM orders o
       JOIN users u ON o.user_id = u.id
       LEFT JOIN billing_addresses ba ON o.billing_address_id = ba.id
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.id = ${order_id} AND o.deleted_at IS NULL
     `;
     

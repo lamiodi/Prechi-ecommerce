@@ -382,9 +382,8 @@ export const getCompleteOrderDetails = async (req, res) => {
           total: order.total || 0,
           tax: order.tax || 0,
           shipping_method: order.shipping_method || 'N/A',
-          shipping_method_id: order.shipping_method_id,
           shipping_cost: order.shipping_cost || 0,
-          shipping_country: order.shipping_country || 'N/A',
+          shipping_country: shippingAddress ? shippingAddress.country : 'N/A',
           payment_method: order.payment_method || 'N/A',
           payment_status: order.payment_status || 'N/A',
           status: order.status || 'pending',
@@ -624,8 +623,10 @@ export const setDeliveryFee = async (req, res) => {
     }
     
     const [order] = await sql`
-      SELECT * FROM orders
-      WHERE id = ${orderId} AND deleted_at IS NULL
+      SELECT o.*, a.country as shipping_country
+      FROM orders o
+      LEFT JOIN addresses a ON o.address_id = a.id
+      WHERE o.id = ${orderId} AND o.deleted_at IS NULL
     `;
     
     if (!order) {
@@ -734,7 +735,7 @@ export const getOrderShippingAddress = async (req, res) => {
     
     // Get the order to find the user
     const [order] = await sql`
-      SELECT user_id, shipping_country
+      SELECT user_id
       FROM orders 
       WHERE id = ${orderId}
     `;

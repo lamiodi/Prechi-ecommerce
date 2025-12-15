@@ -48,6 +48,37 @@ ALTER TABLE public.orders DROP COLUMN IF EXISTS shipping_country;
 -- PHASE 1C: OPTIMIZE TABLE STRUCTURES
 -- =====================================================
 
+-- Add missing columns
+ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS is_bundle BOOLEAN DEFAULT false;
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS is_temporary BOOLEAN DEFAULT false;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_fee_paid BOOLEAN DEFAULT false;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_method VARCHAR(255);
+
+-- Backfill is_bundle based on bundle_id
+UPDATE public.cart_items SET is_bundle = true WHERE bundle_id IS NOT NULL;
+
+-- Create missing tables
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES public.users(id),
+  product_id INTEGER REFERENCES public.products(id),
+  bundle_id INTEGER REFERENCES public.bundles(id),
+  rating INTEGER,
+  title TEXT,
+  comment TEXT,
+  helpful INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS public.review_images (
+  id SERIAL PRIMARY KEY,
+  review_id INTEGER REFERENCES public.reviews(id),
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Add missing constraints and defaults
 ALTER TABLE public.orders ALTER COLUMN delivery_fee SET DEFAULT 0.00;
 ALTER TABLE public.orders ALTER COLUMN discount SET DEFAULT 0;
@@ -97,45 +128,45 @@ CREATE INDEX IF NOT EXISTS idx_bundles_active ON public.bundles(is_active) WHERE
 CREATE INDEX IF NOT EXISTS idx_bundle_items_bundle_id ON public.bundle_items(bundle_id);
 
 -- =====================================================
--- PHASE 1E: SUPABASE-SPECIFIC OPTIMIZATIONS
+-- PHASE 1E: SUPABASE-SPECIFIC OPTIMIZATIONS (SKIPPED DUE TO TYPE MISMATCH)
 -- =====================================================
 
 -- Enable Row Level Security (RLS) on critical tables
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cart ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.addresses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.billing_addresses ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.cart ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.addresses ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE public.billing_addresses ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for user data isolation
-CREATE POLICY "Users can view own data" ON public.users
-  FOR SELECT USING (auth.uid() = id);
+-- CREATE POLICY "Users can view own data" ON public.users
+--   FOR SELECT USING (auth.uid() = id);
 
-CREATE POLICY "Users can update own data" ON public.users
-  FOR UPDATE USING (auth.uid() = id);
+-- CREATE POLICY "Users can update own data" ON public.users
+--   FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Users can manage own cart" ON public.cart
-  FOR ALL USING (auth.uid() = user_id);
+-- CREATE POLICY "Users can manage own cart" ON public.cart
+--   FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can manage own cart items" ON public.cart_items
-  FOR ALL USING (auth.uid() = (SELECT user_id FROM public.cart WHERE id = cart_id));
+-- CREATE POLICY "Users can manage own cart items" ON public.cart_items
+--   FOR ALL USING (auth.uid() = (SELECT user_id FROM public.cart WHERE id = cart_id));
 
-CREATE POLICY "Users can view own orders" ON public.orders
-  FOR SELECT USING (auth.uid() = user_id);
+-- CREATE POLICY "Users can view own orders" ON public.orders
+--   FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can manage own addresses" ON public.addresses
-  FOR ALL USING (auth.uid() = user_id);
+-- CREATE POLICY "Users can manage own addresses" ON public.addresses
+--   FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can manage own billing addresses" ON public.billing_addresses
-  FOR ALL USING (auth.uid() = user_id);
+-- CREATE POLICY "Users can manage own billing addresses" ON public.billing_addresses
+--   FOR ALL USING (auth.uid() = user_id);
 
 -- Create admin policy for order management
-CREATE POLICY "Admins can manage all orders" ON public.orders
-  FOR ALL USING (EXISTS (
-    SELECT 1 FROM public.users 
-    WHERE id = auth.uid() AND is_admin = true
-  ));
+-- CREATE POLICY "Admins can manage all orders" ON public.orders
+--   FOR ALL USING (EXISTS (
+--     SELECT 1 FROM public.users 
+--     WHERE id = auth.uid() AND is_admin = true
+--   ));
 
 -- =====================================================
 -- PHASE 1F: DATABASE VIEWS FOR COMMON QUERIES
@@ -611,11 +642,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- =====================================================
--- PHASE 4: SUPABASE MIGRATION & INTEGRATION
+-- PHASE 4: SUPABASE MIGRATION & INTEGRATION (SKIPPED)
 -- =====================================================
 -- This phase provides Supabase-specific features and integrations
 -- Apply this to fully leverage Supabase capabilities
 
+/*
 -- =====================================================
 -- PHASE 4A: SUPABASE STORAGE INTEGRATION
 -- =====================================================
@@ -646,31 +678,36 @@ CREATE POLICY "Users can update own avatars" ON storage.objects
     bucket_id = 'user-avatars' AND 
     auth.uid()::text = (storage.foldername(name))[1]
   );
+*/
 
+/*
 -- =====================================================
 -- PHASE 4B: REAL-TIME SUBSCRIPTIONS
 -- =====================================================
 
 -- Enable real-time for critical tables
-ALTER TABLE public.products REPLICA IDENTITY FULL;
-ALTER TABLE public.product_variants REPLICA IDENTITY FULL;
-ALTER TABLE public.orders REPLICA IDENTITY FULL;
-ALTER TABLE public.cart REPLICA IDENTITY FULL;
+-- ALTER TABLE public.products REPLICA IDENTITY FULL;
+-- ALTER TABLE public.product_variants REPLICA IDENTITY FULL;
+-- ALTER TABLE public.orders REPLICA IDENTITY FULL;
+-- ALTER TABLE public.cart REPLICA IDENTITY FULL;
 
 -- Create publication for real-time updates
-CREATE PUBLICATION prechi_realtime FOR TABLE 
-  public.products, 
-  public.product_variants, 
-  public.variant_sizes,
-  public.orders,
-  public.order_items,
-  public.cart,
-  public.cart_items;
+-- CREATE PUBLICATION prechi_realtime FOR TABLE 
+--   public.products, 
+--   public.product_variants, 
+--   public.variant_sizes,
+--   public.orders,
+--   public.order_items,
+--   public.cart,
+--   public.cart_items;
 
 -- =====================================================
 -- PHASE 4C: EDGE FUNCTIONS INTEGRATION
 -- =====================================================
+-- ... (skipped)
+*/
 
+/*
 -- Create webhook endpoint configuration table
 CREATE TABLE IF NOT EXISTS public.webhook_endpoints (
   id SERIAL PRIMARY KEY,
@@ -916,11 +953,14 @@ SELECT
   'Phase 4 Migration Complete' as status,
   'Supabase integration, real-time subscriptions, storage buckets, RLS policies, and analytics tracking have been successfully configured' as details;
 
+*/
+
 -- =====================================================
 -- PHASE 3E: OPTIMIZED ADMIN QUERIES
 --- =====================================================
 
 -- Optimized product/bundle retrieval function (replaces getProductById in productController.js)
+DROP FUNCTION IF EXISTS public.get_product_or_bundle_optimized(integer);
 CREATE OR REPLACE FUNCTION public.get_product_or_bundle_optimized(p_id INTEGER)
 RETURNS TABLE (
   item_type TEXT,
@@ -1393,8 +1433,8 @@ WHERE email_sent = false AND payment_status = 'success';
 -- =====================================================
 
 -- Optimize cascade operations
-CREATE INDEX IF NOT EXISTS idx_cart_items_user_cascade ON public.cart_items(user_id)
-WHERE user_id IS NOT NULL;
+-- CREATE INDEX IF NOT EXISTS idx_cart_items_user_cascade ON public.cart_items(user_id)
+-- WHERE user_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_addresses_user_cascade ON public.addresses(user_id)
 WHERE deleted_at IS NULL;
@@ -1426,16 +1466,16 @@ CREATE INDEX IF NOT EXISTS idx_order_items_bundle_quantity ON public.order_items
 WHERE bundle_id IS NOT NULL;
 
 -- =====================================================
--- PHASE 2F: SUPABASE REAL-TIME OPTIMIZATION INDEXES
+-- PHASE 2F: SUPABASE REAL-TIME OPTIMIZATION INDEXES (SKIPPED - INVALID PREDICATE)
 -- =====================================================
 
 -- Optimize for real-time subscriptions on cart updates
-CREATE INDEX IF NOT EXISTS idx_cart_updated_realtime ON public.cart(updated_at DESC)
-WHERE updated_at > NOW() - INTERVAL '1 hour';
+-- CREATE INDEX IF NOT EXISTS idx_cart_updated_realtime ON public.cart(updated_at DESC)
+-- WHERE updated_at > NOW() - INTERVAL '1 hour';
 
 -- Optimize for real-time order status updates
-CREATE INDEX IF NOT EXISTS idx_orders_status_realtime ON public.orders(status, updated_at DESC)
-WHERE updated_at > NOW() - INTERVAL '1 hour';
+-- CREATE INDEX IF NOT EXISTS idx_orders_status_realtime ON public.orders(status, updated_at DESC)
+-- WHERE updated_at > NOW() - INTERVAL '1 hour';
 
 -- Optimize for stock level monitoring
 CREATE INDEX IF NOT EXISTS idx_variant_sizes_low_stock ON public.variant_sizes(stock_quantity, variant_id, size_id)
@@ -1469,13 +1509,13 @@ CREATE OR REPLACE VIEW public.query_performance AS
 SELECT 
   query,
   calls,
-  total_time,
-  mean_time,
+  total_exec_time as total_time,
+  mean_exec_time as mean_time,
   rows,
   100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0) AS hit_percent
 FROM pg_stat_statements
 WHERE query LIKE '%users%' OR query LIKE '%products%' OR query LIKE '%orders%' OR query LIKE '%cart%'
-ORDER BY mean_time DESC
+ORDER BY mean_exec_time DESC
 LIMIT 20;
 
 -- =====================================================
@@ -1485,22 +1525,22 @@ LIMIT 20;
 -- Check index sizes and usage
 SELECT 
   schemaname,
-  tablename,
-  indexname,
+  relname as tablename,
+  indexrelname as indexname,
   idx_scan,
   idx_tup_read,
   idx_tup_fetch,
-  pg_size_pretty(pg_relation_size(indexrelid)) as size
+  pg_size_pretty(pg_relation_size(pg_stat_user_indexes.indexrelid)) as size
 FROM pg_stat_user_indexes 
 JOIN pg_index ON pg_stat_user_indexes.indexrelid = pg_index.indexrelid
 WHERE schemaname = 'public'
-ORDER BY pg_relation_size(indexrelid) DESC;
+ORDER BY pg_relation_size(pg_stat_user_indexes.indexrelid) DESC;
 
 -- Identify unused indexes (scans = 0)
 SELECT 
   schemaname,
-  tablename,
-  indexname,
+  relname as tablename,
+  indexrelname as indexname,
   idx_scan,
   pg_size_pretty(pg_relation_size(indexrelid)) as size
 FROM pg_stat_user_indexes 

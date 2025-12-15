@@ -116,7 +116,7 @@ export const getUserOrders = async (req, res) => {
     const orders = await sql`
       SELECT 
         o.id, o.reference, o.total, o.currency, o.payment_status, 
-        o.shipping_country, o.created_at, o.updated_at, 
+        a.country AS shipping_country, o.created_at, o.updated_at, 
         o.delivery_fee, o.delivery_fee_paid,
         a.title AS shipping_address_title,
         a.address_line_1 AS shipping_address_line_1,
