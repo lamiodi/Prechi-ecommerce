@@ -328,3 +328,29 @@ ORDER BY seq_scan DESC;
 -- [ ] Target queries show 60-90% improvement
 -- [ ] Index hit rate >90% for targeted queries
 -- [ ] No increase in application error rates
+
+-- ============================================
+-- SCHEMA FIXES (Applied to align DB with Code)
+-- ============================================
+
+-- Fix missing columns in orders table
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS address_id INTEGER REFERENCES addresses(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS billing_address_id INTEGER REFERENCES billing_addresses(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS cart_id INTEGER REFERENCES cart(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_cost NUMERIC DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS tax NUMERIC DEFAULT 0;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS note TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS currency VARCHAR(3) DEFAULT 'NGN';
+
+-- Fix addresses table schema
+ALTER TABLE addresses RENAME COLUMN address_line1 TO address_line_1;
+ALTER TABLE addresses RENAME COLUMN address_line2 TO landmark;
+ALTER TABLE addresses RENAME COLUMN postal_code TO zip_code;
+ALTER TABLE addresses ADD COLUMN IF NOT EXISTS title TEXT;
+
+-- Fix billing_addresses table schema
+ALTER TABLE billing_addresses RENAME COLUMN address_line1 TO address_line_1;
+ALTER TABLE billing_addresses RENAME COLUMN postal_code TO zip_code;
+ALTER TABLE billing_addresses ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE billing_addresses ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE billing_addresses ADD COLUMN IF NOT EXISTS phone_number TEXT;
