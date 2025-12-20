@@ -1,15 +1,4 @@
 import sql from '../db/index.js';
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs/promises';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 // Get all products with inventory data
 export const getProducts = async (req, res) => {
@@ -45,11 +34,6 @@ export const getProducts = async (req, res) => {
             'color_id', pv.color_id,
             'color_name', c.color_name,
             'sku', pv.sku,
-            'images', (
-              SELECT jsonb_agg(pi.image_url)
-              FROM product_images pi
-              WHERE pi.variant_id = pv.id
-            ),
             'sizes', (
               SELECT jsonb_agg(
                 jsonb_build_object(
@@ -176,23 +160,10 @@ export const deleteBundle = async (req, res) => {
   }
 };
 
-// Update product price, stock, and images
+// Update product price and stock
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-  
-  // Handle both JSON and FormData requests
-  let body = req.body;
-  if (req.body.data) {
-    try {
-      body = JSON.parse(req.body.data);
-    } catch (e) {
-      console.error('Failed to parse body.data:', e);
-      return res.status(400).json({ error: 'Invalid JSON data' });
-    }
-  }
-
-  const { base_price, variants } = body;
-  const files = req.files || {};
+  const { base_price, variants } = req.body;
 
   try {
     await sql.begin(async (sql) => {
@@ -201,53 +172,13 @@ export const updateProduct = async (req, res) => {
       }
 
       if (variants?.length) {
-        // Iterate using index to match with files (images_0, images_1, etc.)
-        for (const [index, variant] of variants.entries()) {
-          // 1. Update/Insert Sizes
+        for (const variant of variants) {
           for (const size of variant.sizes || []) {
-            if (size.size_id) {
-               // Check if it exists
-               const existing = await sql`
-                 SELECT 1 FROM variant_sizes 
-                 WHERE variant_id = ${variant.id} AND size_id = ${size.size_id}
-               `;
-               
-               if (existing.length > 0) {
-                 await sql`
-                   UPDATE variant_sizes
-                   SET stock_quantity = ${size.stock_quantity}, price = ${size.price || 0}
-                   WHERE variant_id = ${variant.id} AND size_id = ${size.size_id}
-                 `;
-               } else {
-                 await sql`
-                   INSERT INTO variant_sizes (variant_id, size_id, stock_quantity, price)
-                   VALUES (${variant.id}, ${size.size_id}, ${size.stock_quantity}, ${size.price || 0})
-                 `;
-               }
-            }
-          }
-
-          // 2. Handle Image Uploads
-          const variantImages = files[`images_${index}`] || [];
-          if (variantImages.length > 0) {
-            // Check if there are existing images to determine is_primary
-            const existingImages = await sql`SELECT 1 FROM product_images WHERE variant_id = ${variant.id}`;
-            let isFirstNewImage = true;
-
-            for (const file of variantImages) {
-              const uploaded = await cloudinary.uploader.upload(file.path);
-              
-              // If no existing images, make the first new one primary
-              const isPrimary = existingImages.length === 0 && isFirstNewImage;
-              
-              await sql`
-                INSERT INTO product_images (variant_id, image_url, is_primary)
-                VALUES (${variant.id}, ${uploaded.secure_url}, ${isPrimary}) 
-              `;
-              
-              isFirstNewImage = false;
-              await fs.unlink(file.path);
-            }
+            await sql`
+              UPDATE variant_sizes
+              SET stock_quantity = ${size.stock_quantity}, price = ${size.price || 0}
+              WHERE variant_id = ${variant.id} AND size_id = ${size.size_id}
+            `;
           }
         }
       }
