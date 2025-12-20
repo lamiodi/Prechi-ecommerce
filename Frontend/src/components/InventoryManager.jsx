@@ -32,18 +32,22 @@ const InventoryManager = () => {
   const [success, setSuccess] = useState('');
   const [expandedItems, setExpandedItems] = useState({});
   const [conflictInfo, setConflictInfo] = useState(null);
+  const [allSizes, setAllSizes] = useState([]);
+  const [newImages, setNewImages] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
     setError('');
     setSuccess('');
     try {
-      const [productRes, bundleRes] = await Promise.all([
+      const [productRes, bundleRes, sizesRes] = await Promise.all([
         api.get('/products'),
         api.get('/bundles'),
+        axios.get(`${API_BASE_URL}/api/meta/sizes`)
       ]);
       setProducts(productRes.data || []);
       setBundles(bundleRes.data || []);
+      setAllSizes(sizesRes.data || []);
     } catch (err) {
       console.error('Fetch error:', {
         message: err.message,
@@ -96,7 +100,39 @@ const InventoryManager = () => {
   };
 
   const handleEdit = (item, type) => {
+    setNewImages({});
     setEditingItem({ ...item, type });
+  };
+
+  const handleImageChange = (variantIndex, files) => {
+    setNewImages(prev => ({
+        ...prev,
+        [variantIndex]: Array.from(files)
+    }));
+  };
+
+  const handleAddSize = (variantIndex, sizeId) => {
+    const size = allSizes.find(s => s.id === parseInt(sizeId));
+    if (!size) return;
+
+    setEditingItem(prev => {
+        const newVariants = [...prev.variants];
+        const variant = { ...newVariants[variantIndex] };
+        
+        // Check if size already exists
+        if (variant.sizes?.some(s => s.size_id === size.id)) {
+            return prev;
+        }
+
+        variant.sizes = [...(variant.sizes || []), {
+            size_id: size.id,
+            size_name: size.size_name,
+            stock_quantity: 0,
+            price: 0
+        }];
+        newVariants[variantIndex] = variant;
+        return { ...prev, variants: newVariants };
+    });
   };
 
   const handleUpdate = async (e) => {
@@ -109,9 +145,23 @@ const InventoryManager = () => {
 
       if (editingItem.type === 'product') {
         const { id, price, variants } = editingItem;
-        await api.put(`/products/${id}`, {
-          base_price: price,
-          variants: variants,
+        const formData = new FormData();
+        
+        const data = {
+            base_price: price,
+            variants: variants
+        };
+        formData.append('data', JSON.stringify(data));
+        
+        // Append images
+        Object.entries(newImages).forEach(([index, files]) => {
+            files.forEach(file => {
+                formData.append(`images_${index}`, file);
+            });
+        });
+
+        await api.put(`/products/${id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
         const { id, price } = editingItem;
@@ -568,15 +618,55 @@ const InventoryManager = () => {
 
               {editingItem.type === 'product' && editingItem.variants?.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Variant Stock</label>
-                  <div className="space-y-3">
-                    {editingItem.variants.map((variant) => (
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Variants</label>
+                  <div className="space-y-4">
+                    {editingItem.variants.map((variant, vIndex) => (
                       <div
                         key={`edit-variant-${variant.id}`}
                         className="border border-gray-200 rounded-lg p-3 bg-gray-50"
                       >
-                        <p className="font-medium text-gray-900 text-sm md:text-base">{variant.color_name}</p>
+                        <p className="font-medium text-gray-900 text-sm md:text-base mb-2">{variant.color_name}</p>
+                        
+                        {/* Image Section */}
+                        <div className="mb-4 p-2 bg-white rounded border border-gray-100">
+                            <label className="block text-xs font-medium text-gray-600 mb-2">Images</label>
+                            {variant.images && variant.images.length > 0 && (
+                                <div className="flex gap-2 overflow-x-auto mb-3 pb-2">
+                                    {variant.images.map((img, i) => (
+                                        <img key={i} src={img} alt="" className="w-12 h-12 object-cover rounded border border-gray-200" />
+                                    ))}
+                                </div>
+                            )}
+                            <input 
+                                type="file" 
+                                multiple 
+                                accept="image/*"
+                                onChange={(e) => handleImageChange(vIndex, e.target.files)}
+                                className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {newImages[vIndex]?.length > 0 && (
+                                <p className="text-xs text-green-600 mt-1 font-medium">{newImages[vIndex].length} new files selected</p>
+                            )}
+                        </div>
+
                         <div className="mt-2 space-y-2">
+                          <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs font-medium text-gray-600">Stock per Size</span>
+                              <select 
+                                className="text-xs p-1 border rounded bg-white text-gray-700 focus:ring-1 focus:ring-blue-500"
+                                onChange={(e) => {
+                                    if(e.target.value) {
+                                        handleAddSize(vIndex, e.target.value);
+                                        e.target.value = "";
+                                    }
+                                }}
+                              >
+                                <option value="">+ Add Size</option>
+                                {allSizes.map(s => (
+                                    <option key={s.id} value={s.id}>{s.size_name}</option>
+                                ))}
+                              </select>
+                          </div>
                           {variant.sizes?.map((size) => (
                             <div
                               key={`edit-size-${variant.id}-${size.size_id}`}

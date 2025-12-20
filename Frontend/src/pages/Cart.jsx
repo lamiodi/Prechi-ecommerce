@@ -759,13 +759,15 @@ const Cart = () => {
         const formattedPrice = displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
           style: 'currency',
           currency: currency,
-          minimumFractionDigits: 0,
+          minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+          maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
         });
         const totalPrice = displayPrice * item.quantity;
         const formattedTotalPrice = totalPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
           style: 'currency',
           currency: currency,
-          minimumFractionDigits: 0,
+          minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+          maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
         });
         const isOutOfStock = item.item.stock_quantity === 0;
         

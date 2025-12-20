@@ -229,6 +229,14 @@ const ProductCard = ({ product, onImageError, priority }) => {
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
           )}
+          {/* Sold Out Overlay */}
+          {isSoldOut && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-10">
+              <span className="bg-red-600 text-white px-6 py-2 rounded-full font-bold transform -rotate-12 shadow-lg border-2 border-white/20">
+                SOLD OUT
+              </span>
+            </div>
+          )}
           <img
             src={image}
             alt={displayName}
@@ -249,18 +257,24 @@ const ProductCard = ({ product, onImageError, priority }) => {
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2
+              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
             })}
           </p>
         </div>
       </Link>
       <div className="p-3 sm:p-4 pt-1">
-        <Link to={`/product/${productId}?variant=${variantId}`}>
+        <Link to={`/product/${productId}?variant=${variantId}`} onClick={(e) => isSoldOut && e.preventDefault()}>
           <button
-            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl font-PatrickHand"
+            disabled={isSoldOut}
+            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl font-PatrickHand ${
+              isSoldOut 
+                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+                : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
+            }`}
             aria-label={`Shop ${displayName} now`}
           >
-            Shop Now
+            {isSoldOut ? 'Sold Out' : 'Shop Now'}
           </button>
         </Link>
       </div>

@@ -283,8 +283,11 @@ const ProductGrid = () => {
 };
 
 const ProductCard = ({ product, onImageError }) => {
-  const { id, name, price, image, color, is_product, variantId, bundle_types } = product;
+  const { id, name, price, image, color, is_product, variantId, bundle_types, total_stock } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
+  
+  // Calculate sold out status
+  const isSoldOut = is_product ? (total_stock === 0) : false;
   
   // Clean product name (remove trailing "– Color")
   let displayName = name || 'Unnamed Product';
@@ -313,6 +316,14 @@ const ProductCard = ({ product, onImageError }) => {
             loading="lazy"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+          {/* Sold Out Overlay */}
+          {isSoldOut && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-10">
+              <span className="bg-red-600 text-white px-6 py-2 rounded-full font-bold transform -rotate-12 shadow-lg border-2 border-white/20">
+                SOLD OUT
+              </span>
+            </div>
+          )}
           {/* Updated to show all bundle types */}
           {bundle_types && bundle_types.length > 0 && (
             <div className="absolute top-3 right-3 flex flex-col gap-1">
@@ -332,18 +343,24 @@ const ProductCard = ({ product, onImageError }) => {
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2
+              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
             })}
           </p>
         </div>
       </Link>
       
       <div className="p-3 sm:p-4 pt-1 mt-auto">
-        <Link to={productUrl}>
+        <Link to={productUrl} onClick={(e) => isSoldOut && e.preventDefault()}>
           <button
-            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0"
+            disabled={isSoldOut}
+            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${
+              isSoldOut 
+                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+                : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
+            }`}
           >
-            Shop Now
+            {isSoldOut ? 'Sold Out' : 'Shop Now'}
           </button>
         </Link>
       </div>

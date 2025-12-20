@@ -454,9 +454,15 @@ const ShopAllPage = () => {
 };
 
 const ProductCard = ({ product, onImageError }) => {
-  const { id, name, price, image, is_product, variantId, bundle_types } = product;
+  const { id, name, price, image, is_product, variantId, bundle_types, total_stock } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
   
+  // Calculate sold out status
+  // For bundles, we currently assume they are in stock (or logic handled elsewhere) 
+  // unless we fetch bundle stock from backend. 
+  // If total_stock is undefined (e.g. for bundles currently), treat as in stock (Infinity)
+  const isSoldOut = is_product ? (total_stock === 0) : false;
+
   // Clean product name (remove trailing "– Something")
   let displayName = name || 'Unnamed Product';
   // if (displayName.includes('–')) {
@@ -483,6 +489,14 @@ const ProductCard = ({ product, onImageError }) => {
             loading="lazy"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
+          {/* Sold Out Overlay */}
+          {isSoldOut && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-10">
+              <span className="bg-red-600 text-white px-6 py-2 rounded-full font-bold transform -rotate-12 shadow-lg border-2 border-white/20">
+                SOLD OUT
+              </span>
+            </div>
+          )}
           {bundle_types?.[0] && (
             <span className="absolute top-3 right-3 bg-Primarycolor text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-md backdrop-blur-sm">
               {bundle_types[0]}
@@ -497,7 +511,8 @@ const ProductCard = ({ product, onImageError }) => {
             {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
               style: 'currency', 
               currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2
+              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
             })}
           </p>
         </div>

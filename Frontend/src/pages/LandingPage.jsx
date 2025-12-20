@@ -54,7 +54,8 @@ const LandingPage = () => {
     return displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
       style: 'currency',
       currency: displayCurrency,
-      minimumFractionDigits: country === 'Nigeria' ? 0 : 2
+      minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+      maximumFractionDigits: country === 'Nigeria' ? 0 : 2
     });
   };
 

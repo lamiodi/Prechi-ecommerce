@@ -50,7 +50,7 @@ export const getShopAll = async (req, res) => {
         SELECT 
           MIN(b.id) AS id,
           p.id AS product_id,
-          p.name,
+          MIN(b.name) AS name,
           MIN(b.bundle_price) AS price,
           ARRAY_AGG(DISTINCT b.bundle_type) AS bundle_types,
           COALESCE(
@@ -97,7 +97,8 @@ export const getShopAll = async (req, res) => {
           LIMIT 1
         ) AS primary_image,
         c.color_name,
-        p.category
+        p.category,
+        COALESCE((SELECT SUM(quantity) FROM inventory WHERE variant_id = pv.id), 0) AS total_stock
       FROM products p
       JOIN product_variants pv ON p.id = pv.product_id
       JOIN colors c ON pv.color_id = c.id

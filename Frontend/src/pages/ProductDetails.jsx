@@ -580,6 +580,10 @@ const ProductDetails = () => {
   const parsedPrice = Number.parseFloat(rawPrice) || 0
   const displayPrice = country === "Nigeria" ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2)
   const displayCurrency = country === "Nigeria" ? "NGN" : "USD"
+  
+  // Calculate sold out status
+  const isSoldOut = isProduct ? (Number(data?.total_stock) === 0) : false;
+
   const description = data?.description || "No description available"
   const colorOptions = isProduct
     ? Array.isArray(data?.variants)
@@ -804,6 +808,7 @@ const ProductDetails = () => {
                         style: "currency",
                         currency: displayCurrency,
                         minimumFractionDigits: country === "Nigeria" ? 0 : 2,
+                        maximumFractionDigits: country === "Nigeria" ? 0 : 2
                       })}
                     </p>
                     <div className="flex items-center gap-2 flex-nowrap min-w-0">
@@ -1064,15 +1069,19 @@ const ProductDetails = () => {
                   <div className="flex gap-4">
                     <button
                       onClick={handleAddToCart}
-                      disabled={isAddingToCart}
-                      className="flex-1 bg-Primarycolor text-white py-4 rounded-xl font-semibold hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed"
+                      disabled={isAddingToCart || isSoldOut}
+                      className={`flex-1 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed ${
+                        isSoldOut 
+                          ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+                          : 'bg-Primarycolor text-white hover:bg-gray-800'
+                      }`}
                     >
                       {isAddingToCart ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
                       ) : (
                         <>
                           <ShoppingCart className="w-5 h-5" />
-                          <span>Add to Cart</span>
+                          <span>{isSoldOut ? 'Sold Out' : 'Add to Cart'}</span>
                         </>
                       )}
                     </button>

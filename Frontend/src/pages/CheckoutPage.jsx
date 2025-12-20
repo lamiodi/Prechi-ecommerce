@@ -1656,19 +1656,23 @@ const CheckoutPage = () => {
     const message = `Hello, I would like to pay for my order with Bitcoin.\n\nOrder Details:\n- Subtotal: ${displaySubtotal.toLocaleString('en-NG', {
       style: 'currency',
       currency: 'NGN',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     })}\n${displayFirstOrderDiscount > 0 ? `- First Order Discount (5%): -${displayFirstOrderDiscount.toLocaleString('en-NG', {
       style: 'currency',
       currency: 'NGN',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     })}\n` : ''}${displayCouponDiscount > 0 ? `- Coupon Discount: -${displayCouponDiscount.toLocaleString('en-NG', {
       style: 'currency',
       currency: 'NGN',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     })}\n` : ''}- Total Amount: ${displayTotal.toLocaleString('en-NG', {
       style: 'currency',
       currency: 'NGN',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     })}\n- Currency: NGN\n- Order Reference: order_${createdUserId || getUserId()}_${Date.now()}\n\nI have attached a screenshot of my checkout for your reference.`;
     
     const encodedMessage = encodeURIComponent(message);
@@ -2401,7 +2405,8 @@ const CheckoutPage = () => {
                                       {option.total_cost.toLocaleString('en-NG', {
                                         style: 'currency',
                                         currency: 'NGN',
-                                        minimumFractionDigits: 2,
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
                                       })}
                                     </div>
                                   </div>
@@ -2525,14 +2530,16 @@ const CheckoutPage = () => {
                                   {price.toLocaleString('en-NG', {
                                     style: 'currency',
                                     currency: 'NGN',
-                                    minimumFractionDigits: 2,
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
                                   })} each
                                 </span>
                                 <span className="font-semibold text-Primarycolor font-Manrope">
                                   {itemTotal.toLocaleString('en-NG', {
                                     style: 'currency',
                                     currency: 'NGN',
-                                    minimumFractionDigits: 2,
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
                                   })}
                                 </span>
                               </div>
@@ -2622,7 +2629,8 @@ const CheckoutPage = () => {
                           {displaySubtotal.toLocaleString('en-NG', {
                             style: 'currency',
                             currency: 'NGN',
-                            minimumFractionDigits: 2,
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
                           })}
                         </span>
                       </div>
@@ -2634,7 +2642,8 @@ const CheckoutPage = () => {
                             -{displayFirstOrderDiscount.toLocaleString('en-NG', {
                               style: 'currency',
                               currency: 'NGN',
-                              minimumFractionDigits: 2,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
                             })}
                           </span>
                         </div>
@@ -2647,7 +2656,8 @@ const CheckoutPage = () => {
                             -{displayCouponDiscount.toLocaleString('en-NG', {
                               style: 'currency',
                               currency: 'NGN',
-                              minimumFractionDigits: 2,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
                             })}
                           </span>
                         </div>
@@ -2660,7 +2670,8 @@ const CheckoutPage = () => {
                             (shippingMethod?.total_cost || 0).toLocaleString('en-NG', {
                               style: 'currency',
                               currency: 'NGN',
-                              minimumFractionDigits: 2,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
                             })
                           ) : (
                             'TBD'
@@ -2675,7 +2686,8 @@ const CheckoutPage = () => {
                             {displayTax.toLocaleString('en-NG', {
                               style: 'currency',
                               currency: 'NGN',
-                              minimumFractionDigits: 2,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
                             })}
                           </span>
                         </div>
@@ -2689,7 +2701,8 @@ const CheckoutPage = () => {
                           {displayTotal.toLocaleString('en-NG', {
                             style: 'currency',
                             currency: 'NGN',
-                            minimumFractionDigits: 2,
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
                           })}
                         </span>
                       </div>
