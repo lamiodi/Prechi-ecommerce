@@ -185,8 +185,9 @@ const ShopAllPage = () => {
           image: item.image,
           created_at: item.created_at,
           category: item.category, // Include category for brief detection
+          total_stock: item.total_stock,
         };
-  
+
         if (!item.is_product) {
           return {
             ...baseItem,
@@ -502,11 +503,16 @@ const ProductCard = ({ product, onImageError }) => {
         </div>
       </Link>
       <div className="p-3 sm:p-4 pt-1 mt-auto">
-        <Link to={productUrl}>
+        <Link to={productUrl} onClick={(e) => isSoldOut && e.preventDefault()}>
           <button
-            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0"
+            disabled={isSoldOut}
+            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${
+              isSoldOut 
+                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+                : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
+            }`}
           >
-            Shop Now
+            {isSoldOut ? 'Sold Out' : 'Shop Now'}
           </button>
         </Link>
       </div>

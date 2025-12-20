@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState, useContext, useMemo } from "react"
 import { useParams, useSearchParams, useNavigate, Link } from "react-router-dom"
 import Navbar2 from "../components/Navbar2"
 import axios from "axios"
@@ -807,9 +807,15 @@ const ProductDetails = () => {
                       })}
                     </p>
                     <div className="flex items-center gap-2 flex-nowrap min-w-0">
-                    <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
+                    {isVariantSoldOut ? (
+                         <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
+                            Out of Stock
+                          </span>
+                    ) : (
+                      <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
                         In Stock
                       </span>
+                    )}
                       {!isProduct && (
                         <span className="text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
                           {bundleType} Bundle

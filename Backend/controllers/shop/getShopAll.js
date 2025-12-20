@@ -124,7 +124,8 @@ export const getShopAll = async (req, res) => {
       color: row.color_name,
       variantId: row.variant_id,
       category: row.category,
-      is_product: true
+      is_product: true,
+      total_stock: parseInt(row.total_stock || 0)
     }));
 
     return res.status(200).json(products);
