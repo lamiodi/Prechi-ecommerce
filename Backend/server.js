@@ -2,9 +2,14 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from "helmet";
+import hpp from "hpp";
+import rateLimit from "express-rate-limit";
 import bodyParser from "body-parser";
 import { v2 as cloudinary } from "cloudinary";
 import { EventEmitter } from "events";
+import errorMiddleware from "./middleware/errorMiddleware.js";
+import logger from "./utils/logger.js";
 
 // Routes
 import productRoutes from "./routes/products.js";
@@ -56,6 +61,21 @@ console.log('✅ All required environment variables are present');
 EventEmitter.defaultMaxListeners = 40;
 
 const app = express();
+
+// ==== Security Middleware ====
+app.use(helmet());
+app.use(hpp());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all requests
+app.use(limiter);
 
 // ==== Cloudinary Setup ====
 cloudinary.config({
@@ -140,13 +160,7 @@ app.get("/health", (req, res) =>
 app.get("/healthz", (req, res) => res.status(200).json({ status: "ok" }));
 
 // ==== Error Handler ====
-app.use((err, req, res, next) => {
-  console.error(
-    `[${new Date().toISOString()}] Error in ${req.method} ${req.url}:`,
-    err.stack
-  );
-  res.status(500).json({ error: "Something went wrong!" });
-});
+app.use(errorMiddleware);
 
 // ==== Cron Job ====
 // cleanupOldOrders(); // runs on startup - REMOVED
@@ -154,5 +168,5 @@ app.use((err, req, res, next) => {
 // ==== Start Server ====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
+  logger.info(`🚀 Server running on http://localhost:${PORT}`)
 );

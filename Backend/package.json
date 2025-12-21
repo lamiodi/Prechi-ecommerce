@@ -30,6 +30,9 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
     "i18n-iso-countries": "^7.14.0",
     "jsbarcode": "^3.12.1",
     "jsonwebtoken": "^9.0.2",
@@ -39,6 +42,7 @@
     "nodemon": "^3.1.10",
     "postgres": "^3.4.7",
     "resend": "^4.7.0",
-    "tough-cookie": "^5.1.2"
+    "tough-cookie": "^5.1.2",
+    "winston": "^3.19.0"
   }
 }
