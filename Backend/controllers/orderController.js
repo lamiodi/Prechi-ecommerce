@@ -2,6 +2,7 @@ import sql from '../db/index.js';
 import dotenv from 'dotenv';
 import { Country } from 'country-state-city';
 import { sendAdminDeliveryFeeNotification } from '../utils/emailService.js';
+import logger from '../utils/logger.js';
 dotenv.config();
 
 const shippingOptions = [
@@ -34,7 +35,7 @@ export const createOrder = async (req, res) => {
     tax,
   } = req.body;
   
-  console.log('📥 Create order request:', {
+  logger.info('📥 Create order request:', {
     user_id,
     cart_id,
     delivery_option,
@@ -45,7 +46,7 @@ export const createOrder = async (req, res) => {
     exchange_rate,
     discount,
   });
-  console.log('📋 Items:', items);
+  logger.info('📋 Items:', items);
   
   // Get idempotency key from headers if available
   const idempotencyKey = req.headers['x-idempotency-key'];
@@ -59,7 +60,7 @@ export const createOrder = async (req, res) => {
       `;
       
       if (existingOrder) {
-        console.log(`⚠️ Order with idempotency key already exists:`, existingOrder);
+        logger.info(`⚠️ Order with idempotency key already exists:`, existingOrder);
         
         // If order exists and payment is pending, return the existing order
         if (existingOrder.payment_status === 'pending' && existingOrder.status === 'pending') {
@@ -85,7 +86,7 @@ export const createOrder = async (req, res) => {
     `;
     
     if (existingOrder) {
-      console.log('⚠️ Order with reference already exists:', { reference: String(reference).replace(/[^a-zA-Z0-9-_]/g, ''), order: existingOrder });
+      logger.info('⚠️ Order with reference already exists:', { reference: String(reference).replace(/[^a-zA-Z0-9-_]/g, ''), order: existingOrder });
       
       // If order exists and payment is pending, return the existing order
       if (existingOrder.payment_status === 'pending' && existingOrder.status === 'pending') {
