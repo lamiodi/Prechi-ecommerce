@@ -119,6 +119,19 @@ Run the optimization scripts from `database_optimization_scripts.sql` for produc
 2. **Currency**: Modify currency settings in frontend components
 3. **Payment Methods**: Configure in `Backend/controllers/paystackController.js`
 
+#### 🔗 Webhook Setup (Required for Live Payments)
+To ensure orders are automatically marked as "Paid", you MUST configure the webhook in your Paystack Dashboard.
+
+1.  **Login** to your Paystack Dashboard.
+2.  Go to **Settings** > **API & Webhooks**.
+3.  **Webhook URL**: Enter your live backend URL appended with `/api/webhooks/webhook`.
+    *   *Example:* `https://your-backend-app.onrender.com/api/webhooks/webhook`
+4.  **Save Changes**.
+
+**Events Handled:**
+*   `charge.success`: Confirm payments and update order status.
+*   `charge.failed`: Log failed transactions.
+
 ### Product Catalog
 1. **Categories**: Update in database `products` table
 2. **Sizes/Colors**: Modify `sizes` and `colors` tables
