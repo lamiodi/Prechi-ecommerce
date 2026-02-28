@@ -545,13 +545,19 @@ const ProductDetails = () => {
   // Safely extract data with null checks
   const { type, data } = productData || {}
   const isProduct = type === "product"
+  const normalizeImages = (imgArr) => {
+    if (!Array.isArray(imgArr)) return [];
+    // If images are objects with is_primary flag, sort primary first and map to URLs
+    if (typeof imgArr[0] === 'object') {
+      return [...imgArr]
+        .sort((a, b) => (b?.is_primary === true) - (a?.is_primary === true))
+        .map((x) => x.image_url || x.url || x);
+    }
+    return imgArr;
+  };
   const images = isProduct
-    ? Array.isArray(selectedVariant?.images)
-      ? selectedVariant.images
-      : []
-    : Array.isArray(data?.images)
-      ? data.images
-      : []
+    ? normalizeImages(selectedVariant?.images)
+    : normalizeImages(data?.images)
   const videos = isProduct
     ? Array.isArray(selectedVariant?.videos)
       ? selectedVariant.videos

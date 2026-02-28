@@ -11,6 +11,7 @@ export const getProducts = async (req, res) => {
         p.base_price AS price,
         p.sku_prefix AS design_code,
         p.is_active,
+        p.is_new_release,
         (SELECT array_agg(DISTINCT pi.image_url)
          FROM product_images pi
          JOIN product_variants pv ON pi.variant_id = pv.id
@@ -45,6 +46,17 @@ export const getProducts = async (req, res) => {
               FROM variant_sizes vs
               JOIN sizes s ON vs.size_id = s.id
               WHERE vs.variant_id = pv.id
+            ),
+            'images', (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'id', pi.id,
+                  'image_url', pi.image_url,
+                  'is_primary', pi.is_primary
+                )
+              )
+              FROM product_images pi
+              WHERE pi.variant_id = pv.id
             )
           )
         )
@@ -163,12 +175,16 @@ export const deleteBundle = async (req, res) => {
 // Update product price and stock
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { base_price, variants } = req.body;
+  const { base_price, variants, is_new_release } = req.body;
 
   try {
     await sql.begin(async (sql) => {
       if (base_price) {
         await sql`UPDATE products SET base_price = ${base_price} WHERE id = ${id}`;
+      }
+
+      if (typeof is_new_release === 'boolean') {
+        await sql`UPDATE products SET is_new_release = ${is_new_release} WHERE id = ${id}`;
       }
 
       if (variants?.length) {
@@ -202,5 +218,26 @@ export const updateBundle = async (req, res) => {
   } catch (err) {
     console.error('Error updating bundle:', err);
     res.status(500).json({ error: 'Failed to update bundle' });
+  }
+};
+
+// Set primary image for a variant (and unset others)
+export const setPrimaryImage = async (req, res) => {
+  const { variantId } = req.params;
+  const { image_id } = req.body;
+
+  if (!image_id) {
+    return res.status(400).json({ error: 'image_id is required' });
+  }
+
+  try {
+    await sql.begin(async (sql) => {
+      await sql`UPDATE product_images SET is_primary = FALSE WHERE variant_id = ${variantId}`;
+      await sql`UPDATE product_images SET is_primary = TRUE WHERE id = ${image_id} AND variant_id = ${variantId}`;
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error setting primary image:', err);
+    res.status(500).json({ error: 'Failed to set primary image' });
   }
 };

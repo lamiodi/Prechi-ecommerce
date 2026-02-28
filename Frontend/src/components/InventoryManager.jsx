@@ -32,6 +32,7 @@ const InventoryManager = () => {
   const [success, setSuccess] = useState('');
   const [expandedItems, setExpandedItems] = useState({});
   const [conflictInfo, setConflictInfo] = useState(null);
+  const [selectedPrimary, setSelectedPrimary] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -97,6 +98,23 @@ const InventoryManager = () => {
 
   const handleEdit = (item, type) => {
     setEditingItem({ ...item, type });
+    if (type === 'product') {
+      const initial = {};
+      (item.variants || []).forEach(v => {
+        const currentPrimary = (v.images || []).find(img => img.is_primary);
+        if (currentPrimary) initial[v.id] = currentPrimary.id;
+      });
+      setSelectedPrimary(initial);
+    }
+  };
+
+  const handleToggleNewRelease = async (productId, value) => {
+    try {
+      await api.put(`/products/${productId}`, { is_new_release: value });
+      setProducts(prev => prev.map(p => p.id === productId ? { ...p, is_new_release: value } : p));
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to update new release flag');
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -113,6 +131,11 @@ const InventoryManager = () => {
           base_price: price,
           variants: variants,
         });
+        // Update primary images per variant if selection was made
+        const updates = Object.entries(selectedPrimary || {});
+        for (const [variantId, imageId] of updates) {
+          await api.put(`/variants/${variantId}/primary-image`, { image_id: imageId });
+        }
       } else {
         const { id, price } = editingItem;
         await api.put(`/bundles/${id}`, {
@@ -276,6 +299,9 @@ const InventoryManager = () => {
                   Stock
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  New
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -299,6 +325,11 @@ const InventoryManager = () => {
                             <ChevronDown className="h-4 w-4 mr-1" />
                           )}
                           {product.name}
+                          {product.is_new_release && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                              New
+                            </span>
+                          )}
                         </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -309,6 +340,13 @@ const InventoryManager = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {product.stock || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <input
+                          type="checkbox"
+                          checked={!!product.is_new_release}
+                          onChange={(e) => handleToggleNewRelease(product.id, e.target.checked)}
+                        />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span
@@ -609,6 +647,30 @@ const InventoryManager = () => {
                               />
                             </div>
                           ))}
+                          {/* Primary Image Selection */}
+                          {variant.images?.length > 0 && (
+                            <div className="mt-3">
+                              <p className="text-sm font-medium text-gray-700 mb-2">Primary Image</p>
+                              <div className="grid grid-cols-3 gap-2">
+                                {variant.images.map((img) => (
+                                  <button
+                                    key={`img-${variant.id}-${img.id}`}
+                                    type="button"
+                                    onClick={() =>
+                                      setSelectedPrimary(prev => ({ ...prev, [variant.id]: img.id }))
+                                    }
+                                    className={`border rounded overflow-hidden ${
+                                      (selectedPrimary[variant.id] || img.is_primary) === img.id
+                                        ? 'border-blue-500'
+                                        : 'border-gray-200'
+                                    }`}
+                                  >
+                                    <img src={img.image_url} alt="" className="w-full h-20 object-cover" />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

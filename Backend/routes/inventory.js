@@ -6,6 +6,7 @@ import {
   deleteBundle,
   updateProduct,
   updateBundle,
+  setPrimaryImage,
 } from '../controllers/inventoryController.js';
 
 const router = express.Router();
@@ -27,6 +28,9 @@ router.put('/products/:id', updateProduct);
 
 // ✅ Update bundle (price only for now)
 router.put('/bundles/:id', updateBundle);
+
+// ✅ Set primary image for a variant
+router.put('/variants/:variantId/primary-image', setPrimaryImage);
 
 export default router;
 // ✅ Inventory management routes for admin panel
