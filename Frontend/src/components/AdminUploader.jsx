@@ -157,10 +157,10 @@ export default function AdminUploader() {
       return;
     }
     
-    // Check file size (limit to 50MB per video)
-    const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024);
+    // Check file size (limit to 100MB per video)
+    const oversizedFiles = files.filter(file => file.size > 100 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      setError('Each video must be smaller than 50MB.');
+      setError('Each video must be smaller than 100MB.');
       return;
     }
     

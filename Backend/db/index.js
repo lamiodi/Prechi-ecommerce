@@ -9,7 +9,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 // Configure connection options
 const connectionOptions = {
-  ssl: isProduction ? 'require' : false, // Only use SSL in production
+  ssl: 'require', // Always use SSL for Supabase
   max: 10, // Maximum number of connections in the pool
   idle_timeout: 30, // How long a connection can be idle before being closed
   connect_timeout: 10 // Connection timeout in seconds

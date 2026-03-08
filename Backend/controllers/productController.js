@@ -86,10 +86,10 @@ export const uploadProduct = async (req, res) => {
   }
 
   // Validate file uploads
-  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
   const allowedVideoTypes = ['video/mp4', 'video/quicktime', 'video/avi', 'video/x-msvideo'];
-  const maxImageSize = 5 * 1024 * 1024; // 5MB
-  const maxVideoSize = 50 * 1024 * 1024; // 50MB
+  const maxImageSize = 10 * 1024 * 1024; // 10MB
+  const maxVideoSize = 100 * 1024 * 1024; // 100MB
 
   try {
     // Validate image files
@@ -97,10 +97,10 @@ export const uploadProduct = async (req, res) => {
       if (key.startsWith('images_')) {
         files[key].forEach(file => {
           if (!allowedImageTypes.includes(file.mimetype)) {
-            throw new Error(`Invalid image format for ${file.originalname}. Allowed formats: JPEG, PNG, WebP`);
+            throw new Error(`Invalid image format for ${file.originalname}. Allowed formats: JPEG, PNG, WebP, HEIC`);
           }
           if (file.size > maxImageSize) {
-            throw new Error(`Image ${file.originalname} is too large. Maximum size: 5MB`);
+            throw new Error(`Image ${file.originalname} is too large. Maximum size: 10MB`);
           }
         });
       } else if (key.startsWith('videos_')) {
@@ -109,7 +109,7 @@ export const uploadProduct = async (req, res) => {
             throw new Error(`Invalid video format for ${file.originalname}. Allowed formats: MP4, MOV, AVI`);
           }
           if (file.size > maxVideoSize) {
-            throw new Error(`Video ${file.originalname} is too large. Maximum size: 50MB`);
+            throw new Error(`Video ${file.originalname} is too large. Maximum size: 100MB`);
           }
         });
       }
