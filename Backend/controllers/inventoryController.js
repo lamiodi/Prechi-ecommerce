@@ -361,9 +361,39 @@ export const addVariantMedia = async (req, res) => {
   }
 };
 
+// Extract public_id from Cloudinary URL
+const getPublicIdFromUrl = (url) => {
+  if (!url) return null;
+  const parts = url.split('/upload/');
+  if (parts.length < 2) return null;
+  // Remove version (e.g., v1612345678/) if present
+  let pathAfterUpload = parts[1];
+  if (pathAfterUpload.match(/^v\d+\//)) {
+    pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, '');
+  }
+  // Remove file extension
+  const lastDotIndex = pathAfterUpload.lastIndexOf('.');
+  const publicId = lastDotIndex !== -1 ? pathAfterUpload.substring(0, lastDotIndex) : pathAfterUpload;
+  return decodeURIComponent(publicId);
+};
+
 export const deleteVariantImage = async (req, res) => {
   const { imageId } = req.params;
   try {
+    // 1. Get the image URL from DB
+    const imageInfo = await sql`SELECT image_url FROM product_images WHERE id = ${imageId}`;
+
+    if (imageInfo.length > 0 && imageInfo[0].image_url) {
+      const publicId = getPublicIdFromUrl(imageInfo[0].image_url);
+      if (publicId) {
+        // 2. Delete from Cloudinary
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'image' }).catch(err => {
+          console.warn('Failed to delete image from Cloudinary:', err);
+        });
+      }
+    }
+
+    // 3. Delete from DB
     await sql`DELETE FROM product_images WHERE id = ${imageId}`;
     res.json({ success: true, message: 'Image deleted successfully' });
   } catch (err) {
@@ -375,6 +405,20 @@ export const deleteVariantImage = async (req, res) => {
 export const deleteVariantVideo = async (req, res) => {
   const { videoId } = req.params;
   try {
+    // 1. Get the video URL from DB
+    const videoInfo = await sql`SELECT video_url FROM product_videos WHERE id = ${videoId}`;
+
+    if (videoInfo.length > 0 && videoInfo[0].video_url) {
+      const publicId = getPublicIdFromUrl(videoInfo[0].video_url);
+      if (publicId) {
+        // 2. Delete from Cloudinary
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'video' }).catch(err => {
+          console.warn('Failed to delete video from Cloudinary:', err);
+        });
+      }
+    }
+
+    // 3. Delete from DB
     await sql`DELETE FROM product_videos WHERE id = ${videoId}`;
     res.json({ success: true, message: 'Video deleted successfully' });
   } catch (err) {
