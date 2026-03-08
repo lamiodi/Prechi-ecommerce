@@ -98,7 +98,7 @@ export const getShopAll = async (req, res) => {
         ) AS primary_image,
         c.color_name,
         p.category,
-        COALESCE((SELECT SUM(quantity) FROM inventory WHERE variant_id = pv.id), 0) AS total_stock
+        COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
       FROM products p
       JOIN product_variants pv ON p.id = pv.product_id
       JOIN colors c ON pv.color_id = c.id
