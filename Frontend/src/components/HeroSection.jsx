@@ -235,16 +235,16 @@ const HeroSection = () => {
           NEW ARRIVALS
         </Link>
         <Link
-          to="/shop?category=briefs"
+          to="/shop?category=Sets"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
-          BRIEFS
+          SETS
         </Link>
         <Link
-          to="/shop?category=gymwear"
+          to="/shop?category=Tracksuits"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
-          GYM WEAR
+          TRACKSUITS
         </Link>
         <Link
           to="/shop"

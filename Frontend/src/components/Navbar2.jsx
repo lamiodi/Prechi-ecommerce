@@ -15,7 +15,7 @@ export default function Navbar2() {
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   // Determine if current page has white background
   const isWhiteBackgroundPage = () => {
     const whiteBackgroundPages = [
@@ -34,10 +34,10 @@ export default function Navbar2() {
       '/more',
       '/thank-you'
     ];
-    
+
     return whiteBackgroundPages.some(path => location.pathname.includes(path));
   };
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) {
@@ -47,7 +47,7 @@ export default function Navbar2() {
     }, 1000);
     return () => clearTimeout(timer);
   }, [loading]);
-  
+
   const handleLogout = () => {
     logout();
     localStorage.removeItem('pendingOrderId');
@@ -55,7 +55,7 @@ export default function Navbar2() {
     navigate('/login');
     setIsMenuOpen(false);
   };
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -63,12 +63,12 @@ export default function Navbar2() {
       setSearchQuery('');
     }
   };
-  
+
   const handleMenuNavigation = (path) => {
     navigate(path);
     setIsMenuOpen(false);
   };
-  
+
   if (loading && !loadingTimeout) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
@@ -84,19 +84,18 @@ export default function Navbar2() {
       </nav>
     );
   }
-  
+
   return (
     <Disclosure as="nav" className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-sm">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-full container-padding py-1">
             <div className="relative flex h-[3.75rem] items-center justify-between">
-              
+
               {/* Mobile menu button - show below lg */}
               <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
-                <DisclosureButton className={`inline-flex items-center justify-center rounded-md p-2 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white ${
-                  isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                }`}>
+                <DisclosureButton className={`inline-flex items-center justify-center rounded-md p-2 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                  }`}>
                   <span className="sr-only">Open menu</span>
                   {open ? (
                     <XMarkIcon className="block h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
@@ -105,50 +104,47 @@ export default function Navbar2() {
                   )}
                 </DisclosureButton>
               </div>
-              
 
-              
+
+
               {/* Center: Logo */}
               <div className="absolute left-1/2 transform -translate-x-1/2 sm:transform-none">
                 <Link to="/home" className="flex items-center">
-                  <img 
-                    src={isWhiteBackgroundPage() ? LogoBlack : LogoWhite} 
-                    alt="Logo" 
+                  <img
+                    src={isWhiteBackgroundPage() ? LogoBlack : LogoWhite}
+                    alt="Logo"
                     className="h-6 w-8 object-contain sm:h-8 sm:w-10 md:h-10 md:w-12"
                   />
                 </Link>
               </div>
-              
+
               {/* Left-side Navigation Links for large screens - SHOP, CONTACT, MORE */}
               <div className="hidden lg:flex items-center gap-6 ml-6">
-                <Link 
-                  to="/shop" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${
-                    isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                  }`}
+                <Link
+                  to="/shop"
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                    }`}
                 >
                   SHOP
                 </Link>
-                <Link 
-                  to="/help" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${
-                    isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                  }`}
+                <Link
+                  to="/help"
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                    }`}
                 >
                   CONTACT
                 </Link>
-                <Link 
-                  to="/more" 
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${
-                    isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                  }`}
+                <Link
+                  to="/more"
+                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                    }`}
                 >
                   MORE
                 </Link>
               </div>
-              
 
-              
+
+
               {/* Right: Auth and navigation */}
               <div className="flex items-center gap-4 ml-auto">
                 {/* Search (desktop only - show from lg and above) */}
@@ -159,23 +155,21 @@ export default function Navbar2() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                    className={`w-40 lg:w-60 xl:w-70 2xl:w-70 pl-2 pr-8 py-1 text-sm border-b bg-transparent focus:border-b-2 focus:outline-none font-PatrickHand ${
-                      isWhiteBackgroundPage() 
-                        ? 'text-Primarycolor border-Primarycolor focus:border-Primarycolor placeholder-Primarycolor/70' 
+                    className={`w-40 lg:w-60 xl:w-70 2xl:w-70 pl-2 pr-8 py-1 text-sm border-b bg-transparent focus:border-b-2 focus:outline-none font-PatrickHand ${isWhiteBackgroundPage()
+                        ? 'text-Primarycolor border-Primarycolor focus:border-Primarycolor placeholder-Primarycolor/70'
                         : 'text-Secondarycolor border-Secondarycolor focus:border-Secondarycolor placeholder-white/70'
-                    }`}
+                      }`}
                   />
-                  <button 
+                  <button
                     onClick={handleSearch}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2" 
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
                     aria-label="Search"
                   >
-                    <Search className={`h-3 w-3 sm:h-4 sm:w-4 ${
-                      isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`} />
+                    <Search className={`h-3 w-3 sm:h-4 sm:w-4 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                      }`} />
                   </button>
                 </div>
-                
+
                 {/* Hamburger menu for desktop - show from lg and above, only when user is logged in */}
                 {user && (
                   <div className="hidden lg:flex relative group">
@@ -184,32 +178,31 @@ export default function Navbar2() {
                       className="flex items-center p-1 hover:opacity-80 transition-opacity relative"
                       aria-label="User menu"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                        isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                        }`}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                       </svg>
                     </button>
-                    
+
                     {/* Tooltip for Order History */}
                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                       Order History
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-800"></div>
                     </div>
-                    
+
                     {/* Desktop dropdown menu */}
                     {isMenuOpen && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <Link 
-                          to="/profile" 
+                        <Link
+                          to="/profile"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => handleMenuNavigation('/profile')}
                         >
                           <User className="h-4 w-4 mr-3 text-gray-500" />
                           Profile
                         </Link>
-                        <Link 
-                          to="/orders" 
+                        <Link
+                          to="/orders"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => handleMenuNavigation('/orders')}
                         >
@@ -228,7 +221,7 @@ export default function Navbar2() {
                     )}
                   </div>
                 )}
-                
+
                 {/* Auth button */}
                 {user ? (
                   <button
@@ -236,9 +229,8 @@ export default function Navbar2() {
                     className="flex items-center gap-1 text-sm font-medium hover:opacity-80 transition-opacity"
                     aria-label="Logout"
                   >
-                    <LogOut size={14} className={`sm:w-4 sm:h-4 ${
-                      isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`} />
+                    <LogOut size={14} className={`sm:w-4 sm:h-4 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                      }`} />
                   </button>
                 ) : (
                   <Link to="/login">
@@ -246,15 +238,14 @@ export default function Navbar2() {
                       className="flex items-center gap-1 text-sm font-medium hover:opacity-80 transition-opacity"
                       aria-label="Login"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                        isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                        }`}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                       </svg>
                     </button>
                   </Link>
                 )}
-                
+
                 {/* Cart or Back */}
                 {location.pathname === '/cart' ? (
                   <button
@@ -262,18 +253,16 @@ export default function Navbar2() {
                     className="flex items-center p-1 hover:opacity-80 transition-opacity"
                     aria-label="Go back"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                      isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                      }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                     </svg>
                   </button>
                 ) : (
                   <Link to="/cart">
                     <button className="flex items-center p-1 hover:opacity-80 transition-opacity" aria-label="Shopping cart">
-                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${
-                        isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
+                        }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                       </svg>
                     </button>
@@ -282,11 +271,11 @@ export default function Navbar2() {
               </div>
             </div>
           </div>
-          
+
           {/* Enhanced Mobile Menu */}
           <DisclosurePanel className="lg:hidden bg-black/70 backdrop-blur-md border-t border-white/10">
             <div className="space-y-1 px-4 pb-4 pt-3">
-              
+
               {/* Enhanced Search input (mobile only - show below lg) */}
               <div className="mb-6">
                 <form onSubmit={handleSearch} className="flex">
@@ -305,53 +294,53 @@ export default function Navbar2() {
                   </button>
                 </form>
               </div>
-              
+
               {/* Enhanced Quick Navigation Links */}
-              <nav 
-                className="container quicknav flex flex-col space-y-3 lg:max-w-[800px] mb-[40dvh] sm:mb-38 md:mb-50 lg:mb-[50dvh] z-25 lg:absolute lg:left-0 lg:bg-black/70" 
-                role="navigation" 
+              <nav
+                className="container quicknav flex flex-col space-y-3 lg:max-w-[800px] mb-[40dvh] sm:mb-38 md:mb-50 lg:mb-[50dvh] z-25 lg:absolute lg:left-0 lg:bg-black/70"
+                role="navigation"
                 aria-label="Product categories"
               >
-                <Link 
-                  to="/shop" 
+                <Link
+                  to="/shop"
                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
                 >
-                  SHOP
+                  SHOP ALL
                 </Link>
-                <Link 
-                  to="/shop?category=briefs" 
+                <Link
+                  to="/shop?category=new"
                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
                 >
-                  BRIEFS
+                  NEW ARRIVALS
                 </Link>
-                 
-                 {/* Additional Navigation Links */}
-                 <Link 
-                   to="/shop?category=bundles" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                 >
-                   3 in 1 BUNDLES
-                 </Link>
-                 <Link 
-                   to="/shop?category=gymwear" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                 >
-                   GYMWEARS
-                 </Link>
-                 <Link 
-                   to="/help" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                 >
-                   CONTACT
-                 </Link>
-                 <Link 
-                   to="/more" 
-                   className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                 >
-                   MORE
+
+                {/* Additional Navigation Links */}
+                <Link
+                  to="/shop?category=Sets"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
+                >
+                  SETS
                 </Link>
-               </nav>
-              
+                <Link
+                  to="/shop?category=Tracksuits"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
+                >
+                  TRACKSUITS
+                </Link>
+                <Link
+                  to="/help"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
+                >
+                  CONTACT
+                </Link>
+                <Link
+                  to="/more"
+                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
+                >
+                  MORE
+                </Link>
+              </nav>
+
               {/* Enhanced Profile and Orders links (mobile only) */}
               {user && (
                 <>
@@ -364,7 +353,7 @@ export default function Navbar2() {
                         Profile
                       </button>
                     </Link>
-                    
+
                     {/* Orders link (mobile only) */}
                     <Link to="/orders">
                       <button className="flex items-center w-full text-left px-4 py-3 text-sm rounded-lg transition-all duration-200 text-white hover:text-white/80 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-white/20">

@@ -12,7 +12,7 @@ const useMetaTags = (title, description) => {
   useEffect(() => {
     // Update title
     document.title = title;
-    
+
     // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
@@ -21,7 +21,7 @@ const useMetaTags = (title, description) => {
       document.head.appendChild(metaDescription);
     }
     metaDescription.content = description;
-    
+
     // Cleanup on component unmount
     return () => {
       document.title = 'Prechi Clothing - Premium Comfort Wear';
@@ -31,9 +31,9 @@ const useMetaTags = (title, description) => {
 
 const CollectionPageSchema = () => {
   const pageTitle = 'Shop All';
-  const pageDescription = 'Explore our complete collection of premium underwear and activewear';
+  const pageDescription = 'Explore our complete collection of premium tracksuits and streetwear';
   const pageUrl = window.location.href;
-  
+
   return (
     <script type="application/ld+json">
       {JSON.stringify({
@@ -70,14 +70,14 @@ const ShopAllPage = () => {
   const navigate = useNavigate();
   const itemsPerPage = 16;
   const category = searchParams.get('category');
-  
+
   // Define special filters that should always appear
   const specialFilters = ['All', 'New Arrivals', '3 in 1', '5 in 1'];
-  
+
   // Combine special filters with dynamic categories
   const filterCategories = useMemo(() => {
     // Filter out categories that are already covered by special filters to avoid duplicates
-    const dynamicCategories = categories.filter(c => 
+    const dynamicCategories = categories.filter(c =>
       !['new arrivals', '3 in 1', '5 in 1', 'all'].includes(c.toLowerCase())
     );
     return [...specialFilters, ...dynamicCategories];
@@ -95,31 +95,31 @@ const ShopAllPage = () => {
     'new': 'New Arrivals',
     '3in1': '3 in 1',
     '5in1': '5 in 1',
-     // Add dynamic mappings (lowercase key to normal value)
+    // Add dynamic mappings (lowercase key to normal value)
     ...categories.reduce((acc, cat) => ({ ...acc, [cat.toLowerCase()]: cat }), {})
   };
 
   // Meta tags configuration for each category
   const metaConfig = {
     'All': {
-      title: 'Shop All - Premium Boxers, Gymwears & Bundles | Prechi Clothing',
-      description: 'Explore our complete collection of premium underwear, activewear, and exclusive bundles. Premium comfort wear designed for everyday luxury.'
+      title: 'Shop All - Premium Tracksuits, Sets & Streetwear | Prechi Clothing',
+      description: 'Explore our complete collection of premium tracksuits, coordinated sets, and streetwear. Premium comfort wear designed for everyday luxury.'
     },
-    'Briefs': {
-      title: 'Premium Boxers & Briefs Collection | Prechi Clothing',
-      description: 'Discover our luxury boxers and briefs collection. Premium comfort underwear with superior fit, breathable fabrics, and modern designs.'
+    'Sets': {
+      title: 'Premium Sets Collection | Prechi Clothing',
+      description: 'Discover our luxury coordinated sets collection. Premium comfort sets with superior fit, breathable fabrics, and bold designs.'
     },
-    'Gymwear': {
-      title: 'Premium Gymwear & Activewear Collection | Prechi Clothing',
-      description: 'Shop high-performance gymwear and activewear. Moisture-wicking fabrics, superior comfort, and stylish designs for your workout routine.'
+    'Tracksuits': {
+      title: 'Premium Tracksuits & Activewear Collection | Prechi Clothing',
+      description: 'Shop high-performance tracksuits and activewear. Superior comfort and stylish designs for your modern streetwear look.'
     },
     'New Arrivals': {
       title: 'New Arrivals - Latest Comfort Wear Collection | Prechi Clothing',
-      description: 'Discover our newest arrivals in premium comfort wear. Be the first to experience our latest boxers, gymwears, and exclusive bundle designs.'
+      description: 'Discover our newest arrivals in premium comfort wear. Be the first to experience our latest tracksuits, sets, and exclusive designs.'
     },
     '3 in 1': {
       title: '3-in-1 Premium Bundles Collection | Prechi Clothing',
-      description: 'Explore our exclusive 3-in-1 bundles featuring coordinated boxers, gymwears, and accessories. Perfect matching sets for ultimate style and comfort.'
+      description: 'Explore our exclusive 3-in-1 bundles featuring coordinated sets, streetwear, and accessories. Perfect matching sets for ultimate style and comfort.'
     },
     '5 in 1': {
       title: '5-in-1 Luxury Bundles Collection | Prechi Clothing',
@@ -134,27 +134,27 @@ const ShopAllPage = () => {
   // Helper function to check if a product is a brief
   const isBrief = useCallback((product) => {
     if (!product) return false;
-    
+
     // For bundles, check bundle_types
     if (!product.is_product && product.bundle_types && product.bundle_types.length > 0) {
       return product.bundle_types.some(type => {
         const typeLower = type.toLowerCase();
-        return typeLower.includes('brief') || 
-               typeLower.includes('underwear') ||
-               typeLower.includes('boxer') ||
-               typeLower.includes('trunk');
+        return typeLower.includes('brief') ||
+          typeLower.includes('underwear') ||
+          typeLower.includes('boxer') ||
+          typeLower.includes('trunk');
       });
     }
-    
+
     // For products, check the name and category
     const name = (product.name || '').toLowerCase();
     const category = (product.category || '').toLowerCase();
-    
-    return name.includes('brief') || 
-           name.includes('boxer') || 
-           name.includes('underwear') ||
-           name.includes('trunk') ||
-           category === 'briefs';
+
+    return name.includes('brief') ||
+      name.includes('boxer') ||
+      name.includes('underwear') ||
+      name.includes('trunk') ||
+      category === 'briefs';
   }, []);
 
   const fetchProducts = useCallback(async () => {
@@ -172,11 +172,11 @@ const ShopAllPage = () => {
       // 2. Fetch Products
       const endpoint = category ? `/shopall?category=${category}` : `/shopall`;
       const res = await api.get(endpoint);
-  
+
       if (!Array.isArray(res.data)) {
         throw new Error('Unexpected response format');
       }
-  
+
       const processedData = res.data.map(item => {
         const baseItem = {
           id: item.id,
@@ -195,7 +195,7 @@ const ShopAllPage = () => {
             bundle_types: item.bundle_types || [],
           };
         }
-  
+
         return {
           ...baseItem,
           is_product: true,
@@ -203,35 +203,35 @@ const ShopAllPage = () => {
           sizes: item.sizes || [], // Include sizes for add to cart
         };
       });
-  
+
       // Sort to show briefs first when "All" is selected
       if (!category) {
         processedData.sort((a, b) => {
           const aIsBrief = isBrief(a);
           const bIsBrief = isBrief(b);
-          
+
           // Sort briefs first, then everything else
           if (aIsBrief && !bIsBrief) return -1; // a comes before b
           if (!aIsBrief && bIsBrief) return 1;  // b comes before a
           return 0; // maintain original order for non-briefs
         });
       }
-  
+
       setProducts(processedData);
-      
+
       // Update current filter based on URL param
       if (category) {
-          const normalizedCategory = category.toLowerCase();
-          // Check standard maps first
-          if (reverseCategoryMap[normalizedCategory]) {
-              setCurrentFilter(reverseCategoryMap[normalizedCategory]);
-          } else {
-              // Try to find a matching dynamic category (case-insensitive)
-              const match = categories.find(c => c.toLowerCase() === normalizedCategory);
-              setCurrentFilter(match || 'All');
-          }
+        const normalizedCategory = category.toLowerCase();
+        // Check standard maps first
+        if (reverseCategoryMap[normalizedCategory]) {
+          setCurrentFilter(reverseCategoryMap[normalizedCategory]);
+        } else {
+          // Try to find a matching dynamic category (case-insensitive)
+          const match = categories.find(c => c.toLowerCase() === normalizedCategory);
+          setCurrentFilter(match || 'All');
+        }
       } else {
-          setCurrentFilter('All');
+        setCurrentFilter('All');
       }
 
     } catch (err) {
@@ -306,11 +306,10 @@ const ShopAllPage = () => {
     return (
       <div className="container-padding typography  flex flex-col min-h-screen">
         <Navbar2 />
-        <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${
-          mobileLayout === 'one' 
+        <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${mobileLayout === 'one'
             ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
             : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-        }`}>
+          }`}>
           {[...Array(12)].map((_, index) => (
             <div key={index} className="bg-gray-100 rounded-xl p-3 animate-pulse shadow-sm">
               <div className="w-full aspect-[3/4] bg-gray-200 rounded-lg mb-3"></div>
@@ -332,7 +331,7 @@ const ShopAllPage = () => {
         <div className="text-center py-12">
           <h3 className="text-red-600 mb-4">Error</h3>
           <p className="text-gray-600">{error}</p>
-          <button 
+          <button
             onClick={fetchProducts}
             className="mt-4 bg-accent text-black px-6 py-2 rounded hover:bg-accent-dark transition"
           >
@@ -366,11 +365,10 @@ const ShopAllPage = () => {
                 <button
                   key={filter}
                   onClick={() => handleFilterChange(filter)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                    currentFilter === filter
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${currentFilter === filter
                       ? 'bg-accent text-black'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {filter}
                 </button>
@@ -380,11 +378,10 @@ const ShopAllPage = () => {
               <div className="flex sm:hidden bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setMobileLayout('one')}
-                  className={`p-2 rounded-md transition-colors ${
-                    mobileLayout === 'one'
+                  className={`p-2 rounded-md transition-colors ${mobileLayout === 'one'
                       ? 'bg-white shadow-sm text-gray-900'
                       : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                    }`}
                   title="Single column view"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,11 +390,10 @@ const ShopAllPage = () => {
                 </button>
                 <button
                   onClick={() => setMobileLayout('two')}
-                  className={`p-2 rounded-md transition-colors ${
-                    mobileLayout === 'two'
+                  className={`p-2 rounded-md transition-colors ${mobileLayout === 'two'
                       ? 'bg-white shadow-sm text-gray-900'
                       : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                    }`}
                   title="Two column view"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -419,11 +415,10 @@ const ShopAllPage = () => {
             </div>
           </div>
         </div>
-        <div className={`grid gap-x-2 gap-y-[0.7em] sm:gap-x-3 sm:gap-y-[1.05em] md:gap-x-4 md:gap-y-[1.4em] lg:gap-x-3 lg:gap-y-[0.95em] mb-8 ${
-          mobileLayout === 'one' 
+        <div className={`grid gap-x-2 gap-y-[0.7em] sm:gap-x-3 sm:gap-y-[1.05em] md:gap-x-4 md:gap-y-[1.4em] lg:gap-x-3 lg:gap-y-[0.95em] mb-8 ${mobileLayout === 'one'
             ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
             : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-        }`}>
+          }`}>
           {displayedProducts.map((product, index) => (
             <ProductCard
               key={`${product.is_product ? 'product' : 'bundle'}-${product.id}-${index}`}
@@ -456,7 +451,7 @@ const ShopAllPage = () => {
 const ProductCard = ({ product, onImageError }) => {
   const { id, name, price, image, is_product, variantId, bundle_types, total_stock } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
-  
+
   // Calculate sold out status
   // For bundles, we currently assume they are in stock (or logic handled elsewhere) 
   // unless we fetch bundle stock from backend. 
@@ -468,15 +463,15 @@ const ProductCard = ({ product, onImageError }) => {
   // if (displayName.includes('–')) {
   //   displayName = displayName.split('–')[0].trim();
   // }
-  
+
   const productUrl = is_product
     ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
     : `/bundle/${id}`;
-    
+
   const parsedPrice = parseFloat(price) || 0;
   const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
   const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-  
+
   return (
     <div className="group bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100">
       <Link to={productUrl} className="block relative overflow-hidden">
@@ -508,8 +503,8 @@ const ProductCard = ({ product, onImageError }) => {
             {displayName}
           </h3>
           <p className="text-lg sm:text-xl font-semibold font-PatrickHand text-Accent">
-            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
-              style: 'currency', 
+            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+              style: 'currency',
               currency: displayCurrency,
               minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
               maximumFractionDigits: country === 'Nigeria' ? 0 : 2
@@ -521,11 +516,10 @@ const ProductCard = ({ product, onImageError }) => {
         <Link to={productUrl} onClick={(e) => isSoldOut && e.preventDefault()}>
           <button
             disabled={isSoldOut}
-            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${
-              isSoldOut 
-                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${isSoldOut
+                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
                 : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
-            }`}
+              }`}
           >
             {isSoldOut ? 'Sold Out' : 'Shop Now'}
           </button>

@@ -23,14 +23,14 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  
+
   // Image carousel data
   const carouselImages = [
     {
       src: Pic1,
       title: 'Unleash Your Potential',
       description:
-        'Step into performance-ready gymwear and briefs crafted for movement, comfort, and confidence.',
+        'Step into performance-ready tracksuits and sets crafted for movement, comfort, and confidence.',
       placeholder: { bg: '#1E1E1E', pattern: 'circles' },
     },
     {
@@ -48,7 +48,7 @@ const Login = () => {
       placeholder: { bg: '#1E1E1E', pattern: 'triangles' },
     },
   ];
-  
+
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -57,9 +57,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   const from = location.state?.from?.pathname || '/home';
-  
+
   // Helper function to decode JWT token
   const decodeToken = (token) => {
     try {
@@ -76,7 +76,7 @@ const Login = () => {
       return null;
     }
   };
-  
+
   useEffect(() => {
     const savedEmail = localStorage.getItem('userEmail');
     if (savedEmail) {
@@ -92,7 +92,7 @@ const Login = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [carouselImages.length, location.state]);
-  
+
   const validateField = useCallback((name, value) => {
     const errors = {};
     if (name === 'email') {
@@ -106,7 +106,7 @@ const Login = () => {
     }
     return errors;
   }, []);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -120,7 +120,7 @@ const Login = () => {
     if (errorMsg) setErrorMsg('');
     if (successMsg) setSuccessMsg('');
   };
-  
+
   const validateForm = () => {
     const allErrors = {
       ...validateField('email', formData.email),
@@ -129,7 +129,7 @@ const Login = () => {
     setFormErrors(allErrors);
     return Object.keys(allErrors).length === 0;
   };
-  
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -142,17 +142,17 @@ const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      
+
       const data = response.data;
       const { token, user } = data;
-      
+
       // Step 2: Block admin users (optional rule)
       if (user?.isAdmin) {
         setErrorMsg('Admins are not allowed to log in from the user portal.');
         setLoading(false);
         return;
       }
-      
+
       // Step 3: Decode token to extract id
       const tokenData = decodeToken(token);
       const userWithId = {
@@ -162,19 +162,19 @@ const Login = () => {
       if (!userWithId.id) {
         throw new Error('No valid user ID found in user data or token');
       }
-      
+
       // Step 4: Persist user in context
-     
+
       await login(userWithId, token);
-      
+
       // Step 5: Remember email if user checked the box
       if (rememberMe) {
         localStorage.setItem('userEmail', formData.email);
       } else {
         localStorage.removeItem('userEmail');
       }
-      
-      
+
+
       // Step 7: Redirect to intended page
       setSuccessMsg('Login successful! Redirecting...');
       setTimeout(() => navigate(from, { replace: true }), 1000);
@@ -189,16 +189,16 @@ const Login = () => {
       } else {
         setErrorMsg(
           err.response?.data?.error ||
-            err.response?.data?.message ||
-            err.message ||
-            'Login failed. Please try again.'
+          err.response?.data?.message ||
+          err.message ||
+          'Login failed. Please try again.'
         );
       }
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex bg-white font-PatrickHand">
       {/* Left Side - Login Form */}
@@ -248,11 +248,10 @@ const Login = () => {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                    formErrors.email
+                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${formErrors.email
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-gray-300'
-                  }`}
+                    }`}
                   style={{
                     color: '#1E1E1E',
                     ...(formErrors.email ? {} : { '--tw-ring-color': '#1E1E1E' }),
@@ -288,11 +287,10 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                    formErrors.password
+                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${formErrors.password
                       ? 'border-red-300 focus:ring-red-500'
                       : 'border-gray-300'
-                  }`}
+                    }`}
                   style={{
                     color: '#1E1E1E',
                     ...(formErrors.password
@@ -391,13 +389,12 @@ const Login = () => {
           {carouselImages.map((image, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                index === currentImageIndex
+              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentImageIndex
                   ? 'opacity-100 transform translate-x-0'
                   : index < currentImageIndex
-                  ? 'opacity-0 transform -translate-x-full'
-                  : 'opacity-0 transform translate-x-full'
-              }`}
+                    ? 'opacity-0 transform -translate-x-full'
+                    : 'opacity-0 transform translate-x-full'
+                }`}
             >
               <img src={image.src} alt={image.title} className="w-full h-full object-cover" />
               {/* Content overlay */}
@@ -426,9 +423,8 @@ const Login = () => {
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${
-                index === currentImageIndex ? 'scale-125' : ''
-              }`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${index === currentImageIndex ? 'scale-125' : ''
+                }`}
               style={{
                 backgroundColor: index === currentImageIndex ? '#1E1E1E' : '#ffffff',
                 opacity: index === currentImageIndex ? 1 : 0.6,

@@ -7,21 +7,21 @@ import Button from '../components/Button';
 const MorePage = () => {
   const [activeTab, setActiveTab] = useState('about');
   const [expandedSection, setExpandedSection] = useState(null);
-  
+
   const moreItems = [
     { id: 'about', label: 'About Us', icon: Info },
     { id: 'terms', label: 'Terms', icon: FileText },
     { id: 'privacy', label: 'Privacy', icon: Eye },
     { id: 'support', label: 'Support', icon: HeartHandshake }
   ];
-  
+
   const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
-  
+
   // Get the label for the active tab
   const activeTabLabel = moreItems.find((item) => item.id === activeTab)?.label || 'More';
-  
+
   // Help topics content
   const helpTopicsContent = {
     'help-0': {
@@ -30,7 +30,7 @@ const MorePage = () => {
       content: (
         <div className="mt-4 pl-2 space-y-3">
           <p className="font-PatrickHand text-gray-600">
-            You can check your order status at any time by logging into your account on our website. 
+            You can check your order status at any time by logging into your account on our website.
             Once your order is placed, you'll receive a confirmation email with your order details.
           </p>
           <div className="bg-blue-50 p-4 rounded-lg">
@@ -39,7 +39,7 @@ const MorePage = () => {
               Email Notifications
             </p>
             <p className="font-PatrickHand text-blue-700 text-sm mt-2">
-              Our admin team automatically sends email updates whenever your order status changes. 
+              Our admin team automatically sends email updates whenever your order status changes.
               You'll receive notifications when:
             </p>
             <ul className="list-disc list-inside font-PatrickHand text-blue-700 text-sm mt-2 space-y-1">
@@ -51,7 +51,7 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            To track your package, use the tracking number provided in the shipping confirmation email 
+            To track your package, use the tracking number provided in the shipping confirmation email
             on our website or the courier's website.
           </p>
         </div>
@@ -63,7 +63,7 @@ const MorePage = () => {
       content: (
         <div className="mt-4 pl-2 space-y-3">
           <p className="font-PatrickHand text-gray-600">
-            If you need a different size, we offer free size exchanges within 30 days of purchase. 
+            If you need a different size, we offer free size exchanges within 30 days of purchase.
             The item must be unworn, unwashed, and in its original packaging with all tags attached.
           </p>
           <div className="bg-green-50 p-4 rounded-lg">
@@ -77,7 +77,7 @@ const MorePage = () => {
             </ol>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            You'll receive email notifications at each step of the exchange process, including when 
+            You'll receive email notifications at each step of the exchange process, including when
             we receive your return and when your replacement ships.
           </p>
         </div>
@@ -102,7 +102,7 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            If your payment is successful but you don't receive a confirmation email within 30 minutes, 
+            If your payment is successful but you don't receive a confirmation email within 30 minutes,
             please check your spam folder or contact our support team.
           </p>
         </div>
@@ -127,7 +127,7 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            For specific product care instructions, refer to the label on your garment or the product 
+            For specific product care instructions, refer to the label on your garment or the product
             page on our website.
           </p>
         </div>
@@ -139,7 +139,7 @@ const MorePage = () => {
       content: (
         <div className="mt-4 pl-2 space-y-3">
           <p className="font-PatrickHand text-gray-600">
-            Interested in becoming a Prechi Clothing retailer or distributor? We offer wholesale partnerships 
+            Interested in becoming a Prechi Clothing retailer or distributor? We offer wholesale partnerships
             for qualified businesses.
           </p>
           <div className="bg-indigo-50 p-4 rounded-lg">
@@ -153,7 +153,7 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            To apply for a wholesale account, please email us at <strong>prechi.clothing@gmail.com</strong> with 
+            To apply for a wholesale account, please email us at <strong>prechi.clothing@gmail.com</strong> with
             your business information, including your company name, location, and type of retail establishment.
           </p>
         </div>
@@ -178,14 +178,14 @@ const MorePage = () => {
             </ul>
           </div>
           <p className="font-PatrickHand text-gray-600">
-            For technical support, please email us with a detailed description of the issue, screenshots if applicable, 
+            For technical support, please email us with a detailed description of the issue, screenshots if applicable,
             and your device/browser information. Our technical team will respond within 24 hours with a solution.
           </p>
         </div>
       )
     }
   };
-  
+
   const renderContent = () => {
     switch (activeTab) {
       case 'about':
@@ -198,7 +198,7 @@ const MorePage = () => {
                 Premium comfort, tailored for everyday movement.
               </p>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                Founded with a vision to revolutionize men's underwear and activewear, Prechi Clothing combines cutting-edge design with uncompromising comfort.
+                Founded with a vision to revolutionize men's streetwear and activewear, Prechi Clothing combines cutting-edge design with uncompromising comfort.
               </p>
             </div>
             {/* Mission & Vision */}
@@ -209,12 +209,12 @@ const MorePage = () => {
                 </div>
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">Our Mission</h4>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
-                  At Prechi Clothing, we believe that comfort shouldn't compromise style. We create premium 
-                  underwear and activewear that moves with you, providing unmatched comfort for your 
+                  At Prechi Clothing, we believe that comfort shouldn't compromise style. We create premium
+                  tracksuits and sets that move with you, providing unmatched comfort for your
                   everyday adventures.
                 </p>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                  Every piece is crafted with attention to detail, using high-quality materials that 
+                  Every piece is crafted with attention to detail, using high-quality materials that
                   last longer and feel better against your skin.
                 </p>
               </div>
@@ -224,12 +224,12 @@ const MorePage = () => {
                 </div>
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4">Our Vision</h4>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
-                  To become Africa's leading premium underwear brand, setting new standards for comfort, 
-                  quality, and style in men's intimate apparel.
+                  To become Africa's leading premium streetwear brand, setting new standards for comfort,
+                  quality, and style in men's everyday apparel.
                 </p>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                  We envision a world where every man experiences the confidence that comes from wearing 
-                  perfectly fitted, premium quality underwear designed for the modern lifestyle.
+                  We envision a world where every man experiences the confidence that comes from wearing
+                  perfectly fitted, premium quality tracksuits designed for the modern lifestyle.
                 </p>
               </div>
             </div>
@@ -243,7 +243,7 @@ const MorePage = () => {
                   </div>
                   <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Quality First</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                    We source only the finest materials and employ rigorous quality control processes 
+                    We source only the finest materials and employ rigorous quality control processes
                     to ensure every product meets our high standards.
                   </p>
                 </div>
@@ -253,7 +253,7 @@ const MorePage = () => {
                   </div>
                   <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Customer-Centric</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                    Your comfort and satisfaction drive everything we do. We listen to feedback and 
+                    Your comfort and satisfaction drive everything we do. We listen to feedback and
                     continuously improve our products and services.
                   </p>
                 </div>
@@ -263,7 +263,7 @@ const MorePage = () => {
                   </div>
                   <h5 className="text-lg font-semibold font-Manrope text-Primarycolor mb-3">Innovation</h5>
                   <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                    We constantly push boundaries, exploring new technologies and designs to create 
+                    We constantly push boundaries, exploring new technologies and designs to create
                     products that exceed expectations.
                   </p>
                 </div>
@@ -308,18 +308,18 @@ const MorePage = () => {
               <h4 className="text-2xl font-semibold font-Manrope text-Primarycolor mb-6">Our Story</h4>
               <div className="prose prose-gray max-w-none">
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
-                  Prechi Clothing was born from a simple observation: men deserve better underwear. After experiencing 
-                  countless uncomfortable moments with ill-fitting, low-quality underwear, our founders decided to 
+                  Prechi Clothing was born from a simple observation: men deserve better streetwear. After experiencing
+                  countless uncomfortable moments with ill-fitting, low-quality apparel, our founders decided to
                   create a solution that would change the game entirely.
                 </p>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed mb-6">
-                  Starting from a small workshop in Lagos, we began crafting underwear with an obsessive attention 
-                  to detail. We tested dozens of fabric combinations, refined our fits through countless iterations, 
+                  Starting from a small workshop in Lagos, we began crafting sets with an obsessive attention
+                  to detail. We tested dozens of fabric combinations, refined our fits through countless iterations,
                   and worked directly with customers to understand their needs.
                 </p>
                 <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                  Today, Prechi Clothing has grown into Nigeria's premier underwear brand, trusted by thousands of men 
-                  who refuse to compromise on comfort and quality. But our journey is just beginning – we're constantly 
+                  Today, Prechi Clothing has grown into Nigeria's premier streetwear brand, trusted by thousands of men
+                  who refuse to compromise on comfort and quality. But our journey is just beginning – we're constantly
                   innovating and expanding to serve you better.
                 </p>
               </div>
@@ -332,7 +332,7 @@ const MorePage = () => {
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Terms of Service</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                Please read these terms and conditions carefully before using our service. 
+                Please read these terms and conditions carefully before using our service.
                 By accessing our website and making purchases, you agree to these terms.
               </p>
               <p className="text-sm font-PatrickHand text-gray-500 mt-4">Last updated: January 2025</p>
@@ -485,7 +485,7 @@ const MorePage = () => {
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Privacy Policy</h3>
               <p className="font-PatrickHand text-gray-600 leading-relaxed">
-                Your privacy is important to us. This policy explains how we collect, use, and protect your 
+                Your privacy is important to us. This policy explains how we collect, use, and protect your
                 personal information when you visit our website or make a purchase.
               </p>
               <p className="text-sm font-PatrickHand text-gray-500 mt-4">Last updated: January 2025</p>
@@ -497,7 +497,7 @@ const MorePage = () => {
                   <Info className="w-6 h-6 text-blue-600 mr-3" />
                   Information We Collect
                 </h4>
-                
+
                 <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
                   <div className="p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                     <h5 className="font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
@@ -673,7 +673,7 @@ const MorePage = () => {
             <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 sm:p-8 rounded-xl border border-gray-100 shadow-lg">
               <h3 className="text-3xl font-bold font-Manrope text-Primarycolor mb-4">Customer Support</h3>
               <p className="text-lg font-PatrickHand text-gray-600 leading-relaxed">
-                Our dedicated support team is here to help you with any questions, concerns, or issues you may have. 
+                Our dedicated support team is here to help you with any questions, concerns, or issues you may have.
                 We're committed to providing exceptional service every step of the way.
               </p>
             </div>
@@ -685,7 +685,7 @@ const MorePage = () => {
                 </div>
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Email Support</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Get detailed help via email</p>
-                <a 
+                <a
                   href="mailto:prechi.clothing@gmail.com"
                   className="text-blue-600 hover:text-blue-800 font-medium font-PatrickHand transition-colors"
                 >
@@ -699,7 +699,7 @@ const MorePage = () => {
                 </div>
                 <h4 className="font-semibold font-Manrope text-Primarycolor mb-2">Phone Support</h4>
                 <p className="font-PatrickHand text-gray-600 mb-4 text-sm">Speak directly with our team</p>
-                <a 
+                <a
                   href="tel:+2349016420903"
                   className="text-green-600 hover:text-green-800 font-medium font-PatrickHand transition-colors"
                 >
@@ -733,11 +733,10 @@ const MorePage = () => {
                     { id: 'help-4', topic: 'Wholesale Inquiries', desc: 'Bulk orders and business partnerships', icon: <Building className="w-5 h-5" /> },
                     { id: 'help-5', topic: 'Technical Support', desc: 'Website issues and account problems', icon: <Monitor className="w-5 h-5" /> }
                   ].map((item) => (
-                    <div 
-                      key={item.id} 
-                      className={`p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer ${
-                        expandedSection === item.id ? 'bg-accent text-black' : 'bg-gray-50 text-gray-700'
-                      }`}
+                    <div
+                      key={item.id}
+                      className={`p-4 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer ${expandedSection === item.id ? 'bg-accent text-black' : 'bg-gray-50 text-gray-700'
+                        }`}
                       onClick={() => toggleSection(item.id)}
                     >
                       <div className="flex items-center justify-between">
@@ -750,8 +749,8 @@ const MorePage = () => {
                             <p className="text-sm font-PatrickHand text-gray-600 mt-1">{item.desc}</p>
                           </div>
                         </div>
-                        {expandedSection === item.id ? 
-                          <ChevronUp className="w-4 h-4 text-gray-400" /> : 
+                        {expandedSection === item.id ?
+                          <ChevronUp className="w-4 h-4 text-gray-400" /> :
                           <ChevronDown className="w-4 h-4 text-gray-400" />
                         }
                       </div>
@@ -901,7 +900,7 @@ const MorePage = () => {
         return null;
     }
   };
-  
+
   return (
     <div className="flex flex-col min-h-screen" style={{
       '--color-Primarycolor': '#1E1E1E',
@@ -957,11 +956,10 @@ const MorePage = () => {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-2 rounded-full text-left transition-all duration-200 font-PatrickHand ${
-                        activeTab === item.id
+                      className={`w-full flex items-center space-x-3 px-4 py-2 rounded-full text-left transition-all duration-200 font-PatrickHand ${activeTab === item.id
                           ? 'bg-accent text-black border border-accent shadow-sm'
                           : 'text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800'
-                      }`}
+                        }`}
                     >
                       <Icon className="w-5 h-5" />
                       <span className="font-medium">{item.label}</span>

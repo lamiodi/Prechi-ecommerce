@@ -26,7 +26,7 @@ const SearchResults = () => {
   const { currency, exchangeRate, country, loading: contextLoading } = useContext(CurrencyContext);
   const navigate = useNavigate();
   const itemsPerPage = 16;
-  
+
   // Get search query parameter
   const searchQuery = searchParams.get('q');
 
@@ -35,23 +35,23 @@ const SearchResults = () => {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     setError(null);
     try {
       let url = `/shopall/search?q=${encodeURIComponent(searchQuery)}`;
-      
+
       // Add category filter if provided
       if (searchCategory) {
         url += `&category=${encodeURIComponent(searchCategory)}`;
       }
-      
+
       const res = await api.get(url);
-  
+
       if (!Array.isArray(res.data)) {
         throw new Error('Unexpected response format');
       }
-  
+
       const processedData = res.data.map(item => {
         const baseItem = {
           id: item.id,
@@ -60,7 +60,7 @@ const SearchResults = () => {
           image: item.image,
           created_at: item.created_at,
         };
-  
+
         if (!item.is_product) {
           return {
             ...baseItem,
@@ -68,7 +68,7 @@ const SearchResults = () => {
             bundle_types: item.bundle_types || [],
           };
         }
-  
+
         return {
           ...baseItem,
           is_product: true,
@@ -76,7 +76,7 @@ const SearchResults = () => {
           sizes: item.sizes || [],
         };
       });
-  
+
       setProducts(processedData);
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Failed to fetch search results');
@@ -91,7 +91,7 @@ const SearchResults = () => {
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
-    
+
     switch (sortBy) {
       case 'price-low':
         filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
@@ -130,11 +130,10 @@ const SearchResults = () => {
     return (
       <div className="typography container-padding flex flex-col min-h-screen">
         <Navbar2 />
-        <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${
-          mobileLayout === 'one' 
+        <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${mobileLayout === 'one'
             ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
             : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-        }`}>
+          }`}>
           {[...Array(12)].map((_, index) => (
             <div key={index} className="bg-gray-100 rounded-xl p-3 animate-pulse shadow-sm">
               <div className="w-full aspect-[3/4] bg-gray-200 rounded-lg mb-3"></div>
@@ -156,7 +155,7 @@ const SearchResults = () => {
         <div className="text-center py-12">
           <h3 className="text-red-600 mb-4">Error</h3>
           <p className="text-gray-600">{error}</p>
-          <button 
+          <button
             onClick={fetchSearchResults}
             className="mt-4 bg-accent text-black px-6 py-2 rounded hover:bg-accent-dark transition"
           >
@@ -191,11 +190,11 @@ const SearchResults = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="mb-10">
           <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-end">
-               <div className="flex flex-row gap-6 flex-1">
+              <div className="flex flex-row gap-6 flex-1">
                 <div className="flex-1 min-w-0">
                   <label className="block text-sm font-semibold text-gray-800 mb-3">Filter by Category</label>
                   <select
@@ -204,14 +203,14 @@ const SearchResults = () => {
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium transition-all duration-200 hover:border-gray-400"
                   >
                     <option value="">All Categories</option>
-                    <option value="briefs">Briefs</option>
-                    <option value="gymwear">Gymwear</option>
+                    <option value="Sets">Sets</option>
+                    <option value="Tracksuits">Tracksuits</option>
                     <option value="new">New Arrivals</option>
                     <option value="3in1">3 in 1</option>
                     <option value="5in1">5 in 1</option>
                   </select>
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <label className="block text-sm font-semibold text-gray-800 mb-3">Sort Products</label>
                   <select
@@ -227,17 +226,16 @@ const SearchResults = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div className="sm:hidden w-full lg:w-auto">
                 <label className="block text-sm font-semibold text-gray-800 mb-3">Display View</label>
                 <div className="flex bg-white rounded-xl p-2 border-2 border-gray-300 w-full">
                   <button
                     onClick={() => setMobileLayout('one')}
-                    className={`flex-1 p-3 rounded-lg transition-all duration-200 text-sm font-semibold ${
-                      mobileLayout === 'one'
+                    className={`flex-1 p-3 rounded-lg transition-all duration-200 text-sm font-semibold ${mobileLayout === 'one'
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                    }`}
+                      }`}
                     title="Single column view"
                   >
                     <svg className="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,11 +244,10 @@ const SearchResults = () => {
                   </button>
                   <button
                     onClick={() => setMobileLayout('two')}
-                    className={`flex-1 p-3 rounded-lg transition-all duration-200 text-sm font-semibold ${
-                      mobileLayout === 'two'
+                    className={`flex-1 p-3 rounded-lg transition-all duration-200 text-sm font-semibold ${mobileLayout === 'two'
                         ? 'bg-blue-600 text-white shadow-md'
                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                    }`}
+                      }`}
                     title="Two column view"
                   >
                     <svg className="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +259,7 @@ const SearchResults = () => {
             </div>
           </div>
         </div>
-        
+
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <h3 className="text-xl font-medium mb-2">No results found</h3>
@@ -270,11 +267,10 @@ const SearchResults = () => {
           </div>
         ) : (
           <>
-            <div className={`grid gap-4 sm:gap-5 md:gap-6 mb-8 ${
-              mobileLayout === 'one' 
+            <div className={`grid gap-4 sm:gap-5 md:gap-6 mb-8 ${mobileLayout === 'one'
                 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
                 : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-            }`}>
+              }`}>
               {displayedProducts.map((product, index) => (
                 <ProductCard
                   key={`${product.is_product ? 'product' : 'bundle'}-${product.id}-${index}`}
@@ -284,7 +280,7 @@ const SearchResults = () => {
                 />
               ))}
             </div>
-            
+
             {hasMoreProducts && (
               <div className="flex justify-center">
                 <Button
@@ -310,23 +306,23 @@ const SearchResults = () => {
 const ProductCard = ({ product, onAddToCart, onImageError }) => {
   const { id, name, price, image, is_product, variantId, bundle_types } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
-  
+
   // Clean product name (remove trailing "– Something")
   let displayName = name || 'Unnamed Product';
   if (displayName.includes('–')) {
     displayName = displayName.split('–')[0].trim();
   }
-  
+
   // Generate product URL based on type
   const productUrl = is_product
     ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
     : `/bundle/${id}`;
-    
+
   // Format price based on currency
   const parsedPrice = parseFloat(price) || 0;
   const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
   const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-  
+
   return (
     <div className="group bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100">
       <Link to={productUrl} className="block relative overflow-hidden">
@@ -355,8 +351,8 @@ const ProductCard = ({ product, onAddToCart, onImageError }) => {
             {displayName}
           </h3>
           <p className="text-lg sm:text-xl font-semibold font-Manrope text-Accent">
-            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', { 
-              style: 'currency', 
+            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+              style: 'currency',
               currency: displayCurrency,
               minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
               maximumFractionDigits: country === 'Nigeria' ? 0 : 2
