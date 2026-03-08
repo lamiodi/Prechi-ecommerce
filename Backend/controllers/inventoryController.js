@@ -254,8 +254,7 @@ export const setPrimaryImage = async (req, res) => {
   }
 };
 
-// Upload media
-export const uploadMedia = async (req, res) => {
+export const addVariantMedia = async (req, res) => {
   const { variantId } = req.params;
   const files = req.files;
 
@@ -263,19 +262,26 @@ export const uploadMedia = async (req, res) => {
     const uploadedImages = [];
     const uploadedVideos = [];
 
-    if (files && files.length > 0) {
-      for (const file of files) {
+    // Process 'images' field
+    if (files.images && files.images.length > 0) {
+      for (const file of files.images) {
         const result = await cloudinary.uploader.upload(file.path, {
-          resource_type: 'auto',
+          resource_type: 'image',
           folder: 'products',
         });
-        
-        if (result.resource_type === 'image') {
-          uploadedImages.push(result.secure_url);
-        } else if (result.resource_type === 'video') {
-          uploadedVideos.push(result.secure_url);
-        }
+        uploadedImages.push(result.secure_url);
+        await fs.unlink(file.path);
+      }
+    }
 
+    // Process 'videos' field
+    if (files.videos && files.videos.length > 0) {
+      for (const file of files.videos) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          resource_type: 'video',
+          folder: 'products/videos',
+        });
+        uploadedVideos.push(result.secure_url);
         await fs.unlink(file.path);
       }
     }
@@ -293,9 +299,6 @@ export const uploadMedia = async (req, res) => {
         
         // Insert Videos
         for (const url of uploadedVideos) {
-            // Generate thumbnail URL for video (Cloudinary convention)
-            // If url is https://res.cloudinary.com/.../video.mp4, thumbnail is usually .jpg
-            // Simple heuristic: replace file extension with .jpg
             const thumbnailUrl = url.replace(/\.[^/.]+$/, ".jpg");
             
             await sql`
