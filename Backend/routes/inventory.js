@@ -9,7 +9,7 @@ import {
   setPrimaryImage,
   addVariantMedia,
 } from '../controllers/inventoryController.js';
-import upload from '../middleware/uploadMiddleware.js';
+import upload from '../utils/multer.js';
 
 const router = express.Router();
 
