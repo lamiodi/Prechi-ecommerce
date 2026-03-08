@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
-import { 
-  Clock, AlertCircle, Package, CheckCircle, XCircle, Search, Filter, Eye, Edit, Trash2, 
+import {
+  Clock, AlertCircle, Package, CheckCircle, XCircle, Search, Filter, Eye, Edit, Trash2,
   ChevronLeft, ChevronRight, Globe, Mail, CreditCard, Send
 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import OrderDetailsModal from './OrderDetailsModal';
 import AdminDeliveryFeeModal from './AdminDeliveryFeeModal';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com/api';
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const Orders = () => {
   const [orderDetails, setOrderDetails] = useState({});
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [selectedImages, setSelectedImages] = useState({});
-  
+
   const getAuthAxios = () => {
     const adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
@@ -50,7 +50,7 @@ const Orders = () => {
       },
     });
   };
-  
+
   useEffect(() => {
     if (adminLoading) return;
     if (!admin || !admin.isAdmin) {
@@ -73,7 +73,7 @@ const Orders = () => {
             status: statusFilter !== 'all' ? statusFilter : undefined
           }
         });
-        
+
         const ordersData = response.data.orders || response.data;
         const pagination = response.data.pagination || {};
 
@@ -106,7 +106,7 @@ const Orders = () => {
     };
     fetchOrders();
   }, [admin, adminLoading, adminLogout, navigate, currentPage, searchTerm, statusFilter]);
-  
+
   const handleError = (err, defaultMessage) => {
     if (err.response?.status === 401) {
       setError('Authentication expired. Please log in again.');
@@ -119,7 +119,7 @@ const Orders = () => {
       toast.error(errorMessage);
     }
   };
-  
+
   const fetchCompleteOrderDetails = async (orderId) => {
     try {
       setDetailsLoading(true);
@@ -147,34 +147,34 @@ const Orders = () => {
       setDetailsLoading(false);
     }
   };
-  
+
   const handleImageChange = (itemId, imageIndex) => {
     setSelectedImages(prev => ({ ...prev, [itemId]: imageIndex }));
   };
-  
+
   const updateOrderStatus = async () => {
     if (!selectedOrder || !newStatus) return;
     try {
       const authAxios = getAuthAxios();
       const response = await authAxios.put(`/api/admin/orders/${selectedOrder.id}/status`, { status: newStatus });
-      setOrders(orders.map(order => 
+      setOrders(orders.map(order =>
         order.id === selectedOrder.id ? { ...order, status: newStatus } : order
       ));
       setSelectedOrder(prev => ({ ...prev, status: newStatus }));
-      
+
       const details = orderDetails[selectedOrder.id] || {};
       const user = details.user || {};
       const billingAddress = details.billingAddress || {};
-      
+
       // For guest users, prioritize billing address email, for logged-in users use user email
-      const userEmail = selectedOrder.is_temporary 
+      const userEmail = selectedOrder.is_temporary
         ? (billingAddress.email || user.email || selectedOrder.user_email)
         : (user.email || selectedOrder.user_email);
-      
+
       const userName = selectedOrder.is_temporary
         ? (billingAddress.full_name || `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`)
         : `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`;
-      
+
       await authAxios.post('/api/email/send-order-status-update', {
         orderId: selectedOrder.id,
         userEmail: userEmail,
@@ -182,7 +182,7 @@ const Orders = () => {
         status: newStatus,
         isGuest: selectedOrder.is_temporary
       });
-      
+
       setShowStatusModal(false);
       toast.success('Order status updated and email sent');
     } catch (err) {
@@ -190,7 +190,7 @@ const Orders = () => {
       handleError(err, 'Failed to update order status');
     }
   };
-  
+
   const sendEmail = async () => {
     if (!selectedOrder) return;
     try {
@@ -199,16 +199,16 @@ const Orders = () => {
       const details = orderDetails[selectedOrder.id] || {};
       const user = details.user || {};
       const billingAddress = details.billingAddress || {};
-      
+
       // For guest users, prioritize billing address email, for logged-in users use user email
-      const userEmail = selectedOrder.is_temporary 
+      const userEmail = selectedOrder.is_temporary
         ? (billingAddress.email || user.email || selectedOrder.user_email)
         : (user.email || selectedOrder.user_email);
-      
+
       const userName = selectedOrder.is_temporary
         ? (billingAddress.full_name || `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`)
         : `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`;
-      
+
       await authAxios.post('/api/email/send-order-status-update', {
         orderId: selectedOrder.id,
         userEmail: userEmail,
@@ -222,7 +222,7 @@ const Orders = () => {
       handleError(err, 'Failed to send email');
     }
   };
-  
+
   const deleteOrder = async () => {
     if (!selectedOrder) return;
     try {
@@ -237,31 +237,31 @@ const Orders = () => {
       handleError(err, 'Failed to delete order');
     }
   };
-  
+
   const markAsPacked = async () => {
     if (!selectedOrder) return;
     try {
       const authAxios = getAuthAxios();
       const newStatus = 'processing';
       await authAxios.put(`/api/admin/orders/${selectedOrder.id}/status`, { status: newStatus });
-      setOrders(orders.map(order => 
+      setOrders(orders.map(order =>
         order.id === selectedOrder.id ? { ...order, status: newStatus } : order
       ));
       setSelectedOrder(prev => ({ ...prev, status: newStatus }));
-      
+
       const details = orderDetails[selectedOrder.id] || {};
       const user = details.user || {};
       const billingAddress = details.billingAddress || {};
-      
+
       // For guest users, prioritize billing address email, for logged-in users use user email
-      const userEmail = selectedOrder.is_temporary 
+      const userEmail = selectedOrder.is_temporary
         ? (billingAddress.email || user.email || selectedOrder.user_email)
         : (user.email || selectedOrder.user_email);
-      
+
       const userName = selectedOrder.is_temporary
         ? (billingAddress.full_name || `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`)
         : `${user.first_name || selectedOrder.first_name} ${user.last_name || selectedOrder.last_name}`;
-      
+
       await authAxios.post('/api/email/send-order-status-update', {
         orderId: selectedOrder.id,
         userEmail: userEmail,
@@ -269,7 +269,7 @@ const Orders = () => {
         status: newStatus,
         isGuest: selectedOrder.is_temporary
       });
-      
+
       setShowOrderDetail(false);
       toast.success('Order marked as packed and email sent');
     } catch (err) {
@@ -277,7 +277,7 @@ const Orders = () => {
       handleError(err, 'Failed to mark as packed');
     }
   };
-  
+
   const formatCurrency = (amount, currency = 'NGN') => {
     const numAmount = Number(amount) || 0;
     return new Intl.NumberFormat(currency === 'NGN' ? 'en-NG' : 'en-US', {
@@ -285,11 +285,11 @@ const Orders = () => {
       currency: currency.toUpperCase(),
     }).format(numAmount);
   };
-  
+
   const formatDate = (dateString) => {
     return format(new Date(dateString), 'MMM dd, yyyy HH:mm');
   };
-  
+
   const getStatusColor = (status) => ({
     pending: 'bg-yellow-100 text-yellow-800',
     processing: 'bg-blue-100 text-blue-800',
@@ -297,13 +297,13 @@ const Orders = () => {
     delivered: 'bg-green-100 text-green-800',
     cancelled: 'bg-red-100 text-red-800',
   }[status] || 'bg-gray-100 text-gray-800');
-  
+
   const getPaymentStatusColor = (status) => ({
     pending: 'bg-yellow-100 text-yellow-800',
     completed: 'bg-green-100 text-green-800',
     failed: 'bg-red-100 text-red-800',
   }[status] || 'bg-gray-100 text-gray-800');
-  
+
   const getStatusIcon = (status) => ({
     pending: <Clock className="w-4 h-4" />,
     processing: <AlertCircle className="w-4 h-4" />,
@@ -311,29 +311,29 @@ const Orders = () => {
     delivered: <CheckCircle className="w-4 h-4" />,
     cancelled: <XCircle className="w-4 h-4" />,
   }[status] || <Clock className="w-4 h-4" />);
-  
+
   const getPaymentStatusIcon = (status) => ({
     pending: <Clock className="w-4 h-4" />,
     completed: <CheckCircle className="w-4 h-4" />,
     failed: <XCircle className="w-4 h-4" />,
   }[status] || <Clock className="w-4 h-4" />);
-  
+
   // Client-side filtering removed as it's now handled by backend
-  
+
   const countries = [...new Set(orders.map(order => order.shipping_country).filter(Boolean))];
-  
+
   // Calculate indexes for display only
   const indexOfFirstOrder = (currentPage - 1) * ordersPerPage;
   const indexOfLastOrder = currentPage * ordersPerPage;
-   
+
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-  
+
   const viewOrderDetails = async (order) => {
     setSelectedOrder(order);
     await fetchCompleteOrderDetails(order.id);
     setShowOrderDetail(true);
   };
-  
+
   const renderStatusModal = () => showStatusModal && selectedOrder && (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -372,7 +372,7 @@ const Orders = () => {
       </div>
     </div>
   );
-  
+
   const renderDeleteModal = () => showDeleteModal && selectedOrder && (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -393,12 +393,12 @@ const Orders = () => {
       </div>
     </div>
   );
-  
+
   if (loading || adminLoading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div></div>;
   if (error) return <div className="bg-red-50 border-l-4 border-red-500 p-4"><div className="flex"><XCircle className="h-5 w-5 text-red-400" /><p className="ml-3 text-sm text-red-700 font-PatrickHand">{error}</p></div></div>;
-  
+
   return (
-    <div 
+    <div
       className="space-y-6"
       style={{
         '--color-Primarycolor': '#1E1E1E',
@@ -540,9 +540,9 @@ const Orders = () => {
                     Showing <span className="font-medium">{(currentPage - 1) * ordersPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * ordersPerPage, totalOrders)}</span> of <span className="font-medium">{totalOrders}</span> orders
                   </p>
                   <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button 
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} 
-                      disabled={currentPage === 1} 
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
                       className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand disabled:opacity-50"
                     >
                       <ChevronLeft className="h-5 w-5" />
@@ -559,20 +559,20 @@ const Orders = () => {
                       } else {
                         pageNumber = currentPage - 2 + i;
                       }
-                      
+
                       return (
-                        <button 
-                          key={pageNumber} 
-                          onClick={() => setCurrentPage(pageNumber)} 
+                        <button
+                          key={pageNumber}
+                          onClick={() => setCurrentPage(pageNumber)}
                           className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium font-PatrickHand ${currentPage === pageNumber ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
                         >
                           {pageNumber}
                         </button>
                       );
                     })}
-                    <button 
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} 
-                      disabled={currentPage === totalPages} 
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
                       className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 font-PatrickHand disabled:opacity-50"
                     >
                       <ChevronRight className="h-5 w-5" />

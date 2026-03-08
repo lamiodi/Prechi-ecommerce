@@ -12,18 +12,18 @@ const api = axios.create({
   }
 });
 
-const AdminDeliveryFeeModal = ({ 
-  selectedOrder, 
-  showDeliveryFeeModal, 
+const AdminDeliveryFeeModal = ({
+  selectedOrder,
+  showDeliveryFeeModal,
   setShowDeliveryFeeModal,
-  setOrders 
+  setOrders
 }) => {
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [loading, setLoading] = useState(false);
   const [currency, setCurrency] = useState('USD');
   const [paymentLink, setPaymentLink] = useState('');
   const [emailError, setEmailError] = useState(null);
-  
+
   useEffect(() => {
     if (selectedOrder) {
       setDeliveryFee(selectedOrder.delivery_fee || 0);
@@ -32,7 +32,7 @@ const AdminDeliveryFeeModal = ({
       setEmailError(null);
     }
   }, [selectedOrder]);
-  
+
   const getAuthApi = () => {
     const adminToken = localStorage.getItem('adminToken');
     if (!adminToken) {
@@ -46,16 +46,16 @@ const AdminDeliveryFeeModal = ({
       },
     });
   };
-  
+
   const generatePaymentLink = async () => {
     try {
       setLoading(true);
       setEmailError(null);
       const authApi = getAuthApi();
-      
-      const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+
+      const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
       const callbackUrl = `${frontendUrl.replace(/\/$/, '')}/delivery-fee-thank-you`;
-      
+
       const response = await authApi.post(
         '/api/paystack/delivery-fee/initialize',
         {
@@ -65,10 +65,10 @@ const AdminDeliveryFeeModal = ({
           callback_url: callbackUrl
         }
       );
-      
+
       const { authorization_url, emailSent } = response.data;
       setPaymentLink(authorization_url);
-      
+
       navigator.clipboard.writeText(authorization_url);
       if (emailSent) {
         toast.success('Payment link generated and copied to clipboard! Email sent to customer.');
@@ -76,13 +76,13 @@ const AdminDeliveryFeeModal = ({
         setEmailError('Payment link generated, but email failed to send. Please share the link manually.');
         toast.warn('Payment link generated and copied to clipboard, but email failed to send.');
       }
-      
-      setOrders(prev => prev.map(order => 
-        order.id === selectedOrder.id 
-          ? { ...order, delivery_fee: deliveryFee, delivery_fee_paid: false } 
+
+      setOrders(prev => prev.map(order =>
+        order.id === selectedOrder.id
+          ? { ...order, delivery_fee: deliveryFee, delivery_fee_paid: false }
           : order
       ));
-      
+
     } catch (err) {
       console.error('Error generating payment link:', err);
       const errorMessage = err.response?.data?.error || 'Failed to generate payment link. Please try again.';
@@ -94,14 +94,14 @@ const AdminDeliveryFeeModal = ({
       setLoading(false);
     }
   };
-  
+
   const copyToClipboard = () => {
     if (paymentLink) {
       navigator.clipboard.writeText(paymentLink);
       toast.success('Payment link copied to clipboard!');
     }
   };
-  
+
   const sendManually = () => {
     if (paymentLink && selectedOrder) {
       const subject = encodeURIComponent(`Delivery Fee Payment for Order #${selectedOrder.id}`);
@@ -112,9 +112,9 @@ const AdminDeliveryFeeModal = ({
       toast.info('Opening email client to send payment link manually.');
     }
   };
-  
+
   if (!showDeliveryFeeModal || !selectedOrder) return null;
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -123,14 +123,14 @@ const AdminDeliveryFeeModal = ({
             <DollarSign className="mr-2" />
             International Delivery Fee
           </h3>
-          <button 
-            onClick={() => setShowDeliveryFeeModal(false)} 
+          <button
+            onClick={() => setShowDeliveryFeeModal(false)}
             className="text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="p-6">
           <div className="mb-4 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
@@ -140,7 +140,7 @@ const AdminDeliveryFeeModal = ({
               Shipping to: {selectedOrder.shipping_country}
             </p>
           </div>
-          
+
           {!paymentLink ? (
             <>
               <div className="mb-4">
@@ -156,7 +156,7 @@ const AdminDeliveryFeeModal = ({
                   <option value="USD">USD</option>
                 </select>
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Delivery Fee Amount ({currency})
@@ -177,15 +177,14 @@ const AdminDeliveryFeeModal = ({
                   />
                 </div>
               </div>
-              
+
               <button
                 onClick={generatePaymentLink}
                 disabled={loading || deliveryFee <= 0}
-                className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors duration-200 ${
-                  loading || deliveryFee <= 0
+                className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors duration-200 ${loading || deliveryFee <= 0
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700'
-                }`}
+                  }`}
               >
                 {loading ? 'Generating...' : 'Generate Payment Link'}
               </button>

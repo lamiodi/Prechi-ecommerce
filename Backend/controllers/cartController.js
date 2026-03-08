@@ -10,16 +10,16 @@ const validateSingleProduct = async (sql, variant_id, size_id, quantity) => {
     JOIN variant_sizes vs ON vs.variant_id = pv.id AND vs.size_id = ${size_id}
     WHERE pv.id = ${variant_id} AND pv.deleted_at IS NULL AND p.deleted_at IS NULL
   `;
-  
+
   if (!variant) {
     throw new Error('Invalid variant or size.');
   }
-  
+
   const { base_price, stock_quantity } = variant;
   if (stock_quantity < quantity) {
     throw new Error(`Only ${stock_quantity} items available in stock.`);
   }
-  
+
   // Fetch color and size names
   const [details] = await sql`
     SELECT c.color_name AS color_name, s.size_name AS size_name
@@ -28,12 +28,12 @@ const validateSingleProduct = async (sql, variant_id, size_id, quantity) => {
     JOIN sizes s ON s.id = ${size_id}
     WHERE pv.id = ${variant_id}
   `;
-  
+
   const { color_name, size_name } = details || {};
   if (!color_name || !size_name) {
     throw new Error('Could not retrieve color or size information.');
   }
-  
+
   return { base_price, color_name, size_name };
 };
 
@@ -44,17 +44,17 @@ const validateBundle = async (sql, bundle_id, items, quantity) => {
     FROM bundles b
     WHERE b.id = ${bundle_id} AND b.deleted_at IS NULL
   `;
-  
+
   if (!bundle) {
     throw new Error('Invalid bundle.');
   }
-  
+
   const { bundle_price, bundle_type, product_id } = bundle;
   const expectedItems = bundle_type === '3-in-1' ? 3 : 5;
   if (items.length !== expectedItems) {
     throw new Error(`Bundle requires exactly ${expectedItems} items.`);
   }
-  
+
   // Validate bundle items belong to the bundle's product and have sufficient stock
   for (const item of items) {
     const { variant_id, size_id } = item;
@@ -65,16 +65,16 @@ const validateBundle = async (sql, bundle_id, items, quantity) => {
       JOIN variant_sizes vs ON vs.variant_id = pv.id AND vs.size_id = ${size_id}
       WHERE pv.id = ${variant_id} AND pv.product_id = ${product_id} AND pv.deleted_at IS NULL AND p.deleted_at IS NULL
     `;
-    
+
     if (!itemResult) {
       throw new Error(`Invalid variant or size for bundle item: variant_id ${variant_id}, size_id ${size_id}.`);
     }
-    
+
     if (itemResult.stock_quantity < quantity) {
       throw new Error(`Only ${itemResult.stock_quantity} items available for variant ${variant_id}.`);
     }
   }
-  
+
   return { bundle_price, bundle_type, product_id };
 };
 
@@ -85,7 +85,7 @@ const findExistingBundle = async (sql, cart_id, bundle_id, sortedItems) => {
     FROM cart_items
     WHERE cart_id = ${cart_id} AND bundle_id = ${bundle_id} AND is_bundle = TRUE
   `;
-  
+
   for (const item of cartItems) {
     const bundleItems = await sql`
       SELECT variant_id, size_id
@@ -93,16 +93,16 @@ const findExistingBundle = async (sql, cart_id, bundle_id, sortedItems) => {
       WHERE cart_item_id = ${item.id}
       ORDER BY variant_id, size_id
     `;
-    
+
     const existingItems = bundleItems
       .map(bi => ({ variant_id: bi.variant_id, size_id: bi.size_id }))
       .sort((a, b) => a.variant_id === b.variant_id ? a.size_id - b.size_id : a.variant_id - b.variant_id);
-    
+
     if (JSON.stringify(existingItems) === JSON.stringify(sortedItems)) {
       return item.id;
     }
   }
-  
+
   return null;
 };
 
@@ -120,7 +120,7 @@ const fetchCartItems = async (sql, cartId) => {
   const cartItems = await sql`
     SELECT * FROM public.get_cart_items_optimized(${cartId})
   `;
-  
+
   return cartItems.map(row => ({
     id: row.cart_item_id,
     quantity: row.quantity,
@@ -150,54 +150,54 @@ const validateBriefMinimumQuantity = async (sql, cartId) => {
     if (item.is_bundle && item.bundle_type) {
       // Check if bundle contains briefs
       const bundleType = item.bundle_type.toLowerCase();
-      return bundleType.includes('brief') || bundleType.includes('boxer') || 
-             bundleType.includes('underwear') || bundleType.includes('trunk') ||
-             bundleType.includes('jordan') || bundleType.includes('micheal') ||
-             bundleType.includes('michael');
+      return bundleType.includes('brief') || bundleType.includes('boxer') ||
+        bundleType.includes('underwear') || bundleType.includes('trunk') ||
+        bundleType.includes('jordan') || bundleType.includes('micheal') ||
+        bundleType.includes('michael');
     } else if (item.product_name) {
       // Check if single product is a brief
       const productName = item.product_name.toLowerCase();
       const category = (item.category || '').toLowerCase();
-      return category.includes('brief') || productName.includes('brief') || 
-             productName.includes('boxer') || productName.includes('underwear') || 
-             productName.includes('trunk') || productName.includes('jordan') ||
-             productName.includes('micheal') || productName.includes('michael') ||
-             category.includes('underwear') || category.includes('intimates');
+      return category.includes('brief') || productName.includes('brief') ||
+        productName.includes('boxer') || productName.includes('underwear') ||
+        productName.includes('trunk') || productName.includes('jordan') ||
+        productName.includes('micheal') || productName.includes('michael') ||
+        category.includes('underwear') || category.includes('intimates');
     }
     return false;
   });
 
   // Calculate total brief quantity
   const totalBriefQuantity = briefItems.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   // Check if cart contains only briefs
   const nonBriefItems = cartItems.filter(item => {
     if (item.is_bundle && item.bundle_type) {
       const bundleType = item.bundle_type.toLowerCase();
-      return !(bundleType.includes('brief') || bundleType.includes('boxer') || 
-               bundleType.includes('underwear') || bundleType.includes('trunk'));
+      return !(bundleType.includes('brief') || bundleType.includes('boxer') ||
+        bundleType.includes('underwear') || bundleType.includes('trunk'));
     } else if (item.product_name) {
       const productName = item.product_name.toLowerCase();
       const category = (item.category || '').toLowerCase();
-      return !(category.includes('brief') || productName.includes('brief') || 
-               productName.includes('boxer') || productName.includes('underwear') || 
-               productName.includes('trunk'));
+      return !(category.includes('brief') || productName.includes('brief') ||
+        productName.includes('boxer') || productName.includes('underwear') ||
+        productName.includes('trunk'));
     }
     return true; // If we can't identify the product, assume it's not a brief
   });
 
   const isBriefOnlyCart = briefItems.length > 0 && nonBriefItems.length === 0;
-  
+
   // Check if cart contains at least one gymwear item and one single brief
-  const hasGymwear = cartItems.some(item => 
+  const hasGymwear = cartItems.some(item =>
     item.category && item.category.toLowerCase().includes('gymwear')
   );
   const hasSingleBrief = briefItems.some(item => item.quantity === 1);
   const meetsMinimumCombination = hasGymwear && hasSingleBrief;
-  
+
   // Allow gymwear-only carts (Scenario 4)
   const isGymwearOnlyCart = hasGymwear && briefItems.length === 0;
-  
+
   return {
     briefItems,
     totalBriefQuantity,
@@ -213,15 +213,15 @@ const updateCartTotal = async (sql, cartId, country) => {
     FROM cart_items ci
     WHERE ci.cart_id = ${cartId}
   `;
-  
+
   const subtotal = subtotalResult.subtotal;
   const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
   const total = subtotal + tax;
-  
+
   await sql`
     UPDATE cart SET total = ${total} WHERE id = ${cartId}
   `;
-  
+
   return { subtotal, tax, total };
 };
 
@@ -229,48 +229,48 @@ const updateCartTotal = async (sql, cartId, country) => {
 export const getCart = async (req, res) => {
   const { userId } = req.params;
   const country = req.headers['x-user-country'] || 'Nigeria';
-  
+
   try {
     // Step 1: Get the cart for the user
     const [cart] = await sql`
       SELECT id, total FROM cart WHERE user_id = ${userId} ORDER BY updated_at DESC LIMIT 1
     `;
-    
+
     // Step 2: If no cart exists, return an empty cart
     if (!cart) {
       const emptyCart = { cartId: null, subtotal: 0, tax: 0, total: 0, items: [] };
       console.log('Get cart payload:', JSON.stringify(emptyCart, null, 2));
       return res.status(200).json(emptyCart);
     }
-    
+
     const cartId = cart.id;
-    
+
     // Step 3: Fetch all cart items
     const cartItems = await fetchCartItems(sql, cartId);
-    
+
     // Step 4: Calculate cart totals
     const { subtotal, tax, total } = calculateCartTotals(cartItems, country);
-    
+
     // Step 5: Check for brief minimum quantity requirement
     const briefValidation = await validateBriefMinimumQuantity(sql, cartId);
     let warningMessage = null;
-    
+
     if (briefValidation.hasInsufficientBriefs) {
       const remaining = 3 - briefValidation.totalBriefQuantity;
       warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
     }
-    
+
     // Step 6: Update cart total in case of discrepancies
     await sql`
       UPDATE cart SET total = ${total} WHERE id = ${cartId}
     `;
-    
+
     // Step 7: Return the cart payload with warning if applicable
-    const payload = { 
-      cartId, 
-      subtotal, 
-      tax, 
-      total, 
+    const payload = {
+      cartId,
+      subtotal,
+      tax,
+      total,
       items: cartItems,
       ...(warningMessage && { warning: warningMessage })
     };
@@ -288,26 +288,26 @@ export const addToCart = async (req, res) => {
     const { user_id, product_type, variant_id, size_id, quantity, bundle_id, items } = req.body;
     const country = req.headers['x-user-country'] || 'Nigeria';
     console.log('Add to cart request:', { user_id, product_type, variant_id, size_id, quantity, bundle_id, items });
-    
+
     // Validate input
-    if (!user_id || !quantity || !product_type || 
-        (product_type === 'single' && (!variant_id || !size_id)) || 
-        (product_type === 'bundle' && (!bundle_id || !items?.length))) {
+    if (!user_id || !quantity || !product_type ||
+      (product_type === 'single' && (!variant_id || !size_id)) ||
+      (product_type === 'bundle' && (!bundle_id || !items?.length))) {
       console.error('Missing required fields:', { user_id, product_type, variant_id, size_id, quantity, bundle_id, items });
       return res.status(400).json({ error: 'Missing required fields.' });
     }
-    
+
     if (quantity < 1) {
       console.error('Invalid quantity:', quantity);
       return res.status(400).json({ error: 'Quantity must be a positive integer.' });
     }
-    
+
     await sql.begin(async (sql) => {
       // Get or create cart
       let [cart] = await sql`
         SELECT id FROM cart WHERE user_id = ${user_id} ORDER BY updated_at DESC LIMIT 1
       `;
-      
+
       let cart_id;
       if (!cart) {
         try {
@@ -322,13 +322,13 @@ export const addToCart = async (req, res) => {
       } else {
         cart_id = cart.id;
       }
-      
+
       console.log('Cart ID:', cart_id);
-      
+
       // Handle single product
       if (product_type === 'single') {
         const { base_price, color_name, size_name } = await validateSingleProduct(sql, variant_id, size_id, quantity);
-        
+
         // Check if this is a brief product
         const [productInfo] = await sql`
           SELECT p.name, p.category
@@ -336,7 +336,7 @@ export const addToCart = async (req, res) => {
           JOIN products p ON pv.product_id = p.id
           WHERE pv.id = ${variant_id}
         `;
-        
+
         const isBrief = productInfo && (
           (productInfo.category || '').toLowerCase().includes('brief') ||
           productInfo.name.toLowerCase().includes('brief') ||
@@ -344,45 +344,45 @@ export const addToCart = async (req, res) => {
           productInfo.name.toLowerCase().includes('underwear') ||
           productInfo.name.toLowerCase().includes('trunk')
         );
-        
+
         // If adding a brief, validate minimum quantity requirement
         if (isBrief) {
           const briefValidation = await validateBriefMinimumQuantity(sql, cart_id);
-          
+
           // Calculate what the total would be after adding this item
           const existingBriefQuantity = briefValidation.totalBriefQuantity;
           const potentialTotalBriefs = existingBriefQuantity + quantity;
-          
+
           // Enforce minimum of 3 briefs regardless of other products in cart
           if (potentialTotalBriefs < 3) {
             throw new Error('Minimum order quantity for briefs is 3 units. Please add more briefs to meet the minimum requirement.');
           }
         }
-        
+
         // First, let's check if there are any existing items for this variant and size
         const existingItems = await sql`
           SELECT id, quantity FROM cart_items 
           WHERE cart_id = ${cart_id} AND variant_id = ${variant_id} AND size_id = ${size_id} AND bundle_id IS NULL
         `;
-        
+
         console.log('Existing items for this variant and size:', existingItems);
-        
+
         if (existingItems && existingItems.length > 0) {
           // If there are multiple items, delete all but the first one and update its quantity
           if (existingItems.length > 1) {
             console.log(`Found ${existingItems.length} duplicate items, cleaning up...`);
-            
+
             // Keep the first item and delete the rest
             const keepItem = existingItems[0];
             const totalQuantity = existingItems.reduce((sum, item) => sum + item.quantity, 0) + quantity;
-            
+
             // Update the kept item with the new total quantity
             await sql`
               UPDATE cart_items 
               SET quantity = ${totalQuantity} 
               WHERE id = ${keepItem.id}
             `;
-            
+
             // Delete all other items
             const itemIdsToDelete = existingItems.slice(1).map(item => item.id);
             if (itemIdsToDelete.length > 0) {
@@ -391,7 +391,7 @@ export const addToCart = async (req, res) => {
                 WHERE id = ANY(${itemIdsToDelete})
               `;
             }
-            
+
             console.log(`Cleaned up duplicates, updated item ${keepItem.id} with quantity ${totalQuantity}`);
           } else {
             // Just one existing item, update its quantity
@@ -409,46 +409,46 @@ export const addToCart = async (req, res) => {
           `;
           console.log(`Added new single product: variant_id=${variant_id}, quantity=${quantity}`);
         }
-      } 
+      }
       // Handle bundle
       else if (product_type === 'bundle') {
         const { bundle_price, bundle_type } = await validateBundle(sql, bundle_id, items, quantity);
-        
+
         // Check if this is a brief bundle
         const bundleTypeLower = bundle_type.toLowerCase();
-        const isBriefBundle = bundleTypeLower.includes('brief') || 
-                             bundleTypeLower.includes('boxer') || 
-                             bundleTypeLower.includes('underwear') || 
-                             bundleTypeLower.includes('trunk');
-        
+        const isBriefBundle = bundleTypeLower.includes('brief') ||
+          bundleTypeLower.includes('boxer') ||
+          bundleTypeLower.includes('underwear') ||
+          bundleTypeLower.includes('trunk');
+
         // If adding a brief bundle, validate minimum quantity requirement
         if (isBriefBundle) {
           const briefValidation = await validateBriefMinimumQuantity(sql, cart_id);
-          
+
           // Calculate what the total would be after adding this bundle
           const existingBriefQuantity = briefValidation.totalBriefQuantity;
           const potentialTotalBriefs = existingBriefQuantity + quantity;
-          
+
           // Enforce minimum of 3 briefs regardless of other products in cart
           if (potentialTotalBriefs < 3) {
             throw new Error('Minimum order quantity for briefs is 3 units. Please add more briefs to meet the minimum requirement.');
           }
         }
-        
+
         // Sort items for consistent comparison
         const sortedItems = items
           .map(item => ({ variant_id: item.variant_id, size_id: item.size_id }))
           .sort((a, b) => a.variant_id === b.variant_id ? a.size_id - b.size_id : a.variant_id - b.variant_id);
-        
+
         // Check for existing bundle with identical items
         const existingCartItemId = await findExistingBundle(sql, cart_id, bundle_id, sortedItems);
-        
+
         if (existingCartItemId) {
           // Increment quantity
           const [existingItem] = await sql`
             SELECT quantity FROM cart_items WHERE id = ${existingCartItemId}
           `;
-          
+
           const newQuantity = existingItem.quantity + quantity;
           await sql`
             UPDATE cart_items SET quantity = ${newQuantity} WHERE id = ${existingCartItemId}
@@ -461,9 +461,9 @@ export const addToCart = async (req, res) => {
             VALUES (${cart_id}, ${bundle_id}, ${quantity}, ${true}, ${bundle_type === '5-in-1' ? bundle_price * 1.5 : bundle_price})
             RETURNING id
           `;
-          
+
           const cart_item_id = insertCartItem.id;
-          
+
           for (const item of items) {
             await sql`
               INSERT INTO cart_bundle_items (cart_item_id, variant_id, size_id)
@@ -476,17 +476,17 @@ export const addToCart = async (req, res) => {
         console.error('Invalid product type:', product_type);
         throw new Error('Invalid product type.');
       }
-      
+
       // Update cart totals
       const { subtotal, tax, total } = await updateCartTotal(sql, cart_id, country);
-      
+
       // Fetch updated cart for response
       const [updatedCart] = await sql`
         SELECT id, total FROM cart WHERE id = ${cart_id}
       `;
-      
+
       const cartItems = await fetchCartItems(sql, cart_id);
-      
+
       const payload = {
         cartId: updatedCart.id,
         subtotal,
@@ -494,7 +494,7 @@ export const addToCart = async (req, res) => {
         total,
         items: cartItems
       };
-      
+
       console.log('Add to cart response:', JSON.stringify(payload, null, 2));
       return res.status(201).json(payload);
     });
@@ -507,19 +507,19 @@ export const addToCart = async (req, res) => {
 // Remove from cart
 export const removeFromCart = async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     await sql.begin(async (sql) => {
       const [cartItem] = await sql`SELECT cart_id FROM cart_items WHERE id = ${id}`;
       if (!cartItem) {
         return res.status(404).json({ error: 'Cart item not found' });
       }
-      
+
       const cartId = cartItem.cart_id;
-      
+
       await sql`DELETE FROM cart_bundle_items WHERE cart_item_id = ${id}`;
       await sql`DELETE FROM cart_items WHERE id = ${id}`;
-      
+
       await sql`
         UPDATE cart SET total = (
           SELECT COALESCE(SUM(ci.price * ci.quantity), 0) 
@@ -528,7 +528,7 @@ export const removeFromCart = async (req, res) => {
         ) 
         WHERE id = ${cartId}
       `;
-      
+
       res.json({ message: 'Item removed' });
     });
   } catch (err) {
