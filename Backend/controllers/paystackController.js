@@ -19,42 +19,42 @@ if (!PAYSTACK_SECRET_KEY) {
 export const initializePayment = async (req, res) => {
   try {
     const { order_id, reference, email, amount, currency, callback_url } = req.body;
-    
+
     // Add more validation
     if (!order_id || !reference || !email || !amount || !currency) {
       console.error('Missing required fields for payment initialization');
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    
+
     // Check if order exists and is in pending state
     const orderCheck = await sql`
       SELECT id, total, currency, payment_status, user_id
       FROM orders
       WHERE id = ${order_id} AND reference = ${reference} AND deleted_at IS NULL
     `;
-    
+
     if (orderCheck.length === 0) {
       console.error(`Order not found or invalid reference: ${reference}`);
       return res.status(404).json({ error: 'Order not found or invalid reference' });
     }
-    
+
     const order = orderCheck[0];
-    
+
     if (order.payment_status !== 'pending') {
       console.error(`Payment already processed for order: ${reference}`);
       return res.status(400).json({ error: 'Payment already processed or cancelled' });
     }
-    
+
     // Verify amount and currency match - Paystack expects amount in kobo/cents
     const expectedAmountInKobo = Math.round(order.total * 100);
     if (order.currency !== currency || Math.abs(expectedAmountInKobo - amount) > 1) {
       console.error(`Invalid amount or currency. Expected: ${expectedAmountInKobo} ${order.currency}, got: ${amount} ${currency}`);
       return res.status(400).json({ error: 'Invalid amount or currency' });
     }
-    
+
     // Construct callback URL
     const finalCallbackUrl = callback_url || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/thank-you`;
-    
+
     try {
       // Initialize Paystack transaction
       const response = await axios.post(
@@ -83,14 +83,14 @@ export const initializePayment = async (req, res) => {
           },
         }
       );
-      
+
       const { authorization_url, access_code, reference: paystackReference } = response.data.data;
-      
+
       if (!authorization_url) {
         console.error('Paystack did not return authorization_url:', response.data);
         return res.status(500).json({ error: 'Failed to get payment authorization URL from Paystack' });
       }
-      
+
       console.log(`✅ Paystack transaction initialized: reference=${paystackReference}`);
       res.status(200).json({ authorization_url, access_code, reference: paystackReference });
     } catch (err) {
@@ -106,77 +106,106 @@ export const initializePayment = async (req, res) => {
 export const verifyPayment = async (req, res) => {
   try {
     const { reference } = req.query || req.body;
-    
+
     if (!reference) {
       console.error('Missing reference for payment verification');
       return res.status(400).json({ error: 'Reference is required' });
     }
-    
+
     console.log(`🔎 Verifying Paystack payment: reference=${reference}`);
-    
+
     const orderCheck = await sql`
       SELECT id, user_id, payment_status, total, currency, cart_id
       FROM orders
       WHERE reference = ${reference} AND deleted_at IS NULL
     `;
-    
+
     if (orderCheck.length === 0) {
       console.error(`Order not found for reference: ${reference}`);
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     const order = orderCheck[0];
-    
+
     if (order.payment_status === 'completed') {
       console.warn(`Payment already verified for reference=${reference}`);
+      const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
       return req.method === 'GET'
-        ? res.redirect(`/thank-you?reference=${reference}&status=already_verified`)
+        ? res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=already_verified`)
         : res.status(200).json({ message: 'Payment already verified', order });
     }
-    
+
     const response = await axios.get(`${PAYSTACK_BASE_URL}/transaction/verify/${reference}`, {
       headers: {
         Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
     });
-    
+
     const { status, data } = response.data;
-    
+
     if (!status || data.status !== 'success') {
       console.error(`Payment not successful for reference=${reference}`);
-      
+
       // Restock items if payment failed
       const orderItems = await sql`
-        SELECT variant_id, size_id, quantity 
+        SELECT variant_id, size_id, quantity, bundle_id, bundle_details
         FROM order_items 
         WHERE order_id = ${order.id}
       `;
-      
+
       await sql.begin(async sql => {
         for (const item of orderItems) {
-          if (item.variant_id && item.size_id) {
-            await sql`
-              UPDATE variant_sizes
-              SET stock = stock + ${item.quantity}
-              WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
-            `;
-            console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
+          if (item.variant_id) {
+            if (item.size_id) {
+              await sql`
+                UPDATE variant_sizes
+                SET stock_quantity = stock_quantity + ${item.quantity}
+                WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+              `;
+              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
+            } else {
+              await sql`
+                UPDATE variant_sizes
+                SET stock_quantity = stock_quantity + ${item.quantity}
+                WHERE variant_id = ${item.variant_id}
+              `;
+              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id} without size`);
+            }
+          } else if (item.bundle_id) {
+            const bundleItems = item.bundle_details ? (typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details) : [];
+            for (const bi of bundleItems) {
+              if (bi.size_id) {
+                await sql`
+                  UPDATE variant_sizes
+                  SET stock_quantity = stock_quantity + ${item.quantity}
+                  WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
+                `;
+              } else {
+                await sql`
+                  UPDATE variant_sizes
+                  SET stock_quantity = stock_quantity + ${item.quantity}
+                  WHERE variant_id = ${bi.variant_id}
+                `;
+              }
+            }
+            console.log(`✅ Restocked ${item.quantity} units for bundle_id=${item.bundle_id}`);
           }
         }
-        
+
         await sql`
           UPDATE orders 
           SET payment_status = 'failed', updated_at = NOW()
           WHERE reference = ${reference}
         `;
       });
-      
+
+      const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
       return req.method === 'GET'
-        ? res.redirect(`/thank-you?reference=${reference}&status=failed`)
+        ? res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=failed`)
         : res.status(400).json({ error: 'Payment not successful', order });
     }
-    
+
     await sql.begin(async sql => {
       const updatedOrders = await sql`
         UPDATE orders
@@ -186,21 +215,22 @@ export const verifyPayment = async (req, res) => {
         WHERE reference = ${reference} AND deleted_at IS NULL
         RETURNING id, user_id, total, currency, cart_id
       `;
-      
+
       const updatedOrder = updatedOrders[0];
-      
+
       if (updatedOrder.cart_id) {
         await sql`DELETE FROM cart_items WHERE cart_id = ${updatedOrder.cart_id}`;
         console.log(`✅ Cleared cart items for cart_id=${updatedOrder.cart_id}, order_id=${updatedOrder.id}, reference=${reference}`);
       }
     });
-    
+
     console.log(`✅ Payment verified for reference=${reference}, order_id=${order.id}`);
-    
+
     if (req.method === 'GET') {
-      return res.redirect(`/thank-you?reference=${reference}&status=success`);
+      const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
+      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=success`);
     }
-    
+
     res.status(200).json({ message: 'Payment verified successfully', order });
   } catch (err) {
     console.error('❌ Error verifying Paystack payment:', err.message);
@@ -212,12 +242,12 @@ export const initializeDeliveryFeePayment = async (req, res) => {
   try {
     const { order_id, delivery_fee, currency, callback_url } = req.body;
     console.log(`💳 Initializing Paystack delivery fee payment: order_id=${order_id}, delivery_fee=${delivery_fee}, currency=${currency}`);
-    
+
     if (!order_id || !delivery_fee || !currency) {
       console.error('Missing required fields for delivery fee payment initialization');
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    
+
     const orderCheck = await sql`
       SELECT 
         o.id, o.total, o.currency, o.payment_status, 
@@ -233,41 +263,41 @@ export const initializeDeliveryFeePayment = async (req, res) => {
       LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.id = ${order_id} AND o.deleted_at IS NULL
     `;
-    
+
     if (orderCheck.length === 0) {
       console.error(`Order not found: ${order_id}`);
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     const order = orderCheck[0];
-    
+
     if (order.shipping_country.toLowerCase() === 'nigeria') {
       console.error(`Delivery fee not applicable for domestic order: ${order_id}`);
       return res.status(400).json({ error: 'Delivery fee only applicable for international orders' });
     }
-    
+
     if (order.payment_status !== 'completed') {
       console.error(`Order payment not completed: ${order_id}`);
       return res.status(400).json({ error: 'Order payment must be completed before collecting delivery fee' });
     }
-    
+
     if (order.delivery_fee_paid) {
       console.error(`Delivery fee already paid for order: ${order_id}`);
       return res.status(400).json({ error: 'Delivery fee already paid for this order' });
     }
-    
+
     const timestamp = Date.now();
     const reference = `DF-${order_id}-${timestamp}`;
-    
+
     await sql`
       UPDATE orders
       SET delivery_fee = ${delivery_fee}, updated_at = NOW()
       WHERE id = ${order_id}
     `;
-    
+
     const defaultCallbackUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/delivery-fee-thank-you`;
     const finalCallbackUrl = callback_url || defaultCallbackUrl;
-    
+
     const response = await axios.post(
       `${PAYSTACK_BASE_URL}/transaction/initialize`,
       {
@@ -300,14 +330,14 @@ export const initializeDeliveryFeePayment = async (req, res) => {
         },
       }
     );
-    
+
     const { authorization_url, access_code, reference: paystackReference } = response.data.data;
-    
+
     if (!authorization_url) {
       console.error('Paystack did not return authorization_url:', response.data);
       return res.status(500).json({ error: 'Failed to get payment authorization URL from Paystack' });
     }
-    
+
     // Use improved email extraction logic for guest vs logged-in users
     let finalEmail, finalName;
     if (order.is_temporary) {
@@ -333,25 +363,25 @@ export const initializeDeliveryFeePayment = async (req, res) => {
         currency,
         authorization_url
       );
-      console.log('✅ Sent delivery fee payment link email:', { 
-        email: String(finalEmail).replace(/[^a-zA-Z0-9@._-]/g, ''), 
-        orderId: String(order_id).replace(/[^a-zA-Z0-9-_]/g, ''), 
-        userType: order.is_temporary ? 'guest' : 'logged-in' 
+      console.log('✅ Sent delivery fee payment link email:', {
+        email: String(finalEmail).replace(/[^a-zA-Z0-9@._-]/g, ''),
+        orderId: String(order_id).replace(/[^a-zA-Z0-9-_]/g, ''),
+        userType: order.is_temporary ? 'guest' : 'logged-in'
       });
       emailSent = true;
     } catch (emailError) {
-      console.error('Failed to send delivery fee payment link email:', { 
-        email: String(finalEmail).replace(/[^a-zA-Z0-9@._-]/g, ''), 
-        orderId: String(order_id).replace(/[^a-zA-Z0-9-_]/g, ''), 
-        error: emailError.message 
+      console.error('Failed to send delivery fee payment link email:', {
+        email: String(finalEmail).replace(/[^a-zA-Z0-9@._-]/g, ''),
+        orderId: String(order_id).replace(/[^a-zA-Z0-9-_]/g, ''),
+        error: emailError.message
       });
       console.error('Email error details:', emailError.stack || emailError);
     }
-    
+
     console.log(`✅ Paystack delivery fee transaction initialized: reference=${paystackReference}`);
-    res.status(200).json({ 
-      authorization_url, 
-      access_code, 
+    res.status(200).json({
+      authorization_url,
+      access_code,
       reference: paystackReference,
       delivery_fee,
       emailSent
@@ -366,26 +396,26 @@ export const verifyDeliveryFeePayment = async (req, res) => {
   try {
     // Handle both GET (query params) and POST (request body) requests
     const reference = req.method === 'GET' ? req.query.reference : req.body.reference;
-    
+
     if (!reference) {
       console.error('Missing reference for delivery fee payment verification');
       return res.status(400).json({ error: 'Reference is required' });
     }
-    
+
     if (!reference.startsWith('DF-')) {
       console.error(`Invalid delivery fee reference format: ${reference}`);
       return res.status(400).json({ error: 'Invalid delivery fee reference format' });
     }
-    
+
     const referenceParts = reference.split('-');
     if (referenceParts.length < 2) {
       console.error(`Invalid delivery fee reference format: ${reference}`);
       return res.status(400).json({ error: 'Invalid delivery fee reference format' });
     }
-    
+
     const order_id = referenceParts[1];
     console.log(`🔎 Verifying Paystack delivery fee payment: reference=${reference}, order_id=${order_id}`);
-    
+
     const orderCheck = await sql`
       SELECT 
         o.id, o.user_id, o.delivery_fee, o.delivery_fee_paid, o.currency,
@@ -398,7 +428,7 @@ export const verifyDeliveryFeePayment = async (req, res) => {
       LEFT JOIN billing_addresses ba ON o.billing_address_id = ba.id
       WHERE o.id = ${order_id} AND o.deleted_at IS NULL
     `;
-    
+
     if (orderCheck.length === 0) {
       console.error(`Order not found for delivery fee verification: ${order_id}`);
       if (req.method === 'GET') {
@@ -406,9 +436,9 @@ export const verifyDeliveryFeePayment = async (req, res) => {
       }
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     const order = orderCheck[0];
-    
+
     if (order.delivery_fee_paid) {
       console.warn(`Delivery fee already verified for order=${order_id}`);
       if (req.method === 'GET') {
@@ -416,16 +446,16 @@ export const verifyDeliveryFeePayment = async (req, res) => {
       }
       return res.status(200).json({ message: 'Delivery fee already verified', order });
     }
-    
+
     const response = await axios.get(`${PAYSTACK_BASE_URL}/transaction/verify/${reference}`, {
       headers: {
         Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
     });
-    
+
     const { status, data } = response.data;
-    
+
     if (!status || data.status !== 'success') {
       console.error(`Delivery fee payment not successful for reference=${reference}`);
       if (req.method === 'GET') {
@@ -433,15 +463,15 @@ export const verifyDeliveryFeePayment = async (req, res) => {
       }
       return res.status(400).json({ error: 'Delivery fee payment not successful', order });
     }
-    
+
     await sql`
       UPDATE orders
       SET delivery_fee_paid = true, updated_at = NOW()
       WHERE id = ${order_id}
     `;
-    
+
     console.log(`✅ Delivery fee payment verified for reference=${reference}, order_id=${order_id}`);
-    
+
     // Use improved email extraction logic for guest vs logged-in users
     let finalEmail, finalName;
     if (order.is_temporary) {
@@ -455,16 +485,16 @@ export const verifyDeliveryFeePayment = async (req, res) => {
       finalName = order.user_first_name || order.billing_full_name || 'Customer';
       console.log(`📧 Logged-in user delivery fee confirmation for order ${order_id}: Using user email ${finalEmail}`);
     }
-    
+
     // Note: Delivery fee confirmation emails removed - users see delivery thank you page instead
     // Admin notifications for delivery fee payments also removed to reduce email volume
-    
+
     if (req.method === 'GET') {
       return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/delivery-fee-thank-you?reference=${reference}&status=success&type=delivery_fee`);
     }
-    
-    res.status(200).json({ 
-      message: 'Delivery fee payment verified successfully', 
+
+    res.status(200).json({
+      message: 'Delivery fee payment verified successfully',
       order: { ...order, delivery_fee_paid: true }
     });
   } catch (err) {

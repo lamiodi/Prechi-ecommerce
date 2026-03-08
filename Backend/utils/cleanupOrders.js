@@ -20,18 +20,45 @@ export const cleanupOldOrders = async () => {
     for (const order of oldOrders) {
       await sql.begin(async sql => {
         const orderItems = await sql`
-          SELECT variant_id, size_id, quantity 
+          SELECT variant_id, size_id, quantity, bundle_id, bundle_details
           FROM order_items 
           WHERE order_id = ${order.id}
         `;
         for (const item of orderItems) {
-          if (item.variant_id && item.size_id) {
-            await sql`
-              UPDATE variant_sizes
-              SET stock_quantity = stock_quantity + ${item.quantity}
-              WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
-            `;
-            console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
+          if (item.variant_id) {
+            if (item.size_id) {
+              await sql`
+                UPDATE variant_sizes
+                SET stock_quantity = stock_quantity + ${item.quantity}
+                WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+              `;
+              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
+            } else {
+              await sql`
+                UPDATE variant_sizes
+                SET stock_quantity = stock_quantity + ${item.quantity}
+                WHERE variant_id = ${item.variant_id}
+              `;
+              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id} without size`);
+            }
+          } else if (item.bundle_id) {
+            const bundleItems = item.bundle_details ? (typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details) : [];
+            for (const bi of bundleItems) {
+              if (bi.size_id) {
+                await sql`
+                  UPDATE variant_sizes
+                  SET stock_quantity = stock_quantity + ${item.quantity}
+                  WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
+                `;
+              } else {
+                await sql`
+                  UPDATE variant_sizes
+                  SET stock_quantity = stock_quantity + ${item.quantity}
+                  WHERE variant_id = ${bi.variant_id}
+                `;
+              }
+            }
+            console.log(`✅ Restocked ${item.quantity} units for bundle_id=${item.bundle_id}`);
           }
         }
         if (order.cart_id) {
