@@ -8,6 +8,8 @@ import {
   updateBundle,
   setPrimaryImage,
   addVariantMedia,
+  deleteVariantImage,
+  deleteVariantVideo,
 } from '../controllers/inventoryController.js';
 import upload from '../utils/multer.js';
 
@@ -36,9 +38,13 @@ router.put('/variants/:variantId/primary-image', setPrimaryImage);
 
 // ✅ Add new images/videos to an existing variant
 router.post('/variants/:variantId/media', upload.fields([
-    { name: 'images', maxCount: 5 }, 
-    { name: 'videos', maxCount: 3 }
+  { name: 'images', maxCount: 5 },
+  { name: 'videos', maxCount: 3 }
 ]), addVariantMedia);
+
+// ✅ Delete existing images/videos from variant
+router.delete('/variants/media/image/:imageId', deleteVariantImage);
+router.delete('/variants/media/video/:videoId', deleteVariantVideo);
 
 export default router;
 // ✅ Inventory management routes for admin panel

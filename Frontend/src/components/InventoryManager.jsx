@@ -117,6 +117,36 @@ const InventoryManager = () => {
     }
   };
 
+  const handleDeleteMedia = async (type, id, variantId) => {
+    if (!window.confirm(`Are you sure you want to delete this ${type}?`)) return;
+
+    try {
+      setLoading(true);
+      await api.delete(`/variants/media/${type}/${id}`);
+
+      setEditingItem(prev => {
+        if (!prev || prev.type !== 'product') return prev;
+        return {
+          ...prev,
+          variants: prev.variants.map(v => {
+            if (v.id === variantId) {
+              const key = type === 'image' ? 'images' : 'videos';
+              return { ...v, [key]: (v[key] || []).filter(media => media.id !== id) };
+            }
+            return v;
+          })
+        };
+      });
+      fetchData(); // Sync the main list as well
+      setSuccess(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
+      setTimeout(() => setSuccess(''), 5000);
+    } catch (err) {
+      setError(err.response?.data?.error || `Failed to delete ${type}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!editingItem) return;
@@ -127,7 +157,7 @@ const InventoryManager = () => {
 
       if (editingItem.type === 'product') {
         const { id, name, price, variants, sku_prefix } = editingItem;
-        
+
         // 1. Update basic details
         await api.put(`/products/${id}`, {
           name,
@@ -145,20 +175,20 @@ const InventoryManager = () => {
         // 3. Handle new media uploads
         const mediaUploads = variants.filter(v => (v.newImages?.length > 0 || v.newVideos?.length > 0));
         for (const variant of mediaUploads) {
-            const formData = new FormData();
-            if (variant.newImages) {
-                variant.newImages.forEach(file => formData.append('images', file));
-            }
-            if (variant.newVideos) {
-                variant.newVideos.forEach(file => formData.append('videos', file));
-            }
-            
-            // We need a specific endpoint for media upload per variant
-            // Assuming endpoint: POST /variants/:id/media
-            // Note: axios instance 'api' is configured for JSON, so we need to override headers for FormData
-            await axios.post(`${API_BASE_URL}/api/inventory/variants/${variant.id}/media`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+          const formData = new FormData();
+          if (variant.newImages) {
+            variant.newImages.forEach(file => formData.append('images', file));
+          }
+          if (variant.newVideos) {
+            variant.newVideos.forEach(file => formData.append('videos', file));
+          }
+
+          // We need a specific endpoint for media upload per variant
+          // Assuming endpoint: POST /variants/:id/media
+          // Note: axios instance 'api' is configured for JSON, so we need to override headers for FormData
+          await axios.post(`${API_BASE_URL}/api/inventory/variants/${variant.id}/media`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
         }
 
       } else {
@@ -375,11 +405,10 @@ const InventoryManager = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            product.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={`px-2 py-1 rounded-full text-xs ${product.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                            }`}
                         >
                           {product.is_active ? 'Active' : 'Inactive'}
                         </span>
@@ -421,7 +450,7 @@ const InventoryManager = () => {
                                   >
                                     <div className="flex justify-between">
                                       <div>
-                                        <p className="font-medium text-gray-900">{variant.color_name}</p>
+                                        <p className="font-medium text-gray-900">{variant.name ? `${variant.name} (${variant.color_name})` : variant.color_name}</p>
                                         <p className="text-sm text-gray-500">{variant.sku}</p>
                                       </div>
                                     </div>
@@ -522,11 +551,10 @@ const InventoryManager = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            bundle.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={`px-2 py-1 rounded-full text-xs ${bundle.is_active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                            }`}
                         >
                           {bundle.is_active ? 'Active' : 'Inactive'}
                         </span>
@@ -621,7 +649,7 @@ const InventoryManager = () => {
                   />
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {editingItem.type === 'product' ? 'Base Price' : 'Bundle Price'} (NGN)
@@ -652,25 +680,25 @@ const InventoryManager = () => {
                         className="border border-gray-200 rounded-lg p-3 bg-gray-50"
                       >
                         <div className="flex flex-col gap-2 mb-2">
-                            <p className="font-medium text-gray-900 text-sm md:text-base">{variant.color_name}</p>
-                            <input
-                                type="text"
-                                placeholder="Variant Name (Optional)"
-                                className="w-full p-2 border border-gray-300 rounded text-sm"
-                                value={variant.name || ''}
-                                onChange={(e) => {
-                                  const updatedVariants = editingItem.variants.map((v) => {
-                                    if (v.id === variant.id) {
-                                      return { ...v, name: e.target.value };
-                                    }
-                                    return v;
-                                  });
-                                  setEditingItem({
-                                    ...editingItem,
-                                    variants: updatedVariants,
-                                  });
-                                }}
-                            />
+                          <p className="font-medium text-gray-900 text-sm md:text-base">{variant.name ? `${variant.name} (${variant.color_name})` : variant.color_name}</p>
+                          <input
+                            type="text"
+                            placeholder="Variant Name (Optional)"
+                            className="w-full p-2 border border-gray-300 rounded text-sm"
+                            value={variant.name || ''}
+                            onChange={(e) => {
+                              const updatedVariants = editingItem.variants.map((v) => {
+                                if (v.id === variant.id) {
+                                  return { ...v, name: e.target.value };
+                                }
+                                return v;
+                              });
+                              setEditingItem({
+                                ...editingItem,
+                                variants: updatedVariants,
+                              });
+                            }}
+                          />
                         </div>
                         <div className="mt-2 space-y-2">
                           {variant.sizes?.map((size) => (
@@ -705,80 +733,115 @@ const InventoryManager = () => {
                               />
                             </div>
                           ))}
-                          {/* Primary Image Selection */}
-                          {variant.images?.length > 0 && (
+                          {/* Existing Media Display */}
+                          {(variant.images?.length > 0 || variant.videos?.length > 0) && (
                             <div className="mt-3">
-                              <p className="text-sm font-medium text-gray-700 mb-2">Primary Image</p>
-                              <div className="grid grid-cols-3 gap-2">
-                                {variant.images.map((img) => (
-                                  <button
-                                    key={`img-${variant.id}-${img.id}`}
-                                    type="button"
-                                    onClick={() =>
-                                      setSelectedPrimary(prev => ({ ...prev, [variant.id]: img.id }))
-                                    }
-                                    className={`border rounded overflow-hidden ${
-                                      (selectedPrimary[variant.id] || img.is_primary) === img.id
-                                        ? 'border-blue-500'
-                                        : 'border-gray-200'
-                                    }`}
-                                  >
-                                    <img src={img.image_url} alt="" className="w-full h-20 object-cover" />
-                                  </button>
-                                ))}
-                              </div>
+                              {/* Primary Image Selection & Management */}
+                              {variant.images?.length > 0 && (
+                                <div className="mb-4">
+                                  <p className="text-sm font-medium text-gray-700 mb-2">Primary Image Selection</p>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    {variant.images.map((img) => (
+                                      <div key={`img-${variant.id}-${img.id}`} className="relative group max-w-full">
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            setSelectedPrimary(prev => ({ ...prev, [variant.id]: img.id }))
+                                          }
+                                          className={`border rounded overflow-hidden relative block w-full ${(selectedPrimary[variant.id] || img.is_primary) === img.id
+                                            ? 'border-blue-500 border-2'
+                                            : 'border-gray-200'
+                                            }`}
+                                        >
+                                          <img src={img.image_url} alt="Variant" className="w-full h-20 object-cover block" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => { e.stopPropagation(); handleDeleteMedia('image', img.id, variant.id); }}
+                                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 shadow-md transform hover:scale-110"
+                                          disabled={loading}
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Videos Management */}
+                              {variant.videos?.length > 0 && (
+                                <div className="mb-2">
+                                  <p className="text-sm font-medium text-gray-700 mb-2">Videos</p>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    {variant.videos.map((vid) => (
+                                      <div key={`vid-${variant.id}-${vid.id}`} className="relative group border border-gray-200 rounded overflow-hidden max-w-full bg-gray-100">
+                                        <video src={vid.video_url} className="w-full h-20 object-cover block" controls={false} />
+                                        <button
+                                          type="button"
+                                          onClick={(e) => { e.stopPropagation(); handleDeleteMedia('video', vid.id, variant.id); }}
+                                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 shadow-md transform hover:scale-110"
+                                          disabled={loading}
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
 
                           {/* New Media Upload */}
                           <div className="mt-3 border-t pt-3">
                             <p className="text-sm font-medium text-gray-700 mb-2">Add New Media</p>
-                            
+
                             {/* Image Upload */}
                             <div className="mb-2">
-                                <label className="block text-xs text-gray-600 mb-1">Add Images (Max 5)</label>
-                                <input 
-                                    type="file" 
-                                    multiple 
-                                    accept="image/*"
-                                    className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                    onChange={(e) => {
-                                        const files = Array.from(e.target.files);
-                                        const updatedVariants = editingItem.variants.map(v => {
-                                            if (v.id === variant.id) {
-                                                return { ...v, newImages: files };
-                                            }
-                                            return v;
-                                        });
-                                        setEditingItem({ ...editingItem, variants: updatedVariants });
-                                    }}
-                                />
-                                {variant.newImages?.length > 0 && (
-                                    <p className="text-xs text-green-600 mt-1">{variant.newImages.length} images selected</p>
-                                )}
+                              <label className="block text-xs text-gray-600 mb-1">Add Images (Max 5)</label>
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                onChange={(e) => {
+                                  const files = Array.from(e.target.files);
+                                  const updatedVariants = editingItem.variants.map(v => {
+                                    if (v.id === variant.id) {
+                                      return { ...v, newImages: files };
+                                    }
+                                    return v;
+                                  });
+                                  setEditingItem({ ...editingItem, variants: updatedVariants });
+                                }}
+                              />
+                              {variant.newImages?.length > 0 && (
+                                <p className="text-xs text-green-600 mt-1">{variant.newImages.length} images selected</p>
+                              )}
                             </div>
 
                             {/* Video Upload */}
                             <div>
-                                <label className="block text-xs text-gray-600 mb-1">Add Video (Max 100MB)</label>
-                                <input 
-                                    type="file" 
-                                    accept="video/mp4,video/quicktime,video/x-msvideo,video/avi"
-                                    className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                                    onChange={(e) => {
-                                        const files = Array.from(e.target.files);
-                                        const updatedVariants = editingItem.variants.map(v => {
-                                            if (v.id === variant.id) {
-                                                return { ...v, newVideos: files };
-                                            }
-                                            return v;
-                                        });
-                                        setEditingItem({ ...editingItem, variants: updatedVariants });
-                                    }}
-                                />
-                                {variant.newVideos?.length > 0 && (
-                                    <p className="text-xs text-green-600 mt-1">{variant.newVideos.length} video selected</p>
-                                )}
+                              <label className="block text-xs text-gray-600 mb-1">Add Video (Max 100MB)</label>
+                              <input
+                                type="file"
+                                accept="video/mp4,video/quicktime,video/x-msvideo,video/avi"
+                                className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                                onChange={(e) => {
+                                  const files = Array.from(e.target.files);
+                                  const updatedVariants = editingItem.variants.map(v => {
+                                    if (v.id === variant.id) {
+                                      return { ...v, newVideos: files };
+                                    }
+                                    return v;
+                                  });
+                                  setEditingItem({ ...editingItem, variants: updatedVariants });
+                                }}
+                              />
+                              {variant.newVideos?.length > 0 && (
+                                <p className="text-xs text-green-600 mt-1">{variant.newVideos.length} video selected</p>
+                              )}
                             </div>
                           </div>
 

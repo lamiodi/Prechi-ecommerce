@@ -70,6 +70,18 @@ export const getProducts = async (req, res) => {
               )
               FROM product_images pi
               WHERE pi.variant_id = pv.id
+            ),
+            'videos', (
+              SELECT jsonb_agg(
+                jsonb_build_object(
+                  'id', pv_vid.id,
+                  'video_url', pv_vid.video_url,
+                  'video_thumbnail_url', pv_vid.video_thumbnail_url,
+                  'is_primary', pv_vid.is_primary
+                )
+              )
+              FROM product_videos pv_vid
+              WHERE pv_vid.variant_id = pv.id
             )
           )
         )
@@ -82,7 +94,7 @@ export const getProducts = async (req, res) => {
     res.json(products);
   } catch (err) {
     console.error('Error fetching products:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch products',
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
@@ -124,7 +136,7 @@ export const getBundles = async (req, res) => {
     res.json(bundles);
   } catch (err) {
     console.error('Error fetching bundles:', err);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch bundles',
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
@@ -158,7 +170,7 @@ export const deleteProduct = async (req, res) => {
     res.json({ message: 'Product permanently deleted' });
   } catch (err) {
     if (err.type === 'bundle_conflict') {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: `Cannot delete product. It is used in active bundle "${err.bundle.name}"`,
         bundleId: err.bundle.id,
         conflictType: 'bundle'
@@ -194,14 +206,14 @@ export const updateProduct = async (req, res) => {
     await sql.begin(async (sql) => {
       // Update product level details
       if (name || base_price || typeof is_new_release === 'boolean') {
-          const updates = {};
-          if (name) updates.name = name;
-          if (base_price) updates.base_price = base_price;
-          if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
-          
-          if (Object.keys(updates).length > 0) {
-             await sql`UPDATE products SET ${sql(updates)} WHERE id = ${id}`;
-          }
+        const updates = {};
+        if (name) updates.name = name;
+        if (base_price) updates.base_price = base_price;
+        if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
+
+        if (Object.keys(updates).length > 0) {
+          await sql`UPDATE products SET ${sql(updates)} WHERE id = ${id}`;
+        }
       }
 
       if (variants?.length) {
@@ -223,9 +235,10 @@ export const updateProduct = async (req, res) => {
           // SELECT ... (SELECT jsonb_agg(jsonb_build_object(..., 'sku', pv.sku, ...)))
           // It doesn't select 'name' from pv. 
           // But I'll add the update logic for 'name' in product_variants if it is passed.
-          
-          if (variant.name) {
-             await sql`UPDATE product_variants SET name = ${variant.name} WHERE id = ${variant.id}`;
+
+          if (variant.name !== undefined) {
+            const variantName = variant.name === '' ? null : variant.name;
+            await sql`UPDATE product_variants SET name = ${variantName} WHERE id = ${variant.id}`;
           }
 
           for (const size of variant.sizes || []) {
@@ -323,12 +336,12 @@ export const addVariantMedia = async (req, res) => {
             VALUES (${variantId}, ${url}, FALSE)
           `;
         }
-        
+
         // Insert Videos
         for (const url of uploadedVideos) {
-            const thumbnailUrl = url.replace(/\.[^/.]+$/, ".jpg");
-            
-            await sql`
+          const thumbnailUrl = url.replace(/\.[^/.]+$/, ".jpg");
+
+          await sql`
                 INSERT INTO product_videos (variant_id, video_url, video_thumbnail_url, title, position, is_primary)
                 VALUES (${variantId}, ${url}, ${thumbnailUrl}, 'Product Video', 0, FALSE)
             `;
@@ -336,14 +349,36 @@ export const addVariantMedia = async (req, res) => {
       });
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Media uploaded successfully',
       images: uploadedImages,
-      videos: uploadedVideos 
+      videos: uploadedVideos
     });
   } catch (err) {
     console.error('Error uploading media:', err);
     res.status(500).json({ error: 'Failed to upload media' });
+  }
+};
+
+export const deleteVariantImage = async (req, res) => {
+  const { imageId } = req.params;
+  try {
+    await sql`DELETE FROM product_images WHERE id = ${imageId}`;
+    res.json({ success: true, message: 'Image deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting image:', err);
+    res.status(500).json({ error: 'Failed to delete image' });
+  }
+};
+
+export const deleteVariantVideo = async (req, res) => {
+  const { videoId } = req.params;
+  try {
+    await sql`DELETE FROM product_videos WHERE id = ${videoId}`;
+    res.json({ success: true, message: 'Video deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting video:', err);
+    res.status(500).json({ error: 'Failed to delete video' });
   }
 };
