@@ -150,11 +150,11 @@ const LandingPage = () => {
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
               <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed font-Manrope text-white">
                 <span className="max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-                  Effortlessly Chic.
+                  Bold Fits.
                 </span>
                 <br />
                 <span className="max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2">
-                  Beautifully Soft.
+                  Premium Sets & Tracksuits.
                 </span>
               </h1>
               <Link to="/shop">
