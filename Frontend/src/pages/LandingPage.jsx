@@ -7,7 +7,8 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-import heroVideo from '../assets/dreamina-2025-11-27-1712-The camera pushes in on the woman in the....mp4';
+// Hero video from public folder (portrait MP4)
+const heroVideo = '/IMG_9987.mp4';
 
 // Lazy load components for better performance
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
@@ -23,7 +24,7 @@ const LandingPage = () => {
   const [products, setProducts] = useState([]);
   const mobileVideoRef = useRef(null);
   const desktopVideoRef = useRef(null);
-  
+
   // Access currency context for dynamic price formatting
   const currencyContext = useContext(CurrencyContext) || {
     currency: 'NGN',
@@ -31,26 +32,26 @@ const LandingPage = () => {
     country: 'Nigeria',
     contextLoading: false,
   };
-  
+
   const {
     currency = 'NGN',
     exchangeRate = 1,
     country = 'Nigeria',
     contextLoading = false,
   } = currencyContext;
-  
+
   // Helper function to format prices dynamically
   const formatPrice = (price) => {
     let parsedPrice = 0;
     if (typeof price === 'number') {
-        parsedPrice = price;
+      parsedPrice = price;
     } else if (typeof price === 'string') {
-        parsedPrice = parseFloat(price.replace(/[₦,]/g, '')) || 0;
+      parsedPrice = parseFloat(price.replace(/[₦,]/g, '')) || 0;
     }
-    
+
     const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate);
     const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-    
+
     return displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
       style: 'currency',
       currency: displayCurrency,
@@ -133,14 +134,14 @@ const LandingPage = () => {
             onCanPlay={() => console.log('Desktop video can play')}
             onLoadedData={() => handleVideoLoaded('Desktop')}
           />
-          
+
           {/* Debug overlay - shows if videos are not loading */}
           {videoError && (
             <div className="absolute inset-0 bg-red-500 bg-opacity-50 flex items-center justify-center z-30">
               <p className="text-white text-xl font-bold">Video Loading Error</p>
             </div>
           )}
-          
+
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
@@ -166,7 +167,7 @@ const LandingPage = () => {
             </div>
           </div>
         </section>
-        
+
         {/* Product Showcase Grid */}
         <section className="bg-gray-50">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
@@ -179,9 +180,9 @@ const LandingPage = () => {
                 return (
                   <div key={product.id || index} className="relative group cursor-pointer overflow-hidden">
                     <div className="aspect-[4/5]">
-                      <img 
-                        src={product.image || "https://via.placeholder.com/400x500?text=No+Image"} 
-                        alt={product.name || "Product Image"} 
+                      <img
+                        src={product.image || "https://via.placeholder.com/400x500?text=No+Image"}
+                        alt={product.name || "Product Image"}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500?text=No+Image'; }}
                       />
@@ -215,7 +216,7 @@ const LandingPage = () => {
       </main>
       {/* Footer */}
       <Footer />
-      
+
       {/* Lazy-loaded components for better performance */}
       <Suspense fallback={null}>
         <WhatsAppChatWidget />

@@ -9,9 +9,9 @@ const HeroSection = () => {
   const mobileVideoRef = useRef(null);
   const desktopVideoRef = useRef(null);
 
-  // Local hero video (portrait MOV from public folder)
-  const mobileVideoURL = '/IMG_9987.MOV';
-  const desktopVideoURL = '/IMG_9987.MOV';
+  // Local hero video (portrait MP4 from public folder)
+  const mobileVideoURL = '/IMG_9987.mp4';
+  const desktopVideoURL = '/IMG_9987.mp4';
 
   // Poster images for immediate display (using local image as fallback)
   const mobilePosterURL = '/src/assets/images/IMG_4571.JPG';
