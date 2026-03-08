@@ -15,7 +15,7 @@ const LocationPopup = lazy(() => import('../components/LocationPopup'));
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api`
+  ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '') + '/api'
   : 'https://prechi-ecommerce.onrender.com/api';
 
 const LandingPage = () => {
@@ -148,12 +148,12 @@ const LandingPage = () => {
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
-              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed font-Manrope text-white">
-                <span className="max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-white">
+                <span className="font-PatrickHand max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
                   Bold Fits.
                 </span>
                 <br />
-                <span className="max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2">
+                <span className="font-PatrickHand max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2">
                   Premium Sets & Tracksuits.
                 </span>
               </h1>

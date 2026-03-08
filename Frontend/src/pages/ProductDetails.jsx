@@ -23,7 +23,9 @@ import ReviewSection from "../components/ReviewSection"
 import DescriptionSection from "../components/DescriptionSection"
 import { toastSuccess, toastError } from "../utils/toastConfig"
 import ProductSchema from "../components/ProductSchema"
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://tia-backend-r331.onrender.com"
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
+  : 'https://prechi-ecommerce.onrender.com'
 const ProductDetails = () => {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -119,25 +121,25 @@ const ProductDetails = () => {
   // Helper function to check if an item is a brief product
   const isBriefItem = (item) => {
     if (!item || !item.item) return false;
-    
+
     // For bundles, check bundle_types or name
     if (!item.item.is_product) {
       const name = (item.item.name || '').toLowerCase();
-      return name.includes('brief') || 
-             name.includes('boxer') || 
-             name.includes('underwear') ||
-             name.includes('trunk');
+      return name.includes('brief') ||
+        name.includes('boxer') ||
+        name.includes('underwear') ||
+        name.includes('trunk');
     }
-    
+
     // For single products, check the name and category
     const name = (item.item.name || '').toLowerCase();
     const category = (item.item.category || '').toLowerCase();
-    
-    return name.includes('brief') || 
-           name.includes('boxer') || 
-           name.includes('underwear') ||
-           name.includes('trunk') ||
-           category.includes('brief');
+
+    return name.includes('brief') ||
+      name.includes('boxer') ||
+      name.includes('underwear') ||
+      name.includes('trunk') ||
+      category.includes('brief');
   };
 
   // Helper function to validate brief minimum quantity for guest cart
@@ -146,7 +148,7 @@ const ProductDetails = () => {
     const totalBriefQuantity = briefItems.reduce((sum, item) => sum + item.quantity, 0);
     const nonBriefItems = cartItems.filter(item => !isBriefItem(item));
     const isBriefOnlyCart = briefItems.length > 0 && nonBriefItems.length === 0;
-    
+
     return {
       briefItems,
       totalBriefQuantity,
@@ -165,12 +167,12 @@ const ProductDetails = () => {
       } else {
         // For bundles, check if bundle_id AND items are identical
         if (cartItem.bundle_id !== item.bundle_id) return false
-        
+
         // Check if items array is identical (same variant_id and size_id combinations)
         if (!cartItem.items || !item.items) return cartItem.bundle_id === item.bundle_id
-        
+
         if (cartItem.items.length !== item.items.length) return false
-        
+
         // Check each item in the bundle to see if they match
         return cartItem.items.every((cartItemDetail, index) => {
           const newItemDetail = item.items[index]
@@ -195,16 +197,16 @@ const ProductDetails = () => {
     guestCart.subtotal = guestCart.items.reduce((sum, cartItem) => sum + cartItem.quantity * cartItem.price, 0)
     guestCart.tax = country === "Nigeria" ? 0 : guestCart.subtotal * 0.05
     guestCart.total = guestCart.subtotal + guestCart.tax
-    
+
     // Validate brief minimum quantity for guest cart
     const briefValidation = validateGuestBriefQuantity(guestCart.items);
     let warningMessage = null;
-    
+
     if (briefValidation.hasInsufficientBriefs) {
       const remaining = 3 - briefValidation.totalBriefQuantity;
       warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
     }
-    
+
     guestCart.warning = warningMessage;
     saveGuestCart(guestCart)
     window.dispatchEvent(new Event("cartUpdated"))
@@ -565,28 +567,28 @@ const ProductDetails = () => {
     : Array.isArray(data?.videos)
       ? data.videos
       : []
-  const name = isProduct 
+  const name = isProduct
     ? (selectedVariant?.variant_name || data?.name || "Unnamed Product")
     : (data?.name || "Unnamed Bundle")
-  
+
   // Function to get size-specific price
   const getSizeSpecificPrice = () => {
     if (!isProduct || !selectedSize || !selectedVariant) {
       return data?.price || 0;
     }
-    
+
     const sizes = Array.isArray(selectedVariant.sizes) ? selectedVariant.sizes : [];
     const selectedSizeObj = sizes.find(s => s.size_name === selectedSize);
-    
+
     // Use size-specific price if available, otherwise fall back to base price
     return selectedSizeObj?.price || data?.price || 0;
   };
-  
+
   const rawPrice = isProduct ? getSizeSpecificPrice() : getBundlePrice()
   const parsedPrice = Number.parseFloat(rawPrice) || 0
   const displayPrice = country === "Nigeria" ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2)
   const displayCurrency = country === "Nigeria" ? "NGN" : "USD"
-  
+
   // Calculate sold out status
   const isSoldOut = isProduct ? (Number(data?.total_stock) === 0) : false;
 
@@ -607,7 +609,7 @@ const ProductDetails = () => {
       return aIndex - bIndex
     })
   }
-  
+
   const sizeOptions = isProduct
     ? sortSizes(Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [])
     : sortSizes(Array.isArray(data?.items?.[0]?.all_variants?.[0]?.sizes) ? data.items[0].all_variants[0].sizes : [])
@@ -615,7 +617,7 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Product Schema for SEO */}
-      <ProductSchema 
+      <ProductSchema
         productData={productData}
         selectedVariant={selectedVariant}
         selectedSize={selectedSize}
@@ -624,50 +626,50 @@ const ProductDetails = () => {
       />
       <Navbar2 />
       <div className="w-full border-b border-gray-800 relative mt-16" style={{
-  background: 'linear-gradient(90deg, #1E1E1E 0%, #2A2A2A 40%, #6E6E6E 80%, #F5F5DC 100%)'
-}}>
-  {/* Dark overlay for text readability */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-  
-  <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 relative z-10">
-    <div className="flex items-center justify-center gap-4 sm:gap-6">
-      <div className="flex items-center gap-3">
-        <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
+        background: 'linear-gradient(90deg, #1E1E1E 0%, #2A2A2A 40%, #6E6E6E 80%, #F5F5DC 100%)'
+      }}>
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+
+        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-3 relative z-10">
+          <div className="flex items-center justify-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
+                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div className="bg-yellow-400/20 text-yellow-300 text-xs px-3 py-0.5 rounded-full font-bold border border-yellow-400/30 backdrop-blur-sm shadow-sm">
+                10% OFF
+              </div>
+            </div>
+            <div className="hidden sm:block text-white/40 mx-2">|</div>
+            <div className="text-center sm:text-left">
+              {/* Mobile version: shorter statement */}
+              <div className="sm:hidden">
+                <Link to="/login" className="text-sm text-white font-medium hover:text-yellow-300 transition-colors drop-shadow-sm">
+                  Sign In to Save 10%!
+                </Link>
+              </div>
+              {/* Desktop version: professional statement */}
+              <div className="hidden sm:block">
+                <Link to="/login" className="text-sm text-white font-medium hover:text-yellow-300 transition-colors drop-shadow-sm">
+                  Sign In to Unlock 10% Off Your First Purchase
+                </Link>
+                <span className="text-xs text-white/80 ml-3 drop-shadow-sm">Exclusive for new customers</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-yellow-400/20 text-yellow-300 text-xs px-3 py-0.5 rounded-full font-bold border border-yellow-400/30 backdrop-blur-sm shadow-sm">
-          10% OFF
-        </div>
+
+        {/* Bottom gradient border */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent"></div>
       </div>
-      <div className="hidden sm:block text-white/40 mx-2">|</div>
-      <div className="text-center sm:text-left">
-        {/* Mobile version: shorter statement */}
-        <div className="sm:hidden">
-          <Link to="/login" className="text-sm text-white font-medium hover:text-yellow-300 transition-colors drop-shadow-sm">
-            Sign In to Save 10%!
-          </Link>
-        </div>
-        {/* Desktop version: professional statement */}
-        <div className="hidden sm:block">
-          <Link to="/login" className="text-sm text-white font-medium hover:text-yellow-300 transition-colors drop-shadow-sm">
-            Sign In to Unlock 10% Off Your First Purchase
-          </Link>
-          <span className="text-xs text-white/80 ml-3 drop-shadow-sm">Exclusive for new customers</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  {/* Bottom gradient border */}
-  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent"></div>
-</div>
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 pt-24 py-4">
         {/* Breadcrumb */}
         <nav className="flex mb-8 text-sm font-PatrickHand">
@@ -686,113 +688,111 @@ const ProductDetails = () => {
             {/* Image Section */}
             <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white">
               <div className="space-y-6">
-                  {/* Media Display Area */}
-                  <div className="relative aspect-[3/4] bg-white rounded-2xl overflow-hidden shadow-lg group">
-                    {selectedImage < images.length ? (
-                      // Show Image
-                      <img
-                        src={images[selectedImage] || "https://via.placeholder.com/500"}
-                        alt="Product"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      // Show Video
-                      <div className="w-full h-full bg-black flex items-center justify-center">
-                        <video
-                          key={selectedImage} // Force re-render when changing videos
-                          controls
-                          autoPlay
-                          className="w-full h-full object-contain"
-                          poster={videos[selectedImage - images.length]?.video_thumbnail_url || videos[selectedImage - images.length]?.thumbnail_url}
-                        >
-                          <source 
-                            src={videos[selectedImage - images.length]?.video_url || videos[selectedImage - images.length]?.url} 
-                            type="video/mp4" 
-                          />
-                          Your browser does not support the video tag.
-                        </video>
-                      </div>
-                    )}
-
-                    {/* Bundle Badge */}
-                    {!isProduct && (
-                      <div className="absolute top-4 left-4 bg-gradient-to-r font-Manrope from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
-                        <Package className="w-4 h-4" />
-                        <span>Bundle</span>
-                      </div>
-                    )}
-
-                    {/* Navigation Buttons */}
-                    {(images.length + videos.length) > 1 && (
-                      <>
-                        <button
-                          onClick={() => setSelectedImage((selectedImage - 1 + (images.length + videos.length)) % (images.length + videos.length))}
-                          className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
-                        >
-                          <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => setSelectedImage((selectedImage + 1) % (images.length + videos.length))}
-                          className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
-                        >
-                          <ChevronRight className="w-5 h-5" />
-                        </button>
-                      </>
-                    )}
-
-                    {/* Counter */}
-                    {(images.length + videos.length) > 1 && (
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-PatrickHand z-10">
-                        {selectedImage + 1} / {images.length + videos.length}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Combined Thumbnails */}
-                  {(images.length + videos.length) > 1 && (
-                    <div className="grid grid-cols-4 gap-3">
-                      {/* Image Thumbnails */}
-                      {images.map((img, idx) => (
-                        <button
-                          key={`img-${idx}`}
-                          className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
-                            selectedImage === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
-                          }`}
-                          onClick={() => setSelectedImage(idx)}
-                        >
-                          <img
-                            src={img || "../assets/images/IMG_4552.JPG"}
-                            alt={`thumbnail ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          {selectedImage === idx && <div className="absolute inset-0 bg-gray-900/20"></div>}
-                        </button>
-                      ))}
-
-                      {/* Video Thumbnails */}
-                      {videos.map((video, idx) => (
-                        <button
-                          key={`vid-${idx}`}
-                          className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${
-                            selectedImage === (images.length + idx) ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
-                          }`}
-                          onClick={() => setSelectedImage(images.length + idx)}
-                        >
-                          <img
-                            src={video?.video_thumbnail_url || video?.thumbnail_url || "../assets/images/IMG_4554.JPG"}
-                            alt={`video thumbnail ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
-                              <div className="w-0 h-0 border-l-4 border-l-gray-900 border-y-2 border-y-transparent ml-1"></div>
-                            </div>
-                          </div>
-                          {selectedImage === (images.length + idx) && <div className="absolute inset-0 ring-2 ring-gray-900 rounded-lg"></div>}
-                        </button>
-                      ))}
+                {/* Media Display Area */}
+                <div className="relative aspect-[3/4] bg-white rounded-2xl overflow-hidden shadow-lg group">
+                  {selectedImage < images.length ? (
+                    // Show Image
+                    <img
+                      src={images[selectedImage] || "https://via.placeholder.com/500"}
+                      alt="Product"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    // Show Video
+                    <div className="w-full h-full bg-black flex items-center justify-center">
+                      <video
+                        key={selectedImage} // Force re-render when changing videos
+                        controls
+                        autoPlay
+                        className="w-full h-full object-contain"
+                        poster={videos[selectedImage - images.length]?.video_thumbnail_url || videos[selectedImage - images.length]?.thumbnail_url}
+                      >
+                        <source
+                          src={videos[selectedImage - images.length]?.video_url || videos[selectedImage - images.length]?.url}
+                          type="video/mp4"
+                        />
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
                   )}
+
+                  {/* Bundle Badge */}
+                  {!isProduct && (
+                    <div className="absolute top-4 left-4 bg-gradient-to-r font-Manrope from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1 z-10">
+                      <Package className="w-4 h-4" />
+                      <span>Bundle</span>
+                    </div>
+                  )}
+
+                  {/* Navigation Buttons */}
+                  {(images.length + videos.length) > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage - 1 + (images.length + videos.length)) % (images.length + videos.length))}
+                        className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage + 1) % (images.length + videos.length))}
+                        className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 hover:scale-110 z-10"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Counter */}
+                  {(images.length + videos.length) > 1 && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-PatrickHand z-10">
+                      {selectedImage + 1} / {images.length + videos.length}
+                    </div>
+                  )}
+                </div>
+
+                {/* Combined Thumbnails */}
+                {(images.length + videos.length) > 1 && (
+                  <div className="grid grid-cols-4 gap-3">
+                    {/* Image Thumbnails */}
+                    {images.map((img, idx) => (
+                      <button
+                        key={`img-${idx}`}
+                        className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${selectedImage === idx ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
+                          }`}
+                        onClick={() => setSelectedImage(idx)}
+                      >
+                        <img
+                          src={img || "../assets/images/IMG_4552.JPG"}
+                          alt={`thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {selectedImage === idx && <div className="absolute inset-0 bg-gray-900/20"></div>}
+                      </button>
+                    ))}
+
+                    {/* Video Thumbnails */}
+                    {videos.map((video, idx) => (
+                      <button
+                        key={`vid-${idx}`}
+                        className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 ${selectedImage === (images.length + idx) ? "ring-2 ring-gray-900 shadow-lg" : "hover:shadow-md hover:scale-105"
+                          }`}
+                        onClick={() => setSelectedImage(images.length + idx)}
+                      >
+                        <img
+                          src={video?.video_thumbnail_url || video?.thumbnail_url || "../assets/images/IMG_4554.JPG"}
+                          alt={`video thumbnail ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                            <div className="w-0 h-0 border-l-4 border-l-gray-900 border-y-2 border-y-transparent ml-1"></div>
+                          </div>
+                        </div>
+                        {selectedImage === (images.length + idx) && <div className="absolute inset-0 ring-2 ring-gray-900 rounded-lg"></div>}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             {/* Product Info Section */}
@@ -818,15 +818,15 @@ const ProductDetails = () => {
                       })}
                     </p>
                     <div className="flex items-center gap-2 flex-nowrap min-w-0">
-                    {isVariantSoldOut ? (
-                         <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
-                            Out of Stock
-                          </span>
-                    ) : (
-                      <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
-                        In Stock
-                      </span>
-                    )}
+                      {isVariantSoldOut ? (
+                        <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
+                          Out of Stock
+                        </span>
+                      ) : (
+                        <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
+                          In Stock
+                        </span>
+                      )}
                       {!isProduct && (
                         <span className="text-sm text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-PatrickHand whitespace-nowrap">
                           {bundleType} Bundle
@@ -854,11 +854,10 @@ const ProductDetails = () => {
                           <button
                             key={color}
                             onClick={() => handleColorChange(color)}
-                            className={`relative flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-                              color === selectedColor
+                            className={`relative flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${color === selectedColor
                                 ? "border-gray-900 bg-gray-50"
                                 : "border-gray-200 hover:border-gray-300"
-                            }`}
+                              }`}
                           >
                             <div
                               className={`w-6 h-6 rounded-full shadow-sm ${color === "White" ? "border border-gray-300" : ""}`}
@@ -881,13 +880,12 @@ const ProductDetails = () => {
                             key={s.size_name}
                             onClick={() => handleSizeChange(s.size_name)}
                             disabled={s.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${
-                              selectedSize === s.size_name
+                            className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${selectedSize === s.size_name
                                 ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
                                 : s.stock_quantity > 0
                                   ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
                                   : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
-                            }`}
+                              }`}
                           >
                             {s.size_name}
                             {s.stock_quantity === 0 && (
@@ -912,11 +910,10 @@ const ProductDetails = () => {
                           <button
                             key={type}
                             onClick={() => handleBundleTypeChange(type)}
-                            className={`px-6 py-3 border-2 rounded-xl text-sm font-medium font-PatrickHand transition-all duration-200 ${
-                              bundleType === type
+                            className={`px-6 py-3 border-2 rounded-xl text-sm font-medium font-PatrickHand transition-all duration-200 ${bundleType === type
                                 ? "border-gray-900 bg-gray-900 text-white shadow-lg"
                                 : "border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md"
-                            }`}
+                              }`}
                           >
                             {type}
                           </button>
@@ -934,13 +931,12 @@ const ProductDetails = () => {
                             key={size.size_name}
                             onClick={() => handleSizeChange(size.size_name)}
                             disabled={size.stock_quantity === 0}
-                            className={`relative py-3 px-2 text-sm font-medium font-PatrickHand border-2 rounded-xl transition-all duration-200 ${
-                              selectedSize === size.size_name
+                            className={`relative py-3 px-2 text-sm font-medium font-PatrickHand border-2 rounded-xl transition-all duration-200 ${selectedSize === size.size_name
                                 ? "border-gray-900 bg-gray-900 text-white shadow-lg"
                                 : size.stock_quantity > 0
                                   ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
                                   : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
-                            }`}
+                              }`}
                           >
                             {size.size_name}
                             {size.stock_quantity === 0 && (
@@ -978,18 +974,16 @@ const ProductDetails = () => {
                                     key={`${variant.variant_id}-${Date.now()}`}
                                     onClick={() => handleBundleColorSelection(variant)}
                                     disabled={!canSelect}
-                                    className={`relative flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
-                                      colorCount > 0
+                                    className={`relative flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${colorCount > 0
                                         ? "border-purple-500 bg-purple-100 shadow-lg"
                                         : canSelect
                                           ? "border-gray-200 bg-white hover:border-gray-300"
                                           : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
-                                    }`}
+                                      }`}
                                   >
                                     <div
-                                      className={`w-8 h-8 rounded-full shadow-sm mb-2 ${
-                                        variant.color_name === "White" ? "border-2 border-gray-300" : ""
-                                      }`}
+                                      className={`w-8 h-8 rounded-full shadow-sm mb-2 ${variant.color_name === "White" ? "border-2 border-gray-300" : ""
+                                        }`}
                                       style={{ backgroundColor: colorMap[variant.color_name] || "#cccccc" }}
                                     />
                                     <span className="text-sm font-medium text-center font-PatrickHand">
@@ -1023,9 +1017,8 @@ const ProductDetails = () => {
                                 >
                                   <div className="flex items-center space-x-3">
                                     <div
-                                      className={`w-6 h-6 rounded-full shadow-sm ${
-                                        selection.colorName === "White" ? "border border-gray-300" : ""
-                                      }`}
+                                      className={`w-6 h-6 rounded-full shadow-sm ${selection.colorName === "White" ? "border border-gray-300" : ""
+                                        }`}
                                       style={{ backgroundColor: colorMap[selection.colorName] || "#cccccc" }}
                                     />
                                     <div className="flex flex-col">
@@ -1076,11 +1069,10 @@ const ProductDetails = () => {
                     <button
                       onClick={handleAddToCart}
                       disabled={isAddingToCart || isSoldOut}
-                      className={`flex-1 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed ${
-                        isSoldOut 
-                          ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400' 
+                      className={`flex-1 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed ${isSoldOut
+                          ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
                           : 'bg-Primarycolor text-white hover:bg-gray-800'
-                      }`}
+                        }`}
                     >
                       {isAddingToCart ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>

@@ -51,7 +51,7 @@ const CollectionPageSchema = () => {
   );
 };
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api`
+  ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '') + '/api'
   : 'https://prechi-ecommerce.onrender.com/api';
 const api = axios.create({ baseURL: API_BASE_URL });
 
@@ -307,8 +307,8 @@ const ShopAllPage = () => {
       <div className="container-padding typography  flex flex-col min-h-screen">
         <Navbar2 />
         <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${mobileLayout === 'one'
-            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-            : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+          ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
           }`}>
           {[...Array(12)].map((_, index) => (
             <div key={index} className="bg-gray-100 rounded-xl p-3 animate-pulse shadow-sm">
@@ -366,8 +366,8 @@ const ShopAllPage = () => {
                   key={filter}
                   onClick={() => handleFilterChange(filter)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${currentFilter === filter
-                      ? 'bg-accent text-black'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-accent text-black'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
                   {filter}
@@ -379,8 +379,8 @@ const ShopAllPage = () => {
                 <button
                   onClick={() => setMobileLayout('one')}
                   className={`p-2 rounded-md transition-colors ${mobileLayout === 'one'
-                      ? 'bg-white shadow-sm text-gray-900'
-                      : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white shadow-sm text-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
                     }`}
                   title="Single column view"
                 >
@@ -391,8 +391,8 @@ const ShopAllPage = () => {
                 <button
                   onClick={() => setMobileLayout('two')}
                   className={`p-2 rounded-md transition-colors ${mobileLayout === 'two'
-                      ? 'bg-white shadow-sm text-gray-900'
-                      : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-white shadow-sm text-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
                     }`}
                   title="Two column view"
                 >
@@ -416,8 +416,8 @@ const ShopAllPage = () => {
           </div>
         </div>
         <div className={`grid gap-x-2 gap-y-[0.7em] sm:gap-x-3 sm:gap-y-[1.05em] md:gap-x-4 md:gap-y-[1.4em] lg:gap-x-3 lg:gap-y-[0.95em] mb-8 ${mobileLayout === 'one'
-            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-            : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+          ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
+          : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
           }`}>
           {displayedProducts.map((product, index) => (
             <ProductCard
@@ -517,8 +517,8 @@ const ProductCard = ({ product, onImageError }) => {
           <button
             disabled={isSoldOut}
             className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${isSoldOut
-                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
-                : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
+              ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
+              : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
               }`}
           >
             {isSoldOut ? 'Sold Out' : 'Shop Now'}

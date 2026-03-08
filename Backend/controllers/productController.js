@@ -15,10 +15,10 @@ cloudinary.config({
 export const uploadProduct = async (req, res) => {
   const { name, description, base_price, sku_prefix, category, gender, variants } = JSON.parse(req.body.data);
   const files = req.files;
-  
+
   // Enhanced validation with detailed error messages
   const validationErrors = [];
-  
+
   // Get valid color IDs from database for validation
   let validColorIds = [];
   try {
@@ -29,27 +29,27 @@ export const uploadProduct = async (req, res) => {
   } catch (colorErr) {
     console.warn('Could not fetch colors for validation, using fallback validation');
     // Fallback: assume standard color IDs 1-12 are valid
-    validColorIds = Array.from({length: 12}, (_, i) => i + 1);
+    validColorIds = Array.from({ length: 12 }, (_, i) => i + 1);
   }
-  
+
   if (!name || !name.trim()) {
     validationErrors.push('Product name is required');
   }
-  
+
   if (!sku_prefix || !sku_prefix.trim()) {
     validationErrors.push('SKU prefix is required');
   } else if (sku_prefix.length !== 3) {
     validationErrors.push('SKU prefix must be exactly 3 characters');
   }
-  
+
   if (!variants || !Array.isArray(variants) || variants.length === 0) {
     validationErrors.push('At least one product variant is required');
   }
-  
+
   if (!files || !Object.keys(files).length) {
     validationErrors.push('Product images are required');
   }
-  
+
   // Validate variants structure
   if (variants && Array.isArray(variants)) {
     variants.forEach((variant, index) => {
@@ -77,11 +77,11 @@ export const uploadProduct = async (req, res) => {
       }
     });
   }
-  
+
   if (validationErrors.length > 0) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       error: 'Validation failed',
-      details: validationErrors 
+      details: validationErrors
     });
   }
 
@@ -115,9 +115,9 @@ export const uploadProduct = async (req, res) => {
       }
     });
   } catch (fileError) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       error: 'File validation failed',
-      details: [fileError.message] 
+      details: [fileError.message]
     });
   }
 
@@ -167,7 +167,7 @@ export const uploadProduct = async (req, res) => {
               { fetch_format: 'auto' }
             ]
           });
-          
+
           // Generate thumbnail from video (first frame)
           const thumbnailUrl = cloudinary.url(uploaded.public_id, {
             resource_type: 'video',
@@ -177,7 +177,7 @@ export const uploadProduct = async (req, res) => {
               { quality: 'auto' }
             ]
           });
-          
+
           await sql`
             INSERT INTO product_videos (variant_id, video_url, video_thumbnail_url, title, position, is_primary)
             VALUES (${variantId}, ${uploaded.secure_url}, ${thumbnailUrl}, ${`Product Video ${videos.indexOf(file) + 1}`}, ${videos.indexOf(file)}, ${videos.indexOf(file) === 0})
@@ -190,29 +190,29 @@ export const uploadProduct = async (req, res) => {
     res.status(201).json({ message: 'Product created successfully' });
   } catch (err) {
     console.error('Upload product error:', err);
-    
+
     // Handle specific database errors
     if (err.code === '23505') {
       // Unique constraint violation
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'A product with this SKU prefix already exists',
         details: ['Please choose a different SKU prefix']
       });
     } else if (err.code === '23502') {
       // Not null constraint violation
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Missing required field',
         details: ['Please ensure all required fields are filled']
       });
     } else if (err.code === '23503') {
       // Foreign key constraint violation
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid reference',
         details: ['Please check that selected categories, colors, and sizes are valid']
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       error: 'Server error during product upload',
       details: ['Please try again or contact support if the issue persists']
     });
@@ -221,37 +221,199 @@ export const uploadProduct = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   const { id } = req.params;
-  
+  const numericId = parseInt(id, 10);
+
+  if (isNaN(numericId)) {
+    return res.status(400).json({ error: 'Invalid product ID' });
+  }
+
   try {
-    // Use the optimized function for single query retrieval
-    const result = await sql`
-      SELECT * FROM public.get_product_or_bundle_optimized(${id})
+    // ── Try product first ──────────────────────────────────────────────────
+    const [product] = await sql`
+      SELECT id, name, description, base_price AS price, sku_prefix, is_active, category, gender,
+             COALESCE(
+               (SELECT SUM(vs.stock_quantity)
+                FROM product_variants pv2
+                JOIN variant_sizes vs ON vs.variant_id = pv2.id
+                WHERE pv2.product_id = p.id AND pv2.deleted_at IS NULL AND pv2.is_active = TRUE),
+               0
+             )::INTEGER AS total_stock
+      FROM products p
+      WHERE p.id = ${numericId} AND p.deleted_at IS NULL
     `;
-    
-    if (result.length === 0) {
-      return res.status(404).json({ error: 'Item not found' });
+
+    if (product) {
+      // Fetch variants with sizes, images and videos
+      const variants = await sql`
+        SELECT
+          pv.id                  AS variant_id,
+          pv.color_id,
+          c.color_name,
+          c.color_code,
+          pv.sku,
+          pv.name                AS variant_name,
+          COALESCE(
+            (SELECT json_agg(
+               json_build_object(
+                 'size_id',        s.id,
+                 'size_name',      s.size_name,
+                 'stock_quantity', vs.stock_quantity,
+                 'price',          vs.price
+               ) ORDER BY s.id
+             )
+             FROM variant_sizes vs
+             JOIN sizes s ON s.id = vs.size_id
+             WHERE vs.variant_id = pv.id),
+            '[]'
+          ) AS sizes,
+          COALESCE(
+            (SELECT json_agg(
+               json_build_object(
+                 'image_url',  pi.image_url,
+                 'is_primary', pi.is_primary,
+                 'position',   pi.position
+               ) ORDER BY pi.is_primary DESC NULLS LAST, pi.position
+             )
+             FROM product_images pi
+             WHERE pi.variant_id = pv.id),
+            '[]'
+          ) AS images,
+          COALESCE(
+            (SELECT json_agg(
+               json_build_object(
+                 'video_url',           pv2.video_url,
+                 'video_thumbnail_url', pv2.video_thumbnail_url,
+                 'title',               pv2.title,
+                 'position',            pv2.position,
+                 'is_primary',          pv2.is_primary
+               ) ORDER BY pv2.is_primary DESC NULLS LAST, pv2.position
+             )
+             FROM product_videos pv2
+             WHERE pv2.variant_id = pv.id),
+            '[]'
+          ) AS videos
+        FROM product_variants pv
+        JOIN colors c ON c.id = pv.color_id
+        WHERE pv.product_id = ${numericId}
+          AND pv.deleted_at IS NULL
+          AND pv.is_active = TRUE
+        ORDER BY pv.id
+      `;
+
+      return res.json({
+        type: 'product',
+        data: {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          sku_prefix: product.sku_prefix,
+          is_active: product.is_active,
+          category: product.category,
+          gender: product.gender,
+          total_stock: product.total_stock,
+          variants,
+        }
+      });
     }
-    
-    const item = result[0];
-    return res.json({
-      type: item.item_type,
-      data: {
-        id: item.item_id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        sku_prefix: item.sku_prefix,
-        is_active: item.is_active,
-        bundle_type: item.bundle_type,
-        variants: item.variants,
-        images: item.images,
-        videos: item.videos,
-        total_stock: item.total_stock
-      }
-    });
+
+    // ── Try bundle ─────────────────────────────────────────────────────────
+    const [bundle] = await sql`
+      SELECT id, name, description, bundle_price AS price, sku_prefix, is_active, bundle_type,
+             COALESCE(
+               (SELECT SUM(vs.stock_quantity)
+                FROM bundle_items bi2
+                JOIN variant_sizes vs ON vs.variant_id = bi2.variant_id
+                WHERE bi2.bundle_id = b.id),
+               0
+             )::INTEGER AS total_stock
+      FROM bundles b
+      WHERE b.id = ${numericId} AND b.deleted_at IS NULL
+    `;
+
+    if (bundle) {
+      const bundleImages = await sql`
+        SELECT image_url, is_primary, position
+        FROM bundle_images
+        WHERE bundle_id = ${numericId}
+        ORDER BY is_primary DESC NULLS LAST, position
+      `;
+
+      const bundleItems = await sql`
+        SELECT
+          bi.id,
+          pv.id                AS variant_id,
+          p.name               AS product_name,
+          c.color_name,
+          c.color_code,
+          pv.sku,
+          COALESCE(
+            (SELECT json_agg(
+               json_build_object(
+                 'variant_id',    pv2.id,
+                 'color_name',    c2.color_name,
+                 'color_code',    c2.color_code,
+                 'sizes',         (
+                   SELECT json_agg(
+                            json_build_object(
+                              'size_id',        s.id,
+                              'size_name',      s.size_name,
+                              'stock_quantity', vs.stock_quantity,
+                              'price',          vs.price
+                            ) ORDER BY s.id
+                          )
+                   FROM variant_sizes vs
+                   JOIN sizes s ON s.id = vs.size_id
+                   WHERE vs.variant_id = pv2.id
+                 ),
+                 'images', (
+                   SELECT json_agg(
+                            json_build_object(
+                              'image_url',  pi.image_url,
+                              'is_primary', pi.is_primary
+                            ) ORDER BY pi.is_primary DESC NULLS LAST, pi.position
+                          )
+                   FROM product_images pi
+                   WHERE pi.variant_id = pv2.id
+                 )
+               ) ORDER BY pv2.id
+             )
+             FROM product_variants pv2
+             JOIN colors c2 ON c2.id = pv2.color_id
+             WHERE pv2.product_id = p.id
+               AND pv2.deleted_at IS NULL
+               AND pv2.is_active = TRUE),
+            '[]'
+          ) AS all_variants
+        FROM bundle_items bi
+        JOIN product_variants pv ON pv.id = bi.variant_id
+        JOIN products p ON p.id = pv.product_id
+        JOIN colors c ON c.id = pv.color_id
+        WHERE bi.bundle_id = ${numericId}
+        ORDER BY bi.id
+      `;
+
+      return res.json({
+        type: 'bundle',
+        data: {
+          id: bundle.id,
+          name: bundle.name,
+          description: bundle.description,
+          price: bundle.price,
+          sku_prefix: bundle.sku_prefix,
+          is_active: bundle.is_active,
+          bundle_type: bundle.bundle_type,
+          total_stock: bundle.total_stock,
+          images: bundleImages,
+          items: bundleItems,
+        }
+      });
+    }
+
+    return res.status(404).json({ error: 'Item not found' });
   } catch (err) {
     console.error('Get product error:', err);
-    return res.status(500).json({ error: 'Server error' });
+    return res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
