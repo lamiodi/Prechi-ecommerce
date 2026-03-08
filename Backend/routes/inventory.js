@@ -7,7 +7,9 @@ import {
   updateProduct,
   updateBundle,
   setPrimaryImage,
+  addVariantMedia,
 } from '../controllers/inventoryController.js';
+import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -31,6 +33,12 @@ router.put('/bundles/:id', updateBundle);
 
 // ✅ Set primary image for a variant
 router.put('/variants/:variantId/primary-image', setPrimaryImage);
+
+// ✅ Add new images/videos to an existing variant
+router.post('/variants/:variantId/media', upload.fields([
+    { name: 'images', maxCount: 5 }, 
+    { name: 'videos', maxCount: 3 }
+]), addVariantMedia);
 
 export default router;
 // ✅ Inventory management routes for admin panel

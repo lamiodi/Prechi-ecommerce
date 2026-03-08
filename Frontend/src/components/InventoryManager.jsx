@@ -126,16 +126,41 @@ const InventoryManager = () => {
       setError('');
 
       if (editingItem.type === 'product') {
-        const { id, price, variants } = editingItem;
+        const { id, name, price, variants, sku_prefix } = editingItem;
+        
+        // 1. Update basic details
         await api.put(`/products/${id}`, {
+          name,
           base_price: price,
+          sku_prefix,
           variants: variants,
         });
-        // Update primary images per variant if selection was made
+
+        // 2. Handle primary image updates
         const updates = Object.entries(selectedPrimary || {});
         for (const [variantId, imageId] of updates) {
           await api.put(`/variants/${variantId}/primary-image`, { image_id: imageId });
         }
+
+        // 3. Handle new media uploads
+        const mediaUploads = variants.filter(v => (v.newImages?.length > 0 || v.newVideos?.length > 0));
+        for (const variant of mediaUploads) {
+            const formData = new FormData();
+            if (variant.newImages) {
+                variant.newImages.forEach(file => formData.append('images', file));
+            }
+            if (variant.newVideos) {
+                variant.newVideos.forEach(file => formData.append('videos', file));
+            }
+            
+            // We need a specific endpoint for media upload per variant
+            // Assuming endpoint: POST /variants/:id/media
+            // Note: axios instance 'api' is configured for JSON, so we need to override headers for FormData
+            await axios.post(`${API_BASE_URL}/api/inventory/variants/${variant.id}/media`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+        }
+
       } else {
         const { id, price } = editingItem;
         await api.put(`/bundles/${id}`, {
@@ -584,6 +609,19 @@ const InventoryManager = () => {
             </div>
 
             <form onSubmit={handleUpdate} className="space-y-4">
+              {editingItem.type === 'product' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editingItem.name}
+                    onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                    required
+                  />
+                </div>
+              )}
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {editingItem.type === 'product' ? 'Base Price' : 'Bundle Price'} (NGN)
@@ -671,6 +709,59 @@ const InventoryManager = () => {
                               </div>
                             </div>
                           )}
+
+                          {/* New Media Upload */}
+                          <div className="mt-3 border-t pt-3">
+                            <p className="text-sm font-medium text-gray-700 mb-2">Add New Media</p>
+                            
+                            {/* Image Upload */}
+                            <div className="mb-2">
+                                <label className="block text-xs text-gray-600 mb-1">Add Images (Max 5)</label>
+                                <input 
+                                    type="file" 
+                                    multiple 
+                                    accept="image/*"
+                                    className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files);
+                                        const updatedVariants = editingItem.variants.map(v => {
+                                            if (v.id === variant.id) {
+                                                return { ...v, newImages: files };
+                                            }
+                                            return v;
+                                        });
+                                        setEditingItem({ ...editingItem, variants: updatedVariants });
+                                    }}
+                                />
+                                {variant.newImages?.length > 0 && (
+                                    <p className="text-xs text-green-600 mt-1">{variant.newImages.length} images selected</p>
+                                )}
+                            </div>
+
+                            {/* Video Upload */}
+                            <div>
+                                <label className="block text-xs text-gray-600 mb-1">Add Video (Max 100MB)</label>
+                                <input 
+                                    type="file" 
+                                    accept="video/mp4,video/quicktime,video/x-msvideo,video/avi"
+                                    className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files);
+                                        const updatedVariants = editingItem.variants.map(v => {
+                                            if (v.id === variant.id) {
+                                                return { ...v, newVideos: files };
+                                            }
+                                            return v;
+                                        });
+                                        setEditingItem({ ...editingItem, variants: updatedVariants });
+                                    }}
+                                />
+                                {variant.newVideos?.length > 0 && (
+                                    <p className="text-xs text-green-600 mt-1">{variant.newVideos.length} video selected</p>
+                                )}
+                            </div>
+                          </div>
+
                         </div>
                       </div>
                     ))}

@@ -1,4 +1,16 @@
 import sql from '../db/index.js';
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs/promises';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// Ensure Cloudinary is configured
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Get all products with inventory data
 export const getProducts = async (req, res) => {
@@ -239,5 +251,69 @@ export const setPrimaryImage = async (req, res) => {
   } catch (err) {
     console.error('Error setting primary image:', err);
     res.status(500).json({ error: 'Failed to set primary image' });
+  }
+};
+
+// Upload media
+export const uploadMedia = async (req, res) => {
+  const { variantId } = req.params;
+  const files = req.files;
+
+  try {
+    const uploadedImages = [];
+    const uploadedVideos = [];
+
+    if (files && files.length > 0) {
+      for (const file of files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          resource_type: 'auto',
+          folder: 'products',
+        });
+        
+        if (result.resource_type === 'image') {
+          uploadedImages.push(result.secure_url);
+        } else if (result.resource_type === 'video') {
+          uploadedVideos.push(result.secure_url);
+        }
+
+        await fs.unlink(file.path);
+      }
+    }
+
+    // 3. Save to Database
+    if (uploadedImages.length > 0 || uploadedVideos.length > 0) {
+      await sql.begin(async (sql) => {
+        // Insert Images
+        for (const url of uploadedImages) {
+          await sql`
+            INSERT INTO product_images (variant_id, image_url, is_primary)
+            VALUES (${variantId}, ${url}, FALSE)
+          `;
+        }
+        
+        // Insert Videos
+        for (const url of uploadedVideos) {
+            // Generate thumbnail URL for video (Cloudinary convention)
+            // If url is https://res.cloudinary.com/.../video.mp4, thumbnail is usually .jpg
+            // Simple heuristic: replace file extension with .jpg
+            const thumbnailUrl = url.replace(/\.[^/.]+$/, ".jpg");
+            
+            await sql`
+                INSERT INTO product_videos (variant_id, video_url, video_thumbnail_url, title, position, is_primary)
+                VALUES (${variantId}, ${url}, ${thumbnailUrl}, 'Product Video', 0, FALSE)
+            `;
+        }
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Media uploaded successfully',
+      images: uploadedImages,
+      videos: uploadedVideos 
+    });
+  } catch (err) {
+    console.error('Error uploading media:', err);
+    res.status(500).json({ error: 'Failed to upload media' });
   }
 };
