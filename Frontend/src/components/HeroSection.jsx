@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Button from './Button';
 import { Link } from 'react-router-dom';
-import heroVideo from '../assets/dreamina-2025-11-27-1712-The camera pushes in on the woman in the....mp4';
-
 const HeroSection = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -11,10 +9,10 @@ const HeroSection = () => {
   const mobileVideoRef = useRef(null);
   const desktopVideoRef = useRef(null);
 
-  // Local hero video
-  const mobileVideoURL = heroVideo;
-  const desktopVideoURL = heroVideo;
-  
+  // Local hero video (portrait MOV from public folder)
+  const mobileVideoURL = '/IMG_9987.MOV';
+  const desktopVideoURL = '/IMG_9987.MOV';
+
   // Poster images for immediate display (using local image as fallback)
   const mobilePosterURL = '/src/assets/images/IMG_4571.JPG';
   const desktopPosterURL = '/src/assets/images/IMG_4571.JPG';
@@ -66,7 +64,7 @@ const HeroSection = () => {
       link.href = url;
       document.head.appendChild(link);
     };
-    
+
     preloadVideo(mobileVideoURL);
     preloadVideo(desktopVideoURL);
   }, []);
@@ -80,7 +78,7 @@ const HeroSection = () => {
     const handleCanPlay = () => {
       setVideoLoaded(true);
       setVideoError(false);
-      
+
       // Try to start playback immediately
       video.play().then(() => {
         setNeedsUserInteraction(false);
@@ -131,7 +129,7 @@ const HeroSection = () => {
   }, [needsUserInteraction, handleUserInteraction]);
 
   return (
-    <div 
+    <div
       className="flex container-padding flex-col justify-start items-center h-[77dvh] sm:h-[84dvh] md:h-[82dvh] lg:h-[740px] relative overflow-hidden"
       onClick={needsUserInteraction ? handleUserInteraction : undefined}
     >
@@ -139,22 +137,21 @@ const HeroSection = () => {
       <img
         src={isMobile ? mobilePosterURL : desktopPosterURL}
         alt="Hero background"
-        className={`absolute top-0 left-0 object-cover w-full h-full transition-opacity duration-300 ${
-          videoLoaded ? 'opacity-0' : 'opacity-100'
-        }`}
+        className={`absolute top-0 left-0 object-cover w-full h-full transition-opacity duration-300 ${videoLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
         style={{
           transform: 'translateZ(0)',
           willChange: 'opacity'
         }}
       />
-      
+
       {/* Loading State */}
       {!videoLoaded && !videoError && (
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center z-10 opacity-50">
           <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"></div>
         </div>
       )}
-      
+
       {/* iOS Autoplay Notice */}
       {needsUserInteraction && (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
@@ -166,7 +163,7 @@ const HeroSection = () => {
           </div>
         </div>
       )}
-      
+
       {/* Mobile Video */}
       <video
         ref={mobileVideoRef}
@@ -180,10 +177,9 @@ const HeroSection = () => {
         preload="metadata"
         disablePictureInPicture
         controlsList="nodownload nofullscreen noremoteplayback"
-        className={`absolute top-0 left-0 object-cover w-full h-full lg:hidden transition-opacity duration-300 ${
-          videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ 
+        className={`absolute top-0 left-0 object-cover w-full h-full lg:hidden transition-opacity duration-300 ${videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
+          }`}
+        style={{
           pointerEvents: 'none',
           transform: 'translateZ(0)',
           willChange: 'transform, opacity',
@@ -195,8 +191,8 @@ const HeroSection = () => {
         }}
         onContextMenu={(e) => e.preventDefault()}
       />
-      
-      {/* Desktop Video */}
+
+      {/* Desktop Video — portrait video scaled to cover landscape container */}
       <video
         ref={desktopVideoRef}
         src={desktopVideoURL}
@@ -208,42 +204,50 @@ const HeroSection = () => {
         playsInline
         preload="metadata"
         disablePictureInPicture
-        className={`absolute top-0 left-0 object-cover w-full h-full hidden lg:block transition-opacity duration-300 ${
-          videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{ 
+        className={`absolute hidden lg:block transition-opacity duration-300 ${videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
+          }`}
+        style={{
           pointerEvents: 'none',
           transform: 'translateZ(0)',
-          willChange: 'transform, opacity'
+          willChange: 'transform, opacity',
+          top: '50%',
+          left: '50%',
+          minWidth: '100%',
+          minHeight: '100%',
+          width: 'auto',
+          height: 'auto',
+          transform: 'translate(-50%, -50%)',
+          objectFit: 'cover',
+          objectPosition: 'center center',
         }}
       />
 
       {/* Quick Nav */}
-      <nav 
+      <nav
         className="container quicknav flex flex-row justify-between lg:max-w-[800px] mb-[40dvh] sm:mb-38 md:mb-50 lg:mb-[50dvh] z-25"
         role="navigation"
         aria-label="Product categories"
       >
-        <Link 
-          to="/shop?category=new" 
+        <Link
+          to="/shop?category=new"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
           NEW ARRIVALS
         </Link>
-        <Link 
-          to="/shop?category=briefs" 
+        <Link
+          to="/shop?category=briefs"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
           BRIEFS
         </Link>
-        <Link 
-          to="/shop?category=gymwear" 
+        <Link
+          to="/shop?category=gymwear"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
           GYM WEAR
         </Link>
-        <Link 
-          to="/shop" 
+        <Link
+          to="/shop"
           className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
         >
           SHOP ALL
