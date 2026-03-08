@@ -592,6 +592,10 @@ const ProductDetails = () => {
   // Calculate sold out status
   const isSoldOut = isProduct ? (Number(data?.total_stock) === 0) : false;
 
+  const isVariantSoldOut = isProduct && selectedVariant && selectedSize
+    ? (selectedVariant.sizes?.find((s) => s.size_name === selectedSize)?.stock_quantity || 0) <= 0
+    : isSoldOut;
+
   const description = data?.description || "No description available"
   const colorOptions = isProduct
     ? Array.isArray(data?.variants)
@@ -855,8 +859,8 @@ const ProductDetails = () => {
                             key={color}
                             onClick={() => handleColorChange(color)}
                             className={`relative flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${color === selectedColor
-                                ? "border-gray-900 bg-gray-50"
-                                : "border-gray-200 hover:border-gray-300"
+                              ? "border-gray-900 bg-gray-50"
+                              : "border-gray-200 hover:border-gray-300"
                               }`}
                           >
                             <div
@@ -881,10 +885,10 @@ const ProductDetails = () => {
                             onClick={() => handleSizeChange(s.size_name)}
                             disabled={s.stock_quantity === 0}
                             className={`relative py-3 px-2 text-sm font-Manrope font-medium border-2 rounded-xl transition-all duration-200 ${selectedSize === s.size_name
-                                ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
-                                : s.stock_quantity > 0
-                                  ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
-                                  : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
+                              ? "border-Primarycolor bg-gray-900 text-white shadow-lg"
+                              : s.stock_quantity > 0
+                                ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
+                                : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
                               }`}
                           >
                             {s.size_name}
@@ -911,8 +915,8 @@ const ProductDetails = () => {
                             key={type}
                             onClick={() => handleBundleTypeChange(type)}
                             className={`px-6 py-3 border-2 rounded-xl text-sm font-medium font-PatrickHand transition-all duration-200 ${bundleType === type
-                                ? "border-gray-900 bg-gray-900 text-white shadow-lg"
-                                : "border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md"
+                              ? "border-gray-900 bg-gray-900 text-white shadow-lg"
+                              : "border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md"
                               }`}
                           >
                             {type}
@@ -932,10 +936,10 @@ const ProductDetails = () => {
                             onClick={() => handleSizeChange(size.size_name)}
                             disabled={size.stock_quantity === 0}
                             className={`relative py-3 px-2 text-sm font-medium font-PatrickHand border-2 rounded-xl transition-all duration-200 ${selectedSize === size.size_name
-                                ? "border-gray-900 bg-gray-900 text-white shadow-lg"
-                                : size.stock_quantity > 0
-                                  ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
-                                  : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
+                              ? "border-gray-900 bg-gray-900 text-white shadow-lg"
+                              : size.stock_quantity > 0
+                                ? "border-gray-200 text-gray-900 hover:border-gray-300 hover:shadow-md"
+                                : "border-gray-100 text-gray-300 cursor-not-allowed bg-gray-50"
                               }`}
                           >
                             {size.size_name}
@@ -975,10 +979,10 @@ const ProductDetails = () => {
                                     onClick={() => handleBundleColorSelection(variant)}
                                     disabled={!canSelect}
                                     className={`relative flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${colorCount > 0
-                                        ? "border-purple-500 bg-purple-100 shadow-lg"
-                                        : canSelect
-                                          ? "border-gray-200 bg-white hover:border-gray-300"
-                                          : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                                      ? "border-purple-500 bg-purple-100 shadow-lg"
+                                      : canSelect
+                                        ? "border-gray-200 bg-white hover:border-gray-300"
+                                        : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
                                       }`}
                                   >
                                     <div
@@ -1070,8 +1074,8 @@ const ProductDetails = () => {
                       onClick={handleAddToCart}
                       disabled={isAddingToCart || isSoldOut}
                       className={`flex-1 py-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 font-Manrope disabled:opacity-70 disabled:cursor-not-allowed ${isSoldOut
-                          ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
-                          : 'bg-Primarycolor text-white hover:bg-gray-800'
+                        ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
+                        : 'bg-Primarycolor text-white hover:bg-gray-800'
                         }`}
                     >
                       {isAddingToCart ? (
