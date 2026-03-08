@@ -89,6 +89,9 @@ const LandingPage = () => {
   };
 
   useEffect(() => {
+    // Scroll to top on mount (fixes mobile showing footer first)
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     // Force video load on component mount
     if (mobileVideoRef.current) {
       mobileVideoRef.current.load();
@@ -99,7 +102,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white overflow-y-auto">
+    <div className="min-h-screen bg-white">
       {/* Navigation - Overlaying the hero section */}
       <Navbar2 />
       <main className="bg-Primarycolor">
