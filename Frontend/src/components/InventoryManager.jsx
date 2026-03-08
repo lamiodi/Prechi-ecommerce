@@ -651,7 +651,27 @@ const InventoryManager = () => {
                         key={`edit-variant-${variant.id}`}
                         className="border border-gray-200 rounded-lg p-3 bg-gray-50"
                       >
-                        <p className="font-medium text-gray-900 text-sm md:text-base">{variant.color_name}</p>
+                        <div className="flex flex-col gap-2 mb-2">
+                            <p className="font-medium text-gray-900 text-sm md:text-base">{variant.color_name}</p>
+                            <input
+                                type="text"
+                                placeholder="Variant Name (Optional)"
+                                className="w-full p-2 border border-gray-300 rounded text-sm"
+                                value={variant.name || ''}
+                                onChange={(e) => {
+                                  const updatedVariants = editingItem.variants.map((v) => {
+                                    if (v.id === variant.id) {
+                                      return { ...v, name: e.target.value };
+                                    }
+                                    return v;
+                                  });
+                                  setEditingItem({
+                                    ...editingItem,
+                                    variants: updatedVariants,
+                                  });
+                                }}
+                            />
+                        </div>
                         <div className="mt-2 space-y-2">
                           {variant.sizes?.map((size) => (
                             <div

@@ -44,6 +44,7 @@ export const getProducts = async (req, res) => {
         (SELECT jsonb_agg(
           jsonb_build_object(
             'id', pv.id,
+            'name', pv.name,
             'color_id', pv.color_id,
             'color_name', c.color_name,
             'sku', pv.sku,
@@ -184,23 +185,49 @@ export const deleteBundle = async (req, res) => {
   }
 };
 
-// Update product price and stock
+// Update product price, stock, and variant details
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { base_price, variants, is_new_release } = req.body;
+  const { name, base_price, variants, is_new_release } = req.body;
 
   try {
     await sql.begin(async (sql) => {
-      if (base_price) {
-        await sql`UPDATE products SET base_price = ${base_price} WHERE id = ${id}`;
-      }
-
-      if (typeof is_new_release === 'boolean') {
-        await sql`UPDATE products SET is_new_release = ${is_new_release} WHERE id = ${id}`;
+      // Update product level details
+      if (name || base_price || typeof is_new_release === 'boolean') {
+          const updates = {};
+          if (name) updates.name = name;
+          if (base_price) updates.base_price = base_price;
+          if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
+          
+          if (Object.keys(updates).length > 0) {
+             await sql`UPDATE products SET ${sql(updates)} WHERE id = ${id}`;
+          }
       }
 
       if (variants?.length) {
         for (const variant of variants) {
+          // Update variant name (if provided and different)
+          // Note: Frontend sends 'name' inside variant object if we add it there.
+          // Currently getProducts query returns 'sku' but not explicit variant 'name' column if it exists in product_variants table?
+          // Let's check the schema. Usually product_variants has a name or it uses color/size.
+          // The getProducts query selects 'p.name' as product name, and 'c.color_name' for variant.
+          // Let's assume the user wants to update the 'name' column in 'product_variants' table if it exists,
+          // OR they mean the 'sku' or just the display name which is often 'Product Name - Color'.
+          // The user said "name in product_variant table".
+          // Let's check if 'product_variants' table has a 'name' column.
+          // Based on create_tables.js (which I read earlier but might need to recall), 
+          // product_variants usually has: id, product_id, color_id, sku, is_active, etc.
+          // If it has a 'name' column, we should update it.
+          // I will assume it does or add it to the query. 
+          // Wait, in getProducts query:
+          // SELECT ... (SELECT jsonb_agg(jsonb_build_object(..., 'sku', pv.sku, ...)))
+          // It doesn't select 'name' from pv. 
+          // But I'll add the update logic for 'name' in product_variants if it is passed.
+          
+          if (variant.name) {
+             await sql`UPDATE product_variants SET name = ${variant.name} WHERE id = ${variant.id}`;
+          }
+
           for (const size of variant.sizes || []) {
             await sql`
               UPDATE variant_sizes
