@@ -344,27 +344,21 @@ export const createOrder = async (req, res) => {
             return res.status(400).json({ error: `Product variant not found. An item in your cart is no longer available. Please remove it and try again.` });
           }
 
-          // Check stock, handle case where size_id is null
+          // Check stock
           let variantSize;
           if (item.size_id) {
             [variantSize] = await sql`
               SELECT stock_quantity, price FROM variant_sizes 
               WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+              FOR UPDATE
             `;
             if (!variantSize) {
               console.error(`Validation failed: Size ${item.size_id} not found for variant ${item.variant_id}`);
               return res.status(400).json({ error: `Size option is no longer available. Please remove this item and try again.` });
             }
           } else {
-            // Fallback for products without size; adjust based on your schema
-            [variantSize] = await sql`
-              SELECT stock_quantity, price FROM variant_sizes 
-              WHERE variant_id = ${item.variant_id}
-            `;
-            if (!variantSize) {
-              console.error(`Validation failed: No stock found for variant ${item.variant_id} without size`);
-              return res.status(400).json({ error: `This item is currently out of stock. Please remove it and try again.` });
-            }
+            console.error(`Validation failed: Missing size_id for variant ${item.variant_id}`);
+            return res.status(400).json({ error: `Please select a size for this item.` });
           }
 
           const { stock_quantity } = variantSize;
@@ -440,20 +434,15 @@ export const createOrder = async (req, res) => {
                 [variantSize] = await sql`
                   SELECT stock_quantity FROM variant_sizes 
                   WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
+                  FOR UPDATE
                 `;
                 if (!variantSize) {
                   console.error(`Validation failed: Size ${bi.size_id} not found for bundle item variant ${bi.variant_id}`);
                   return res.status(400).json({ error: `A size option in your bundle is no longer available.` });
                 }
               } else {
-                [variantSize] = await sql`
-                  SELECT stock_quantity FROM variant_sizes 
-                  WHERE variant_id = ${bi.variant_id}
-                `;
-                if (!variantSize) {
-                  console.error(`Validation failed: No stock found for bundle item variant ${bi.variant_id} without size`);
-                  return res.status(400).json({ error: `An item in your bundle is out of stock.` });
-                }
+                console.error(`Validation failed: Missing size_id for bundle item variant ${bi.variant_id}`);
+                return res.status(400).json({ error: `Please select a size for all items in your bundle.` });
               }
 
               if (variantSize.stock_quantity < item.quantity) {
@@ -651,17 +640,8 @@ export const createOrder = async (req, res) => {
             }
             console.log(`Updated stock for variant ${item.variant_id}, size ${item.size_id}: ${updateResult.stock_quantity}`);
           } else {
-            const [updateResult] = await sql`
-              UPDATE variant_sizes 
-              SET stock_quantity = stock_quantity - ${item.quantity} 
-              WHERE variant_id = ${item.variant_id}
-              RETURNING stock_quantity
-            `;
-            if (!updateResult) {
-              console.error(`Stock update failed: No stock found for variant ${item.variant_id} without size`);
-              throw new Error(`Failed to update stock for variant ${item.variant_id} without size`);
-            }
-            console.log(`Updated stock for variant ${item.variant_id} without size: ${updateResult.stock_quantity}`);
+            console.error(`Stock update failed: Missing size_id for variant ${item.variant_id}`);
+            throw new Error(`Failed to update stock: missing size`);
           }
         } else if (item.bundle_id) {
           const bundleItems = item.bundle_details ? JSON.parse(item.bundle_details) : [];
@@ -679,17 +659,8 @@ export const createOrder = async (req, res) => {
               }
               console.log(`Updated stock for bundle item variant ${bi.variant_id}, size ${bi.size_id}: ${updateResult.stock_quantity}`);
             } else {
-              const [updateResult] = await sql`
-                UPDATE variant_sizes 
-                SET stock_quantity = stock_quantity - ${item.quantity} 
-                WHERE variant_id = ${bi.variant_id}
-                RETURNING stock_quantity
-              `;
-              if (!updateResult) {
-                console.error(`Stock update failed: No stock found for bundle item variant ${bi.variant_id} without size`);
-                throw new Error(`Failed to update stock for bundle item variant ${bi.variant_id} without size`);
-              }
-              console.log(`Updated stock for bundle item variant ${bi.variant_id} without size: ${updateResult.stock_quantity}`);
+              console.error(`Stock update failed: Missing size_id for bundle item variant ${bi.variant_id}`);
+              throw new Error(`Failed to update stock: missing size in bundle item`);
             }
           }
         }

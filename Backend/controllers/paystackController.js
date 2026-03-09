@@ -173,12 +173,7 @@ export const verifyPayment = async (req, res) => {
               `;
               console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
             } else {
-              await sql`
-                UPDATE variant_sizes
-                SET stock_quantity = stock_quantity + ${item.quantity}
-                WHERE variant_id = ${item.variant_id}
-              `;
-              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id} without size`);
+              console.error(`Skipping restocking for variant_id=${item.variant_id} due to missing size_id`);
             }
           } else if (item.bundle_id) {
             const bundleItems = item.bundle_details ? (typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details) : [];
@@ -190,11 +185,7 @@ export const verifyPayment = async (req, res) => {
                   WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
                 `;
               } else {
-                await sql`
-                  UPDATE variant_sizes
-                  SET stock_quantity = stock_quantity + ${item.quantity}
-                  WHERE variant_id = ${bi.variant_id}
-                `;
+                console.error(`Skipping restocking for bundle item variant_id=${bi.variant_id} due to missing size_id`);
               }
             }
             console.log(`✅ Restocked ${item.quantity} units for bundle_id=${item.bundle_id}`);
