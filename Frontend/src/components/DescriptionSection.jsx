@@ -13,7 +13,7 @@ const DescriptionSection = ({ isProduct, description, data }) => {
           <div className="mt-4 p-4 font-Manrope bg-purple-50 rounded-xl">
             <h4 className="font-medium text-purple-900 mb-2">Bundle Includes:</h4>
             <ul className="text-sm text-purple-800 font-PatrickHand space-y-1">
-              {data.items?.map((item, index) => (
+              {data?.items?.map((item, index) => (
                 <li key={index}>• {item.product_name}</li>
               ))}
             </ul>
