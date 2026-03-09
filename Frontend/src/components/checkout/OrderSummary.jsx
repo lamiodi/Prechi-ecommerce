@@ -37,12 +37,17 @@ const OrderSummary = React.memo(({
           const price = Number(item.price || 0);
           const itemTotal = Number((price * (cartItem.quantity || 1)).toFixed(2));
 
+          let displayImage = item.image || item.image_url || '/images/placeholder.jpg';
+          if (typeof displayImage === 'object') {
+            displayImage = displayImage?.image_url || displayImage?.url || '/images/placeholder.jpg';
+          }
+
           return (
             <div key={cartItem.id || index} className="group">
               <div className="flex gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
                 <div className="relative flex-shrink-0">
                   <img
-                    src={item.image || item.image_url || '/images/placeholder.jpg'}
+                    src={displayImage}
                     alt={item.name || 'Product'}
                     className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg"
                     onError={(e) => {

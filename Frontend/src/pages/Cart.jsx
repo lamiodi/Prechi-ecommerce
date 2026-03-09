@@ -771,6 +771,12 @@ const Cart = () => {
       });
       const isOutOfStock = item.item.stock_quantity === 0;
 
+      // Defensively parse image to handle cached objects in localStorage
+      let displayImage = item.item.image || item.item.image_url || '/images/placeholder.jpg';
+      if (typeof displayImage === 'object') {
+        displayImage = displayImage?.image_url || displayImage?.url || '/images/placeholder.jpg';
+      }
+
       return (
         <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -778,7 +784,7 @@ const Cart = () => {
             <div className="relative flex-shrink-0">
               <div className="relative overflow-hidden rounded-lg bg-gray-100">
                 <img
-                  src={item.item.image || '/images/placeholder.jpg'}
+                  src={displayImage}
                   alt={item.item.name || 'Product'}
                   className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg mr-3 sm:mr-4 border border-gray-100"
                   onError={(e) => {

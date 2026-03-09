@@ -363,8 +363,12 @@ const ProductDetails = () => {
           toastError("Invalid size selected")
           return
         }
-        // Get product image
-        const productImage = selectedVariant.images?.[0] || "https://via.placeholder.com/500"
+        // Get product image (safely extract URL)
+        let productImage = "https://via.placeholder.com/500";
+        if (selectedVariant.images && selectedVariant.images.length > 0) {
+          const img = selectedVariant.images[0];
+          productImage = img?.image_url || img?.url || img || productImage;
+        }
         // Get product name
         const productName = productData?.data?.name || "Unnamed Product"
         // Get product price
@@ -435,8 +439,12 @@ const ProductDetails = () => {
           toastError("Each bundle item must have both color and size selected")
           return
         }
-        // Get bundle image
-        const bundleImage = productData?.data?.images?.[0] || "https://via.placeholder.com/500"
+        // Get bundle image (safely extract URL)
+        let bundleImage = "https://via.placeholder.com/500";
+        if (productData?.data?.images && productData.data.images.length > 0) {
+          const img = productData.data.images[0];
+          bundleImage = img?.image_url || img?.url || img || bundleImage;
+        }
         // Get bundle name
         const bundleName = productData?.data?.name || "Unnamed Bundle"
         // Get bundle price
@@ -1120,9 +1128,9 @@ const ProductDetails = () => {
                   </div>
                 </div>
                 {/* Description */}
-              <div className="pt-8 border-t border-gray-200">
-                <DescriptionSection description={description} isProduct={isProduct} data={data} />
-              </div>
+                <div className="pt-8 border-t border-gray-200">
+                  <DescriptionSection description={description} isProduct={isProduct} data={data} />
+                </div>
               </div>
             </div>
           </div>
