@@ -782,28 +782,26 @@ const Cart = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Product Image */}
             <div className="relative flex-shrink-0">
-              <div className="relative overflow-hidden rounded-lg bg-gray-100">
-                <img
-                  src={displayImage}
-                  alt={item.item.name || 'Product'}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg mr-3 sm:mr-4 border border-gray-100"
-                  onError={(e) => {
-                    e.target.src = '/images/placeholder.jpg';
-                  }}
-                  loading="lazy"
-                  width="150"
-                  height="150"
-                />
-                {/* Quantity Badge */}
-                <div className="absolute -top-2 -right-2 bg-gray-900 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center sm:text-xs sm:h-6 sm:w-6">
-                  {item.quantity}
-                </div>
-                {isOutOfStock && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-90 rounded-lg">
-                    <span className="text-white text-sm sm:text-xs font-bold">Out of Stock</span>
-                  </div>
-                )}
+              <img
+                src={displayImage}
+                alt={item.item.name || 'Product'}
+                className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg"
+                onError={(e) => {
+                  e.target.src = '/images/placeholder.jpg';
+                }}
+                loading="lazy"
+                width="150"
+                height="150"
+              />
+              {/* Quantity Badge */}
+              <div className="absolute -top-2 -right-2 bg-Primarycolor text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
+                {item.quantity}
               </div>
+              {isOutOfStock && (
+                <div className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-90 rounded-lg">
+                  <span className="text-white text-sm sm:text-xs font-bold">Out of Stock</span>
+                </div>
+              )}
             </div>
 
             {/* Product Details */}
