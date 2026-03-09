@@ -752,7 +752,6 @@ const CheckoutPage = () => {
 
 
 
-      // Try to initialize payment with multiple retries
       let paymentResponse;
       let retryCount = 0;
       const maxRetries = 3;
@@ -773,14 +772,20 @@ const CheckoutPage = () => {
           break;
         } catch (err) {
           retryCount++;
+          console.error(`Payment initialization attempt ${retryCount} failed:`, err);
 
           if (retryCount >= maxRetries) {
-            throw new Error('Payment initialization failed after multiple attempts');
+            throw new Error('Payment initialization failed after multiple attempts. Please try again later.');
           }
 
-          // Wait before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Wait before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
         }
+      }
+
+      // Add null checks for paymentResponse
+      if (!paymentResponse || !paymentResponse.data) {
+        throw new Error('No response from payment server');
       }
 
       let paymentInfo = paymentResponse.data;
@@ -832,7 +837,7 @@ const CheckoutPage = () => {
       let errorMessage = 'Failed to process order';
 
       if (err.message === 'Payment initialization timeout' ||
-        err.message === 'Payment initialization failed after multiple attempts') {
+        err.message.includes('Payment initialization failed after multiple attempts')) {
         errorMessage = 'Payment service is currently experiencing high traffic. Please try again later.';
       } else if (err.response?.data?.error) {
         errorMessage = err.response.data.error;

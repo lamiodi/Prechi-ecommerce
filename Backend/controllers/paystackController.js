@@ -92,18 +92,39 @@ export const initializePayment = async (req, res) => {
         }
       );
 
+      // Check if data exists in response
+      if (!response.data || !response.data.data) {
+        console.error('Invalid response from Paystack:', response.data);
+        return res.status(502).json({ error: 'Invalid response from payment provider' });
+      }
+
       const { authorization_url, access_code, reference: paystackReference } = response.data.data;
 
       if (!authorization_url) {
         console.error('Paystack did not return authorization_url:', response.data);
-        return res.status(500).json({ error: 'Failed to get payment authorization URL from Paystack' });
+        return res.status(502).json({ error: 'Failed to get payment authorization URL from Paystack' });
       }
 
       console.log(`✅ Paystack transaction initialized: reference=${paystackReference}`);
       res.status(200).json({ authorization_url, access_code, reference: paystackReference });
     } catch (err) {
       console.error('❌ Error initializing Paystack payment:', err.response?.data || err.message);
-      res.status(500).json({ error: 'Failed to initialize payment' });
+      
+      // Enhanced error handling
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        return res.status(err.response.status).json({ 
+          error: err.response.data?.message || 'Payment provider error',
+          details: err.response.data 
+        });
+      } else if (err.request) {
+        // The request was made but no response was received
+        return res.status(504).json({ error: 'Payment provider timeout' });
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        return res.status(500).json({ error: 'Payment initialization failed' });
+      }
     }
   } catch (err) {
     console.error('❌ Unexpected error in initializePayment:', err.message);

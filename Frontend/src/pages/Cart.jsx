@@ -882,7 +882,7 @@ const Cart = () => {
                             <img
                               src={bi.image_url || '/images/placeholder.jpg'}
                               alt={bi.product_name || 'Bundle item'}
-                              className="w-10 h-10 object-cover rounded-md border border-gray-200 shadow-sm"
+                              className="w-10 h-10 object-cover rounded-md shadow-sm"
                               onError={(e) => {
                                 e.target.src = '/images/placeholder.jpg';
                               }}
