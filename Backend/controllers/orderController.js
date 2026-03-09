@@ -823,7 +823,7 @@ export const cancelOrder = async (req, res) => {
             const [updateResult] = await sql`
               UPDATE variant_sizes 
               SET stock_quantity = stock_quantity + ${item.quantity} 
-              WHERE variant_id = ${item.variant_id} LIMIT 1
+              WHERE variant_id = ${item.variant_id}
               RETURNING stock_quantity
             `;
             if (!updateResult) {
@@ -851,7 +851,7 @@ export const cancelOrder = async (req, res) => {
               const [updateResult] = await sql`
                 UPDATE variant_sizes 
                 SET stock_quantity = stock_quantity + ${item.quantity} 
-                WHERE variant_id = ${bi.variant_id} LIMIT 1
+                WHERE variant_id = ${bi.variant_id}
                 RETURNING stock_quantity
               `;
               if (!updateResult) {
