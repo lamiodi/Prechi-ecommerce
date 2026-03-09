@@ -329,12 +329,13 @@ export const createOrder = async (req, res) => {
         if (item.variant_id) {
           // Fetch product variant, using LEFT JOIN for sizes to handle null size_id
           const [variant] = await sql`
-            SELECT pv.id, p.name, p.base_price, pi.image_url, c.color_name, s.size_name
+            SELECT pv.id, p.name, p.base_price, 
+                   (SELECT image_url FROM product_images WHERE variant_id = pv.id ORDER BY is_primary DESC, position ASC LIMIT 1) as image_url,
+                   c.color_name, s.size_name
             FROM product_variants pv
             JOIN products p ON pv.product_id = p.id
             LEFT JOIN colors c ON pv.color_id = c.id
             LEFT JOIN sizes s ON s.id = ${item.size_id || null}
-            LEFT JOIN product_images pi ON pv.id = pi.variant_id AND pi.is_primary = true
             WHERE pv.id = ${item.variant_id} AND pv.deleted_at IS NULL AND p.deleted_at IS NULL
           `;
 
@@ -396,9 +397,9 @@ export const createOrder = async (req, res) => {
         } else if (item.bundle_id) {
           // Fetch bundle
           const [bundle] = await sql`
-            SELECT b.id, b.name, b.bundle_price, b.bundle_type, bi.image_url
+            SELECT b.id, b.name, b.bundle_price, b.bundle_type, 
+                   (SELECT image_url FROM bundle_images WHERE bundle_id = b.id ORDER BY is_primary DESC, position ASC LIMIT 1) as image_url
             FROM bundles b
-            LEFT JOIN bundle_images bi ON b.id = bi.bundle_id AND bi.is_primary = true
             WHERE b.id = ${item.bundle_id} AND b.deleted_at IS NULL
           `;
 
@@ -420,12 +421,12 @@ export const createOrder = async (req, res) => {
             for (const bi of item.bundle_items) {
               const [variant] = await sql`
                 SELECT pv.id AS variant_id, pv.product_id, p.name AS product_name, 
-                       c.color_name, s.size_name, pi.image_url
+                       c.color_name, s.size_name, 
+                       (SELECT image_url FROM product_images WHERE variant_id = pv.id ORDER BY is_primary DESC, position ASC LIMIT 1) as image_url
                 FROM product_variants pv
                 JOIN products p ON pv.product_id = p.id
                 LEFT JOIN colors c ON pv.color_id = c.id
                 LEFT JOIN sizes s ON s.id = ${bi.size_id || null}
-                LEFT JOIN product_images pi ON pv.id = pi.variant_id AND pi.is_primary = true
                 WHERE pv.id = ${bi.variant_id} AND pv.deleted_at IS NULL AND p.deleted_at IS NULL
               `;
 
