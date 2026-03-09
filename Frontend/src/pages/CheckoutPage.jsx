@@ -710,11 +710,23 @@ const CheckoutPage = () => {
       const paymentData = {
         order_id: orderId,
         reference: orderResponse.data.order?.reference || orderData.reference,
-        email: billingForm.email || guestForm.email || user.email,
+        // Resolve email from all available sources with clear priority
+        email: billingForm.email ||
+          guestForm.email ||
+          user?.email ||
+          user?.login ||
+          JSON.parse(localStorage.getItem('user') || '{}')?.email ||
+          null,
         amount: Math.round(paymentAmount * 100), // Convert to kobo
         currency: paymentCurrency,
         callback_url: callbackUrl,
       };
+
+      // Guard: if no email found, show a clear message instead of a 500
+      if (!paymentData.email || !paymentData.email.includes('@')) {
+        throw new Error('No email address found for payment. Please add an email to your billing details and try again.');
+      }
+
 
 
 

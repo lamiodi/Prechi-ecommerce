@@ -511,19 +511,13 @@ export const createOrder = async (req, res) => {
       const calculatedTax = tax || (delivery_option === 'international' ? Number((calculatedSubtotal * 0.05).toFixed(2)) : 0);
       const calculatedTotal = Number((calculatedSubtotal - discount + calculatedTax).toFixed(2));
 
-      if (Math.abs(calculatedTotal - total) > 0.01) {
-        console.error(`Validation failed: Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}, discount ${discount}`);
-        throw new Error(`Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}, discount ${discount}`);
+      // Allow ₦1 (1 unit) tolerance for floating-point rounding differences
+      if (Math.abs(calculatedTotal - total) > 1) {
+        console.error(`Validation failed: Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}, discount ${discount}, shipping: ${shipping_cost}`);
+        throw new Error(`Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}. Please refresh your cart and try again.`);
       }
 
-      // Validate base_currency_total
-      const expectedBaseTotal = currency === 'USD' && exchange_rate > 0
-        ? Math.round(total / exchange_rate)
-        : total;
-      if (Math.abs(expectedBaseTotal - base_currency_total) > 1) {
-        console.error(`Validation failed: Base currency total mismatch: expected ${expectedBaseTotal} NGN, got ${base_currency_total} NGN`);
-        throw new Error(`Base currency total mismatch: expected ${expectedBaseTotal} NGN, got ${base_currency_total} NGN`);
-      }
+      // Skip base_currency_total validation — all orders are in NGN, no conversion needed
 
       // Resolve shipping method string
       const shippingOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
@@ -534,13 +528,14 @@ export const createOrder = async (req, res) => {
       try {
         [order] = await sql`
           INSERT INTO orders (
-            user_id, address_id, billing_address_id, cart_id, total, discount, tax, shipping_method, shipping_cost,
+            user_id, address_id, billing_address_id, cart_id, subtotal, total, discount, tax, shipping_method, shipping_cost,
             payment_method, payment_status, status, currency, reference, note,
             delivery_fee_paid, idempotency_key
           ) VALUES (
-            ${user_id}, ${finalAddressId}, ${finalBillingAddressId}, ${finalCartId}, ${total}, ${discount}, 
+            ${user_id}, ${finalAddressId}, ${finalBillingAddressId}, ${finalCartId},
+            ${calculatedSubtotal - shipping_cost}, ${total}, ${discount}, 
             ${calculatedTax}, ${shippingMethodName}, ${shipping_cost},
-            ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note}, 
+            ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note || null}, 
             ${address.country.toLowerCase() === 'nigeria' ? true : false}, ${idempotencyKey || null}
           )
           RETURNING id

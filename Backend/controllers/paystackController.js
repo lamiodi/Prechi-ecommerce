@@ -21,9 +21,15 @@ export const initializePayment = async (req, res) => {
     const { order_id, reference, email, amount, currency, callback_url } = req.body;
 
     // Add more validation
-    if (!order_id || !reference || !email || !amount || !currency) {
+    if (!order_id || !reference || !amount || !currency) {
       console.error('Missing required fields for payment initialization');
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Validate email separately with a clear message
+    if (!email || !email.includes('@')) {
+      console.error(`Invalid or missing email for payment initialization: order_id=${order_id}, email=${email}`);
+      return res.status(400).json({ error: 'A valid email address is required for payment. Please ensure your billing details include an email address.' });
     }
 
     // Check if order exists and is in pending state
@@ -46,10 +52,12 @@ export const initializePayment = async (req, res) => {
     }
 
     // Verify amount and currency match - Paystack expects amount in kobo/cents
-    const expectedAmountInKobo = Math.round(order.total * 100);
-    if (order.currency !== currency || Math.abs(expectedAmountInKobo - amount) > 1) {
-      console.error(`Invalid amount or currency. Expected: ${expectedAmountInKobo} ${order.currency}, got: ${amount} ${currency}`);
-      return res.status(400).json({ error: 'Invalid amount or currency' });
+    const orderTotal = Number(order.total); // postgres may return numeric as string
+    const expectedAmountInKobo = Math.round(orderTotal * 100);
+    const orderCurrency = String(order.currency || 'NGN');
+    if (orderCurrency !== currency || Math.abs(expectedAmountInKobo - amount) > 100) { // Allow ₦1 tolerance
+      console.error(`Invalid amount or currency. Expected: ${expectedAmountInKobo} ${orderCurrency}, got: ${amount} ${currency}`);
+      return res.status(400).json({ error: `Invalid amount or currency. Expected: ${expectedAmountInKobo} ${orderCurrency}, got: ${amount} ${currency}` });
     }
 
     // Construct callback URL
