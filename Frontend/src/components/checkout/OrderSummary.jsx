@@ -24,7 +24,8 @@ const OrderSummary = React.memo(({
   isGuest,
   createdUserId,
   guestFormSubmitted,
-  requiredForm
+  requiredForm,
+  billingAddressOption
 }) => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md sticky top-24">
@@ -248,7 +249,7 @@ const OrderSummary = React.memo(({
           className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-Manrope font-semibold"
           disabled={isProcessing || loading ||
             (!shippingForm.address_line_1 && !shippingAddressId) ||
-            (!billingForm.address_line_1 && !billingAddressId) ||
+            (!billingForm.address_line_1 && !billingAddressId && billingAddressOption !== 'same') ||
             (isNigeria && !shippingMethod) ||
             (isGuest && !createdUserId && !guestFormSubmitted)
           }

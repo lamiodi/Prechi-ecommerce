@@ -1,10 +1,17 @@
 import dotenv from 'dotenv';
+import postgres from 'postgres';
 dotenv.config();
-import sql from './db/index.js';
+
+// Use direct connection (port 5432) derived from DATABASE_URL to bypass pooler timeout issues
+const connectionString = process.env.DATABASE_URL
+  ? process.env.DATABASE_URL.replace(':6543', ':5432')
+  : 'postgres://postgres:postgres@localhost:5432/prechi_clothing';
+
+const sql = postgres(connectionString);
 
 async function fix() {
-    try {
-        await sql`
+  try {
+    await sql`
 CREATE OR REPLACE FUNCTION public.get_cart_items_optimized(p_cart_id INTEGER)
 RETURNS TABLE (
   cart_item_id INTEGER,
@@ -28,6 +35,7 @@ BEGIN
           'is_active', p.is_active,
           'stock_quantity', COALESCE(vs_price.stock_quantity, 0),
           'is_product', true,
+          'size_id', ci.size_id,
           'image', (SELECT image_url FROM product_images WHERE variant_id = pv.id ORDER BY is_primary DESC, position ASC LIMIT 1),
           'color', c.color_name,
           'size', s_main.size_name,
@@ -140,11 +148,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
     `;
-        console.log("Corrected get_cart_items_optimized!");
-    } catch (e) {
-        console.error(e);
-    } finally {
-        process.exit(0);
-    }
+    console.log("Corrected get_cart_items_optimized!");
+  } catch (e) {
+    console.error(e);
+  } finally {
+    process.exit(0);
+  }
 }
 fix();

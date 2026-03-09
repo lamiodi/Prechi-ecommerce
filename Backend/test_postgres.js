@@ -3,24 +3,36 @@ dotenv.config();
 import postgres from 'postgres';
 
 async function test() {
-    const dbUrl = process.env.DATABASE_URL.replace('6543', '5432');
-    const sql = postgres(dbUrl, {
-        idle_timeout: 10,
-        max: 1
-    });
+    const dbUrl = process.env.DATABASE_URL;
+    const sql = postgres(dbUrl, { idle_timeout: 20, max: 1 });
 
     try {
-        console.log("Connected successfully to 5432");
+        // Check orders table columns
+        const columns = await sql`
+            SELECT column_name, data_type, is_nullable
+            FROM information_schema.columns
+            WHERE table_name = 'orders' AND table_schema = 'public'
+            ORDER BY ordinal_position
+        `;
+        console.log("Orders table columns:");
+        columns.forEach(c => console.log(`  ${c.column_name}: ${c.data_type} (nullable: ${c.is_nullable})`));
 
-        // Let's check a cart item to see what is returned
-        const cartItems = await sql`
-            SELECT ci.cart_id, get_cart_items_optimized.* 
-            FROM cart_items ci 
-            CROSS JOIN LATERAL get_cart_items_optimized(ci.cart_id) 
+        // Check if variant_sizes table has data for products in product_variants
+        const vsCount = await sql`SELECT count(*) FROM variant_sizes`;
+        console.log(`\nVariant sizes count: ${vsCount[0].count}`);
+
+        const [sampleVS] = await sql`SELECT * FROM variant_sizes LIMIT 1`;
+        console.log("Sample variant size:", JSON.stringify(sampleVS, null, 2));
+
+        // Check product_variants and their variant_id
+        const [sampleVariant] = await sql`
+            SELECT pv.id, pv.product_id, p.name, p.base_price
+            FROM product_variants pv
+            JOIN products p ON p.id = pv.product_id
             LIMIT 1
         `;
-        console.log("Cart item data:");
-        console.log(JSON.stringify(cartItems, null, 2));
+        console.log("Sample product variant:", JSON.stringify(sampleVariant, null, 2));
+
     } catch (e) {
         console.error("DB error:", e);
     } finally {

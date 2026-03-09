@@ -124,7 +124,11 @@ const fetchCartItems = async (sql, cartId) => {
   return cartItems.map(row => ({
     id: row.cart_item_id,
     quantity: row.quantity,
-    item: row.item_data
+    item: row.item_data,
+    // Expose size_id and bundle_id at top level for use in checkout
+    size_id: row.item_data?.size_id ?? null,
+    bundle_id: row.item_data?.bundle_id ?? null,
+    variant_id: row.item_data?.variant?.variant_id ?? null,
   }));
 };
 

@@ -586,7 +586,16 @@ const CheckoutPage = () => {
         // For guests, we send shipping_data and billing_data
         // For authenticated users, we send address_id and billing_address_id
         shipping_data: !isAuthenticated() ? shippingForm : null,
-        billing_data: !isAuthenticated() ? billingForm : null,
+        billing_data: !isAuthenticated()
+          ? (billingAddressOption === 'same'
+            ? {
+              ...shippingForm,
+              full_name: guestForm.name || billingForm.full_name,
+              email: guestForm.email || billingForm.email,
+              phone_number: guestForm.phone_number || shippingForm.phone_number,
+            }
+            : billingForm)
+          : null,
         address_id: isAuthenticated() ? parseInt(shippingAddressId) : null,
         billing_address_id: isAuthenticated() ?
           (billingAddressOption === 'same' ? parseInt(shippingAddressId) : parseInt(billingAddressId)) : null,
@@ -606,17 +615,25 @@ const CheckoutPage = () => {
           const basePrice = Number(item.item?.price || 0);
 
           // Resolve variant_id correctly:
-          // - Auth users: item_data from DB has item.item.id = PRODUCT id, actual variant id is in item.item.variant.variant_id
-          // - Guest users: variant_id stored directly at item.variant_id (top level)
+          // - Auth users (DB cart): item.variant_id is now exposed at top level by cartController,
+          //   OR it's in item.item.variant.variant_id
+          // - Guest users: item.variant_id stored directly (top level) OR item.item.id was set to variant_id
           const resolvedVariantId = item.item?.is_product
-            ? (item.item?.variant?.variant_id ?? item.variant_id ?? null)
+            ? (item.variant_id ?? item.item?.variant?.variant_id ?? null)
             : null;
 
           // Resolve bundle id
-          const resolvedBundleId = item.item?.is_product ? null : (item.item?.id ?? item.bundle_id ?? null);
+          const resolvedBundleId = item.item?.is_product ? null : (item.bundle_id ?? item.item?.id ?? null);
 
-          // Resolve size_id: auth cart items have it at top level; guest items too
-          const resolvedSizeId = item.size_id ?? null;
+          // Resolve size_id: now exposed at top level by cartController for auth users; guest items also have it top level
+          const resolvedSizeId = item.size_id ?? item.item?.size_id ?? null;
+
+          const resolveImgUrl = (raw) => {
+            if (!raw) return null;
+            if (typeof raw === 'string') return raw;
+            if (typeof raw === 'object') return raw?.image_url || raw?.url || null;
+            return null;
+          };
 
           const orderItem = {
             variant_id: resolvedVariantId,
@@ -624,18 +641,23 @@ const CheckoutPage = () => {
             quantity: item.quantity || 1,
             price: basePrice,
             size_id: resolvedSizeId,
-            image_url: item.item?.image || item.item?.image_url ||
-              (item.item?.is_product
-                ? (item.item?.variant?.images?.[0] ?? null)
-                : (item.item?.images?.[0] ?? null)),
+            image_url: resolveImgUrl(item.item?.image) ||
+              resolveImgUrl(item.item?.image_url) ||
+              resolveImgUrl(item.item?.is_product
+                ? item.item?.variant?.images?.[0]
+                : item.item?.images?.[0]) ||
+              null,
             product_name: item.item?.name || 'Unknown Item',
             color_name: item.item?.color || item.item?.variant?.color_name || null,
             size_name: item.item?.size || item.size_name || null,
           };
 
-          // Add bundle_items array for bundle orders
-          if (!item.item?.is_product && item.item?.items) {
-            orderItem.bundle_items = item.item.items.map(bundleItem => ({
+          // Add bundle_items for bundle orders
+          // For auth users: comes as item.item.items (from cart_bundle_items via get_cart_items_optimized)
+          // For guest users: comes as item.item.items (manually constructed in addToGuestCart)
+          const bundleItems = item.item?.items;
+          if (!item.item?.is_product && Array.isArray(bundleItems) && bundleItems.length > 0) {
+            orderItem.bundle_items = bundleItems.map(bundleItem => ({
               variant_id: bundleItem.variant_id,
               size_id: bundleItem.size_id
             }));
@@ -2254,6 +2276,7 @@ const CheckoutPage = () => {
                   createdUserId={createdUserId}
                   guestFormSubmitted={guestFormSubmitted}
                   requiredForm={requiredForm}
+                  billingAddressOption={billingAddressOption}
                 />
               </div>
             </div>
