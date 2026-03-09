@@ -29,24 +29,24 @@ const OrderSummary = React.memo(({
   return (
     <div className="p-6 bg-white rounded-lg shadow-md sticky top-24">
       <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">Order Summary</h3>
-      
+
       {/* Cart Items */}
       <div className="space-y-4 mb-6">
         {cart.items.map((cartItem, index) => {
           const item = cartItem.item || {};
           const price = Number(item.price || 0);
           const itemTotal = Number((price * (cartItem.quantity || 1)).toFixed(2));
-          
+
           return (
             <div key={cartItem.id || index} className="group">
               <div className="flex gap-3 p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
                 <div className="relative flex-shrink-0">
                   <img
-                    src={item.image || item.image_url || 'https://via.placeholder.com/80x80?text=No+Image'}
+                    src={item.image || item.image_url || '/images/placeholder.jpg'}
                     alt={item.name || 'Product'}
                     className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg"
-                    onError={(e) => { 
-                      e.target.src = 'https://via.placeholder.com/80x80?text=No+Image'; 
+                    onError={(e) => {
+                      e.target.src = '/images/placeholder.jpg';
                     }}
                   />
                   <div className="absolute -top-2 -right-2 bg-Primarycolor text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
@@ -95,15 +95,15 @@ const OrderSummary = React.memo(({
           );
         })}
       </div>
-      
+
       {/* Coupon Code Section */}
       <div className="mb-6">
-        <CouponCode 
-          subtotal={displaySubtotal} 
-          onDiscountApplied={(amount) => setCouponDiscount(amount)} 
+        <CouponCode
+          subtotal={displaySubtotal}
+          onDiscountApplied={(amount) => setCouponDiscount(amount)}
         />
       </div>
-      
+
       <div className="border-t border-gray-200 pt-4">
         <div className="space-y-2">
           <div className="flex justify-between text-sm text-Accent font-PatrickHand">
@@ -117,7 +117,7 @@ const OrderSummary = React.memo(({
               })}
             </span>
           </div>
-          
+
           {displayFirstOrderDiscount > 0 && (
             <div className="flex justify-between text-sm text-green-600 font-PatrickHand">
               <span>First Order Discount (5%)</span>
@@ -131,7 +131,7 @@ const OrderSummary = React.memo(({
               </span>
             </div>
           )}
-          
+
           {displayCouponDiscount > 0 && (
             <div className="flex justify-between text-sm text-green-600 font-PatrickHand">
               <span>Coupon Discount</span>
@@ -145,7 +145,7 @@ const OrderSummary = React.memo(({
               </span>
             </div>
           )}
-          
+
           <div className="flex justify-between text-sm text-Accent font-PatrickHand">
             <span>Shipping</span>
             <span>
@@ -161,7 +161,7 @@ const OrderSummary = React.memo(({
               )}
             </span>
           </div>
-          
+
           {!isNigeria && (
             <div className="flex justify-between text-sm text-Accent font-PatrickHand">
               <span>Tax (5%)</span>
@@ -176,7 +176,7 @@ const OrderSummary = React.memo(({
             </div>
           )}
         </div>
-        
+
         <div className="border-t border-gray-200 mt-3 pt-3">
           <div className="flex justify-between text-lg font-bold text-Primarycolor font-Manrope">
             <span>Total</span>
@@ -190,7 +190,7 @@ const OrderSummary = React.memo(({
             </span>
           </div>
         </div>
-        
+
         {!isNigeria && (
           <div className="mt-3 p-3 bg-blue-50 rounded-lg">
             <p className="text-xs text-blue-700 font-PatrickHand">
@@ -198,7 +198,7 @@ const OrderSummary = React.memo(({
             </p>
           </div>
         )}
-        
+
         {displayFirstOrderDiscount > 0 && (
           <div className="mt-3 p-3 bg-green-50 rounded-lg">
             <p className="text-xs text-green-700 font-PatrickHand">
@@ -206,17 +206,17 @@ const OrderSummary = React.memo(({
             </p>
           </div>
         )}
-        
+
         {appliedCoupon && (
           <div className="mt-3 p-3 bg-green-50 rounded-lg">
             <p className="text-xs text-green-700 font-PatrickHand">
-              🎁 <strong>Coupon Applied!</strong> You saved {appliedCoupon.type === 'percentage' 
-                ? `${appliedCoupon.value}%` 
+              🎁 <strong>Coupon Applied!</strong> You saved {appliedCoupon.type === 'percentage'
+                ? `${appliedCoupon.value}%`
                 : `₦${appliedCoupon.amount.toFixed(2)}`} with coupon code {appliedCoupon.code}.
             </p>
           </div>
         )}
-        
+
         {requiredForm && (
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-start">
@@ -236,15 +236,15 @@ const OrderSummary = React.memo(({
             </div>
           </div>
         )}
-        
+
         {/* Updated Place Order Button */}
         <button
           onClick={handlePlaceOrder}
           className="mt-6 w-full bg-Primarycolor text-Secondarycolor text-sm py-4 px-4 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-Manrope font-semibold"
-          disabled={isProcessing || loading || 
-            (!shippingForm.address_line_1 && !shippingAddressId) || 
-            (!billingForm.address_line_1 && !billingAddressId) || 
-            (isNigeria && !shippingMethod) || 
+          disabled={isProcessing || loading ||
+            (!shippingForm.address_line_1 && !shippingAddressId) ||
+            (!billingForm.address_line_1 && !billingAddressId) ||
+            (isNigeria && !shippingMethod) ||
             (isGuest && !createdUserId && !guestFormSubmitted)
           }
         >
@@ -257,7 +257,7 @@ const OrderSummary = React.memo(({
             'Place Order'
           )}
         </button>
-        
+
         {paymentMethod === 'bitcoin' && (
           <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
             <div className="flex items-center gap-2">

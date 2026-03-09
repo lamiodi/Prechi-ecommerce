@@ -43,7 +43,7 @@ const Cart = () => {
   const { user, loading: authLoading, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Safely access CurrencyContext with error handling
   const currencyContext = useContext(CurrencyContext) || {
     currency: 'NGN',
@@ -51,7 +51,7 @@ const Cart = () => {
     country: 'Nigeria',
     contextLoading: false,
   };
-  
+
   const {
     currency = 'NGN',
     exchangeRate = 1,
@@ -65,7 +65,7 @@ const Cart = () => {
   const [isUpdating, setIsUpdating] = useState(null);
   const [isCartLoading, setIsCartLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
-  
+
   // Helper function to decode JWT token
   const decodeToken = useCallback((token) => {
     try {
@@ -83,7 +83,7 @@ const Cart = () => {
       return null;
     }
   }, []);
-  
+
   // Helper function to get the JWT token
   const getToken = useCallback(() => {
     if (user && user.token) {
@@ -91,12 +91,12 @@ const Cart = () => {
     }
     return localStorage.getItem('token');
   }, [user]);
-  
+
   // Helper function to check if user is authenticated
   const isAuthenticated = useCallback(() => {
     return !!getToken();
   }, [getToken]);
-  
+
   // Helper function to get user ID
   const getUserId = useCallback(() => {
     const token = getToken();
@@ -104,7 +104,7 @@ const Cart = () => {
     const tokenData = decodeToken(token);
     return tokenData?.id;
   }, [getToken, decodeToken]);
-  
+
   // Helper function to handle authentication errors
   const handleAuthError = useCallback(() => {
     console.log('Cart: Authentication error, clearing user data and redirecting');
@@ -117,7 +117,7 @@ const Cart = () => {
     toast.error('Your session has expired. Please log in again.');
     navigate('/login', { state: { from: location.pathname } });
   }, [logout, navigate, location.pathname]);
-  
+
   // Create a centralized axios instance with auth headers
   const getAuthAxios = useCallback(() => {
     const token = getToken();
@@ -135,26 +135,26 @@ const Cart = () => {
       withCredentials: true,
     });
   }, [getToken, country]);
-  
+
   // Helper function to check if an item is a brief product
   const isBriefItem = useCallback((item) => {
     if (!item || !item.item) return false;
-    
+
     const name = (item.item.name || '').toLowerCase();
     const category = (item.item.category || '').toLowerCase();
-    
+
     // Check for brief-related keywords in name or category
-    const isBrief = name.includes('brief') || 
-                   name.includes('boxer') || 
-                   name.includes('underwear') ||
-                   name.includes('trunk') ||
-                   name.includes('jordan') || // Include Jordan products as they appear to be briefs
-                   name.includes('micheal') || // Include Micheal products (common misspelling)
-                   name.includes('michael') || // Include Michael products
-                   category.includes('brief') ||
-                   category.includes('underwear') ||
-                   category.includes('intimates');
-    
+    const isBrief = name.includes('brief') ||
+      name.includes('boxer') ||
+      name.includes('underwear') ||
+      name.includes('trunk') ||
+      name.includes('jordan') || // Include Jordan products as they appear to be briefs
+      name.includes('micheal') || // Include Micheal products (common misspelling)
+      name.includes('michael') || // Include Michael products
+      category.includes('brief') ||
+      category.includes('underwear') ||
+      category.includes('intimates');
+
     // Additional check: if it's a single product with a price around typical brief pricing
     if (item.item.is_product && !isBrief) {
       const price = item.item.price || 0;
@@ -163,7 +163,7 @@ const Cart = () => {
         return true;
       }
     }
-    
+
     return isBrief;
   }, []);
 
@@ -173,19 +173,19 @@ const Cart = () => {
     const totalBriefQuantity = briefItems.reduce((sum, item) => sum + item.quantity, 0);
     const nonBriefItems = cartItems.filter(item => !isBriefItem(item));
     const isBriefOnlyCart = briefItems.length > 0 && nonBriefItems.length === 0;
-    
+
     // Check if cart contains at least one gymwear item and one single brief
-    const hasGymwear = cartItems.some(item => 
+    const hasGymwear = cartItems.some(item =>
       item.item.category && item.item.category.toLowerCase().includes('gymwear')
     );
-    const hasSingleBrief = cartItems.some(item => 
+    const hasSingleBrief = cartItems.some(item =>
       isBriefItem(item) && item.quantity === 1
     );
     const meetsMinimumCombination = hasGymwear && hasSingleBrief;
-    
+
     // Allow gymwear-only carts (Scenario 4)
     const isGymwearOnlyCart = hasGymwear && briefItems.length === 0;
-    
+
     return {
       briefItems,
       totalBriefQuantity,
@@ -201,16 +201,16 @@ const Cart = () => {
       if (guestCart) {
         const parsedCart = JSON.parse(guestCart);
         console.log('Guest cart loaded from localStorage:', parsedCart.items?.length || 0, 'items');
-        
+
         // Validate brief minimum quantity for guest cart
         const briefValidation = validateGuestBriefQuantity(parsedCart.items || []);
         let warningMessage = null;
-        
+
         if (briefValidation.hasInsufficientBriefs) {
           const remaining = 3 - briefValidation.totalBriefQuantity;
           warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
         }
-        
+
         setCart({ ...parsedCart, warning: warningMessage });
         setIsGuest(true);
       } else {
@@ -226,7 +226,7 @@ const Cart = () => {
     console.log('Cart loading completed - guest mode');
     setIsCartLoading(false);
   }, [validateGuestBriefQuantity])
-  
+
   // Save guest cart to localStorage
   const saveGuestCart = useCallback((updatedCart) => {
     try {
@@ -235,16 +235,16 @@ const Cart = () => {
       console.error('Error saving guest cart:', err);
     }
   }, []);
-  
+
   // Function to migrate guest cart to user cart after account creation
   const migrateGuestCartToUserCart = useCallback(async (userId, token) => {
     const guestCartData = localStorage.getItem('guestCart');
     if (!guestCartData) return;
-    
+
     try {
       const guestCart = JSON.parse(guestCartData);
       if (!guestCart.items || guestCart.items.length === 0) return;
-      
+
       const authAxios = axios.create({
         baseURL: API_BASE_URL,
         headers: {
@@ -252,7 +252,7 @@ const Cart = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       // Process each item in the guest cart
       for (const item of guestCart.items) {
         if (item.product_type === 'single') {
@@ -273,11 +273,11 @@ const Cart = () => {
           });
         }
       }
-      
+
       // Clear the guest cart after successful migration
       localStorage.removeItem('guestCart');
       toast.success('Your cart has been transferred to your account');
-      
+
       // Reload the cart to show the updated items
       const response = await authAxios.get(`/cart/${userId}`);
       setCart(response.data);
@@ -287,23 +287,23 @@ const Cart = () => {
       toast.error('Failed to transfer your cart. Please try adding items again.');
     }
   }, []);
-  
+
   // Fetch cart data
   useEffect(() => {
     console.log('Cart useEffect triggered:', { authLoading, contextLoading, user: !!user });
-    
+
     const fetchCart = async (retries = 3, delay = 1000) => {
       console.log('Starting cart fetch...');
-      
+
       const token = getToken();
       if (!token) {
         console.log('No token found, loading guest cart');
         loadGuestCart();
         return;
       }
-      
+
       console.log('Token found, fetching user cart');
-      
+
       try {
         const userId = getUserId();
         if (!userId) {
@@ -317,89 +317,89 @@ const Cart = () => {
         if (typeof response.data === 'string' && response.data.startsWith('<!doctype html')) {
           throw new Error('Received HTML instead of JSON; check Vite proxy configuration');
         }
-        
+
         // Validate brief minimum quantity for logged-in users
         const cartData = response.data;
         const briefValidation = validateGuestBriefQuantity(cartData.items || []);
         let warningMessage = null;
-        
+
         if (briefValidation.hasInsufficientBriefs) {
           const remaining = 3 - briefValidation.totalBriefQuantity;
           warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
         }
-        
+
         setCart({ ...cartData, warning: warningMessage });
         setIsGuest(false);
         setError('');
       } catch (err) {
-          console.error('Cart: Fetch error details:', {
-            message: err.message,
-            code: err.code,
-            response: err.response
-              ? {
-                  status: err.response.status,
-                  data: typeof err.response.data === 'string' ? err.response.data.slice(0, 100) + '...' : err.response.data,
-                }
-              : 'No response',
-            config: err.config,
-          });
-          if (err.response?.status === 401 || err.response?.status === 404 || err.message.includes('Could not determine user ID')) {
-            console.log('Cart: Authentication failed or cart not found, falling back to guest cart');
-            loadGuestCart();
-            return;
-          }
-          
-          if (retries > 0 && (err.code === 'ECONNABORTED' || err.message.includes('Network Error') || err.message.includes('HTML instead of JSON'))) {
-            console.log(`Cart: Retrying fetchCart (${retries} retries left)...`);
-            await new Promise((resolve) => setTimeout(resolve, delay));
-            return fetchCart(retries - 1, delay * 2);
-          }
-          
-          // For other errors, fall back to guest cart instead of showing errors
-          console.log('Cart: Max retries reached or non-retryable error, falling back to guest cart');
-          setError('');
+        console.error('Cart: Fetch error details:', {
+          message: err.message,
+          code: err.code,
+          response: err.response
+            ? {
+              status: err.response.status,
+              data: typeof err.response.data === 'string' ? err.response.data.slice(0, 100) + '...' : err.response.data,
+            }
+            : 'No response',
+          config: err.config,
+        });
+        if (err.response?.status === 401 || err.response?.status === 404 || err.message.includes('Could not determine user ID')) {
+          console.log('Cart: Authentication failed or cart not found, falling back to guest cart');
           loadGuestCart();
-        } finally {
-          console.log('Cart fetch completed, setting loading to false');
-          setIsCartLoading(false);
+          return;
         }
+
+        if (retries > 0 && (err.code === 'ECONNABORTED' || err.message.includes('Network Error') || err.message.includes('HTML instead of JSON'))) {
+          console.log(`Cart: Retrying fetchCart (${retries} retries left)...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return fetchCart(retries - 1, delay * 2);
+        }
+
+        // For other errors, fall back to guest cart instead of showing errors
+        console.log('Cart: Max retries reached or non-retryable error, falling back to guest cart');
+        setError('');
+        loadGuestCart();
+      } finally {
+        console.log('Cart fetch completed, setting loading to false');
+        setIsCartLoading(false);
+      }
     };
-    
+
     if (!authLoading && !contextLoading) {
       fetchCart();
     }
   }, [user, authLoading, contextLoading, country, getToken, getUserId, getAuthAxios, loadGuestCart]);
-  
+
   // Update quantity
   const updateQuantity = useCallback(
     async (itemId, newQuantity) => {
       if (newQuantity < 1 || isUpdating === itemId) return;
       setIsUpdating(itemId);
-      
+
       try {
         if (isGuest) {
           // Handle guest cart update
           const item = cart.items.find((item) => item.id === itemId);
           if (!item) throw new Error('Item not found in cart');
-          
+
           // Validate stock quantity
-        let maxStock = item.item.stock_quantity;
-        // For bundles, skip stock validation since bundle items don't have stock_quantity info
-        // and bundles should be treated as separate entities with their own availability
-        if (!item.item.is_product) {
-          // For bundles, we don't have individual item stock information in the cart
-          // So we'll assume there's sufficient stock and allow quantity increases
-          maxStock = 999; // Set a high limit for bundles
-        }
-        if (maxStock === undefined || maxStock === null) {
-          throw new Error('Stock quantity information is missing');
-        }
-        if (newQuantity > maxStock) {
-          setError(`Cannot add more. Only ${maxStock} in stock.`);
-          toast.error(`Cannot add more. Only ${maxStock} in stock.`);
-          return;
-        }
-          
+          let maxStock = item.item.stock_quantity;
+          // For bundles, skip stock validation since bundle items don't have stock_quantity info
+          // and bundles should be treated as separate entities with their own availability
+          if (!item.item.is_product) {
+            // For bundles, we don't have individual item stock information in the cart
+            // So we'll assume there's sufficient stock and allow quantity increases
+            maxStock = 999; // Set a high limit for bundles
+          }
+          if (maxStock === undefined || maxStock === null) {
+            throw new Error('Stock quantity information is missing');
+          }
+          if (newQuantity > maxStock) {
+            setError(`Cannot add more. Only ${maxStock} in stock.`);
+            toast.error(`Cannot add more. Only ${maxStock} in stock.`);
+            return;
+          }
+
           // Update cart
           const updatedItems = cart.items.map((cartItem) =>
             cartItem.id === itemId ? { ...cartItem, quantity: newQuantity } : cartItem
@@ -410,23 +410,23 @@ const Cart = () => {
           );
           const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
           const total = subtotal + tax;
-          
+
           // Validate brief minimum quantity for guest cart
           const briefValidation = validateGuestBriefQuantity(updatedItems);
           let warningMessage = null;
-          
+
           if (briefValidation.hasInsufficientBriefs) {
             const remaining = 3 - briefValidation.totalBriefQuantity;
             warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
           }
-          
+
           const updatedCart = { ...cart, items: updatedItems, subtotal, tax, total, warning: warningMessage };
           setCart(updatedCart);
           saveGuestCart(updatedCart);
           toast.success('Quantity updated successfully');
           return;
         }
-        
+
         // Handle authenticated user cart update
         const token = getToken();
         if (!token) {
@@ -436,10 +436,10 @@ const Cart = () => {
           navigate('/login', { state: { from: location.pathname } });
           return;
         }
-        
+
         const item = cart.items.find((item) => item.id === itemId);
         if (!item) throw new Error('Item not found in cart');
-        
+
         // Validate stock quantity
         let maxStock = item.item.stock_quantity;
         // For bundles, skip stock validation since bundle items don't have stock_quantity info
@@ -457,7 +457,7 @@ const Cart = () => {
           toast.error(`Cannot add more. Only ${maxStock} in stock.`);
           return;
         }
-        
+
         // Optimistic update with brief validation
         setCart((prev) => {
           const updatedItems = prev.items.map((cartItem) =>
@@ -469,41 +469,41 @@ const Cart = () => {
           );
           const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
           const total = subtotal + tax;
-          
+
           // Validate brief minimum quantity for logged-in users
           const briefValidation = validateGuestBriefQuantity(updatedItems);
           let warningMessage = null;
-          
+
           if (briefValidation.hasInsufficientBriefs) {
             const remaining = 3 - briefValidation.totalBriefQuantity;
             warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
           }
-          
+
           console.log('Cart: Optimistic cart update:', { items: updatedItems, subtotal, tax, total, warning: warningMessage });
           return { ...prev, items: updatedItems, subtotal, tax, total, warning: warningMessage };
         });
-        
+
         const authAxios = getAuthAxios();
         const response = await authAxios.put(`/cart/${itemId}`, { quantity: newQuantity });
         if (response.status !== 200) {
           throw new Error(response.data?.error || 'Failed to update quantity');
         }
-        
+
         // Fetch the updated cart to ensure consistency
         const userId = getUserId();
         if (userId) {
           const cartResponse = await authAxios.get(`/cart/${userId}`);
-          
+
           // Validate brief minimum quantity for the final cart data
           const cartData = cartResponse.data;
           const briefValidation = validateGuestBriefQuantity(cartData.items || []);
           let warningMessage = null;
-          
+
           if (briefValidation.hasInsufficientBriefs) {
             const remaining = 3 - briefValidation.totalBriefQuantity;
             warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
           }
-          
+
           setCart({ ...cartData, warning: warningMessage });
         }
         toast.success('Quantity updated successfully');
@@ -518,7 +518,7 @@ const Cart = () => {
           : err.message || 'Server error';
         setError(errorMessage);
         toast.error(errorMessage);
-        
+
         // Revert optimistic update by fetching the latest cart
         if (!isGuest) {
           const userId = getUserId();
@@ -534,7 +534,7 @@ const Cart = () => {
     },
     [isUpdating, isGuest, cart.items, country]
   );
-  
+
   // Debounced update quantity with useRef to maintain stable reference
   const timeoutRef = useRef(null);
   const debouncedUpdateQuantity = useCallback(
@@ -546,14 +546,14 @@ const Cart = () => {
     },
     [updateQuantity]
   );
-  
+
   // Remove item
   const removeItem = useCallback(
     async (itemId) => {
       try {
         if (isGuest) {
           // Handle guest cart item removal
-          
+
           const remaining = cart.items.filter((item) => item.id !== itemId);
           const subtotal = remaining.reduce(
             (sum, item) => sum + item.quantity * item.item.price,
@@ -561,16 +561,16 @@ const Cart = () => {
           );
           const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
           const total = subtotal + tax;
-          
+
           // Validate brief minimum quantity for guest cart
           const briefValidation = validateGuestBriefQuantity(remaining);
           let warningMessage = null;
-          
+
           if (briefValidation.hasInsufficientBriefs) {
             const remaining = 3 - briefValidation.totalBriefQuantity;
             warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
           }
-          
+
           const updatedCart = { ...cart, items: remaining, subtotal, tax, total, warning: warningMessage };
           setCart(updatedCart);
           saveGuestCart(updatedCart);
@@ -578,7 +578,7 @@ const Cart = () => {
           toast.success('Item removed from cart');
           return;
         }
-        
+
         // Handle authenticated user cart item removal
         const token = getToken();
         if (!token) {
@@ -588,9 +588,9 @@ const Cart = () => {
           navigate('/login', { state: { from: location.pathname } });
           return;
         }
-        
+
         console.log(`Cart: Removing item with cart_item_id ${itemId}`);
-        
+
         // Optimistic update with brief validation
         setCart((prev) => {
           const remaining = prev.items.filter((item) => item.id !== itemId);
@@ -600,25 +600,25 @@ const Cart = () => {
           );
           const tax = country === 'Nigeria' ? 0 : subtotal * 0.05;
           const total = subtotal + tax;
-          
+
           // Validate brief minimum quantity for logged-in users
           const briefValidation = validateGuestBriefQuantity(remaining);
           let warningMessage = null;
-          
+
           if (briefValidation.hasInsufficientBriefs) {
             const remainingBriefs = 3 - briefValidation.totalBriefQuantity;
             warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remainingBriefs} more brief${remainingBriefs > 1 ? 's' : ''} to meet the requirement.`;
           }
-          
+
           return { ...prev, items: remaining, subtotal, tax, total, warning: warningMessage };
         });
-        
+
         const authAxios = getAuthAxios();
         const response = await authAxios.delete(`/cart/${itemId}`);
         if (response.status !== 200) {
           throw new Error(response.data?.error || 'Failed to remove item');
         }
-        
+
         setError('');
         toast.success('Item removed from cart');
       } catch (err) {
@@ -633,24 +633,24 @@ const Cart = () => {
             : err.response?.data?.error || 'Server error';
         setError(errorMessage);
         toast.error(errorMessage);
-        
+
         // Refresh cart from backend to revert optimistic update
         if (!isGuest) {
           const userId = getUserId();
           if (userId) {
             const authAxios = getAuthAxios();
             const response = await authAxios.get(`/cart/${userId}`);
-            
+
             // Validate brief minimum quantity for the refreshed cart data
             const cartData = response.data;
             const briefValidation = validateGuestBriefQuantity(cartData.items || []);
             let warningMessage = null;
-            
+
             if (briefValidation.hasInsufficientBriefs) {
               const remaining = 3 - briefValidation.totalBriefQuantity;
               warningMessage = `Minimum order quantity for briefs is 3 units. Please add ${remaining} more brief${remaining > 1 ? 's' : ''} to meet the requirement.`;
             }
-            
+
             setCart({ ...cartData, warning: warningMessage });
           }
         }
@@ -658,7 +658,7 @@ const Cart = () => {
     },
     [isGuest, cart, country]
   );
-  
+
   // Clear cart
   const clearCart = useCallback(
     async () => {
@@ -672,7 +672,7 @@ const Cart = () => {
           toast.success('Cart cleared successfully');
           return;
         }
-        
+
         // Handle authenticated user cart clearing
         const token = getToken();
         if (!token) {
@@ -682,11 +682,11 @@ const Cart = () => {
           navigate('/login', { state: { from: location.pathname } });
           return;
         }
-        
+
         const userId = getUserId();
         const authAxios = getAuthAxios();
         console.log(`Cart: Attempting to clear cart for userId=${userId}, URL=${API_BASE_URL}/cart/clear/${userId}`);
-        
+
         let response;
         try {
           // Try DELETE first
@@ -705,7 +705,7 @@ const Cart = () => {
             throw deleteErr;
           }
         }
-        
+
         if (response.status === 200 || response.status === 204) {
           setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [], warning: null });
           setError('');
@@ -728,277 +728,277 @@ const Cart = () => {
           err.response?.status === 404
             ? 'Cart not found.'
             : err.response?.status === 405
-            ? 'Unable to clear cart. Please try again or contact support.'
-            : err.response?.data?.error || `Server error: ${err.message}`;
+              ? 'Unable to clear cart. Please try again or contact support.'
+              : err.response?.data?.error || `Server error: ${err.message}`;
         setError(errorMessage);
         toast.error(errorMessage);
       }
     },
     [isGuest]
   );
-  
 
-  
+
+
   // Calculate cart totals with safe fallbacks
   const subtotal = Number(cart.subtotal) || 0;
   const tax = Number(cart.tax) || 0;
   const total = Number(cart.total) || 0;
-  
+
   // Format values for display
   const displaySubtotal = country === 'Nigeria' ? subtotal : subtotal * exchangeRate;
   const displayTax = country === 'Nigeria' ? tax : tax * exchangeRate;
   const displayTotal = country === 'Nigeria' ? total : total * exchangeRate;
-  
+
   // Memoized Cart Item Component
   const CartItem = useCallback(
     ({ item }) => {
-        const bundleItems = item.item.is_product ? [] : item.item.items || [];
-        console.log(`Cart: Rendering cart_item_id ${item.id}, bundle items:`, JSON.stringify(bundleItems, null, 2));
-        const basePrice = Number(item.item.price) || 0;
-        const displayPrice = country === 'Nigeria' ? basePrice : basePrice * exchangeRate;
-        const formattedPrice = displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-          style: 'currency',
-          currency: currency,
-          minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-          maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
-        });
-        const totalPrice = displayPrice * item.quantity;
-        const formattedTotalPrice = totalPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-          style: 'currency',
-          currency: currency,
-          minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-          maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
-        });
-        const isOutOfStock = item.item.stock_quantity === 0;
-        
-        return (
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Product Image */}
-              <div className="relative flex-shrink-0">
-                <div className="relative overflow-hidden rounded-lg bg-gray-100">
-                  <img
-                    src={item.item.image || 'https://via.placeholder.com/150x150?text=No+Image'}
-                    alt={item.item.name}
-                    className={`w-full h-40 sm:w-24 sm:h-24 md:w-28 md:h-28 object-cover ${isOutOfStock ? 'opacity-50 grayscale' : ''}`}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150?text=No+Image';
-                    }}
-                    loading="lazy"
-                    width="150"
-                    height="150"
-                  />
-                  {/* Quantity Badge */}
-                  <div className="absolute -top-2 -right-2 bg-gray-900 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center sm:text-xs sm:h-6 sm:w-6">
-                    {item.quantity}
+      const bundleItems = item.item.is_product ? [] : item.item.items || [];
+      console.log(`Cart: Rendering cart_item_id ${item.id}, bundle items:`, JSON.stringify(bundleItems, null, 2));
+      const basePrice = Number(item.item.price) || 0;
+      const displayPrice = country === 'Nigeria' ? basePrice : basePrice * exchangeRate;
+      const formattedPrice = displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+        maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
+      });
+      const totalPrice = displayPrice * item.quantity;
+      const formattedTotalPrice = totalPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+        maximumFractionDigits: country === 'Nigeria' ? 0 : 2,
+      });
+      const isOutOfStock = item.item.stock_quantity === 0;
+
+      return (
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Product Image */}
+            <div className="relative flex-shrink-0">
+              <div className="relative overflow-hidden rounded-lg bg-gray-100">
+                <img
+                  src={item.item.image || '/images/placeholder.jpg'}
+                  alt={item.item.name || 'Product'}
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg mr-3 sm:mr-4 border border-gray-100"
+                  onError={(e) => {
+                    e.target.src = '/images/placeholder.jpg';
+                  }}
+                  loading="lazy"
+                  width="150"
+                  height="150"
+                />
+                {/* Quantity Badge */}
+                <div className="absolute -top-2 -right-2 bg-gray-900 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center sm:text-xs sm:h-6 sm:w-6">
+                  {item.quantity}
+                </div>
+                {isOutOfStock && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-90 rounded-lg">
+                    <span className="text-white text-sm sm:text-xs font-bold">Out of Stock</span>
                   </div>
-                  {isOutOfStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-red-500 bg-opacity-90 rounded-lg">
-                      <span className="text-white text-sm sm:text-xs font-bold">Out of Stock</span>
+                )}
+              </div>
+            </div>
+
+            {/* Product Details */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                {/* Product Info */}
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="text-base md:text-lg font-semibold font-Manrope text-gray-900 line-clamp-2">
+                        {item.item.name}
+                        {!item.item.is_product && (
+                          <span className="inline-flex items-center ml-2 px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            <Package className="h-3 w-3 mr-1" />
+                            Bundle
+                          </span>
+                        )}
+                      </h3>
+
+                      {/* Product Variants */}
+                      {item.item.is_product && (item.item.color || item.item.size) && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {item.item.color && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
+                              Color: {item.item.color}
+                            </span>
+                          )}
+                          {item.item.size && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
+                              Size: {item.item.size}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Stock Status */}
+                      <div className="mt-2 flex items-center gap-2">
+                        {isOutOfStock ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Out of Stock
+                          </span>
+                        ) : item.item.stock_quantity <= 5 ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Only {item.item.stock_quantity} left
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            In Stock
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Delete Button - Top Right */}
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                      title="Remove item"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Bundle Items Display */}
+                  {!item.item.is_product && Array.isArray(bundleItems) && bundleItems.length > 0 && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
+                        <Package className="h-3 w-3 mr-1" />
+                        Bundle includes ({bundleItems.length} items):
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {bundleItems.slice(0, 4).map((bi, index) => (
+                          <div key={`${item.id}-bundle-item-${bi.id}`} className="flex items-center gap-2">
+                            <img
+                              src={bi.image_url || '/images/placeholder.jpg'}
+                              alt={bi.product_name || 'Bundle item'}
+                              className="w-10 h-10 object-cover rounded-md border border-gray-200 shadow-sm"
+                              onError={(e) => {
+                                e.target.src = '/images/placeholder.jpg';
+                              }}
+                              loading="lazy"
+                              width="40"
+                              height="40"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-gray-800 truncate">{bi.product_name}</p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {bi.color_name && `${bi.color_name}`}
+                                {bi.size_name && `, ${bi.size_name}`}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        {bundleItems.length > 4 && (
+                          <div className="col-span-full text-center">
+                            <span className="text-xs text-gray-500">+{bundleItems.length - 4} more items</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!item.item.is_product && (!Array.isArray(bundleItems) || bundleItems.length === 0) && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <p className="text-xs text-red-600">Bundle items not available. Please remove and re-add the bundle.</p>
                     </div>
                   )}
                 </div>
+
+                {/* Price Section */}
+                <div className="flex-shrink-0 text-right">
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-500 font-PatrickHand">{formattedPrice} each</p>
+                    <p className="text-lg md:text-xl font-bold text-gray-900 font-PatrickHand">{formattedTotalPrice}</p>
+                  </div>
+                </div>
               </div>
-              
-              {/* Product Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-                  {/* Product Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="text-base md:text-lg font-semibold font-Manrope text-gray-900 line-clamp-2">
-                          {item.item.name}
-                          {!item.item.is_product && (
-                            <span className="inline-flex items-center ml-2 px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                              <Package className="h-3 w-3 mr-1" />
-                              Bundle
-                            </span>
-                          )}
-                        </h3>
-                        
-                        {/* Product Variants */}
-                        {item.item.is_product && (item.item.color || item.item.size) && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {item.item.color && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
-                                Color: {item.item.color}
-                              </span>
-                            )}
-                            {item.item.size && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-600">
-                                Size: {item.item.size}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                        
-                        {/* Stock Status */}
-                        <div className="mt-2 flex items-center gap-2">
-                          {isOutOfStock ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Out of Stock
-                            </span>
-                          ) : item.item.stock_quantity <= 5 ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800">
-                              <AlertCircle className="h-3 w-3 mr-1" />
-                              Only {item.item.stock_quantity} left
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                              In Stock
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Delete Button - Top Right */}
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                        title="Remove item"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+
+              {/* Quantity Controls */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t border-gray-200 gap-3">
+                <div className="flex items-center">
+                  <label className="text-sm text-gray-600 font-PatrickHand mr-3">Quantity:</label>
+                  <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => debouncedUpdateQuantity(item.id, item.quantity - 1)}
+                      disabled={isOutOfStock || isUpdating === item.id || item.quantity <= 1}
+                      className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
+                    <div className="px-2 sm:px-4 py-1 sm:py-2 bg-gray-50 border-x border-gray-300 min-w-[2.5rem] sm:min-w-[3rem] text-center">
+                      {isUpdating === item.id ? (
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-Primarycolor mx-auto" />
+                      ) : (
+                        <span className="text-xs sm:text-sm font-semibold font-PatrickHand">{item.quantity}</span>
+                      )}
                     </div>
-                    
-                    {/* Bundle Items Display */}
-                    {!item.item.is_product && Array.isArray(bundleItems) && bundleItems.length > 0 && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
-                          <Package className="h-3 w-3 mr-1" />
-                          Bundle includes ({bundleItems.length} items):
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {bundleItems.slice(0, 4).map((bi, index) => (
-                            <div key={`${item.id}-bundle-item-${bi.id}`} className="flex items-center gap-2">
-                              <img
-                                src={bi.image_url || 'https://via.placeholder.com/40x40'}
-                                alt={bi.product_name}
-                                className="w-8 h-8 rounded object-cover flex-shrink-0"
-                                onError={(e) => {
-                                  e.target.src = 'https://via.placeholder.com/40x40';
-                                }}
-                                loading="lazy"
-                                width="40"
-                                height="40"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-medium text-gray-800 truncate">{bi.product_name}</p>
-                                <p className="text-xs text-gray-500 truncate">
-                                  {bi.color_name && `${bi.color_name}`}
-                                  {bi.size_name && `, ${bi.size_name}`}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                          {bundleItems.length > 4 && (
-                            <div className="col-span-full text-center">
-                              <span className="text-xs text-gray-500">+{bundleItems.length - 4} more items</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {!item.item.is_product && (!Array.isArray(bundleItems) || bundleItems.length === 0) && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-xs text-red-600">Bundle items not available. Please remove and re-add the bundle.</p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Price Section */}
-                  <div className="flex-shrink-0 text-right">
-                    <div className="space-y-1">
-                      <p className="text-sm text-gray-500 font-PatrickHand">{formattedPrice} each</p>
-                      <p className="text-lg md:text-xl font-bold text-gray-900 font-PatrickHand">{formattedTotalPrice}</p>
-                    </div>
+                    <button
+                      onClick={() => debouncedUpdateQuantity(item.id, item.quantity + 1)}
+                      disabled={isOutOfStock || isUpdating === item.id || item.quantity >= item.item.stock_quantity}
+                      className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </button>
                   </div>
                 </div>
-                
-                {/* Quantity Controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 pt-4 border-t border-gray-200 gap-3">
-                  <div className="flex items-center">
-                    <label className="text-sm text-gray-600 font-PatrickHand mr-3">Quantity:</label>
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => debouncedUpdateQuantity(item.id, item.quantity - 1)}
-                        disabled={isOutOfStock || isUpdating === item.id || item.quantity <= 1}
-                        className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </button>
-                      <div className="px-2 sm:px-4 py-1 sm:py-2 bg-gray-50 border-x border-gray-300 min-w-[2.5rem] sm:min-w-[3rem] text-center">
-                        {isUpdating === item.id ? (
-                          <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-Primarycolor mx-auto" />
-                        ) : (
-                          <span className="text-xs sm:text-sm font-semibold font-PatrickHand">{item.quantity}</span>
-                        )}
-                      </div>
-                      <button
-                        onClick={() => debouncedUpdateQuantity(item.id, item.quantity + 1)}
-                        disabled={isOutOfStock || isUpdating === item.id || item.quantity >= item.item.stock_quantity}
-                        className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Delete Button - Bottom */}
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-PatrickHand transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Remove
-                  </button>
-                </div>
+
+                {/* Delete Button - Bottom */}
+                <button
+                  onClick={() => removeItem(item.id)}
+                  className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-PatrickHand transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Remove
+                </button>
               </div>
             </div>
           </div>
-        );
+        </div>
+      );
     },
     [country, currency, exchangeRate, debouncedUpdateQuantity, isUpdating, removeItem]
   );
-  
+
   // Handle loading states AFTER all hooks are declared
   if (authLoading || contextLoading) {
     console.log('Cart page showing loading state:', { authLoading, contextLoading });
     return (
       <div
         style={{
+          '--color-Primarycolor': '#1E1E1E',
+          '--color-Secondarycolor': '#ffffff',
+          '--color-Accent': '#6E6E6E',
+          '--font-Manrope': '"Manrope", "sans-serif"',
+          '--font-PatrickHand': '"Jost", "sans-serif"',
+        }}
+      >
+        <Navbar2 />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center text-gray-600">
+            <Loader2 className="animate-spin h-8 w-8 text-Primarycolor" />
+            <p className="mt-2 text-sm font-PatrickHand">Loading cart...</p>
+          </div>
+        </div>
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
         '--color-Primarycolor': '#1E1E1E',
         '--color-Secondarycolor': '#ffffff',
         '--color-Accent': '#6E6E6E',
         '--font-Manrope': '"Manrope", "sans-serif"',
         '--font-PatrickHand': '"Jost", "sans-serif"',
-      }}
-    >
-      <Navbar2 />
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center text-gray-600">
-          <Loader2 className="animate-spin h-8 w-8 text-Primarycolor" />
-          <p className="mt-2 text-sm font-PatrickHand">Loading cart...</p>
-        </div>
-      </div>
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
-    </div>
-  );
-}
-
-return (
-  <div
-    style={{
-      '--color-Primarycolor': '#1E1E1E',
-      '--color-Secondarycolor': '#ffffff',
-      '--color-Accent': '#6E6E6E',
-      '--font-Manrope': '"Manrope", "sans-serif"',
-      '--font-PatrickHand': '"Jost", "sans-serif"',
       }}
     >
       <Navbar2 />
@@ -1019,7 +1019,7 @@ return (
                   )}
                 </p>
               </div>
-              
+
               {/* Continue Shopping Button - Better Position */}
               {cart.items.length > 0 && (
                 <Link to="/shop" className="self-start">
@@ -1031,7 +1031,7 @@ return (
               )}
             </div>
           </div>
-          
+
           {/* Error Display */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
@@ -1039,7 +1039,7 @@ return (
               <span className="text-red-700 font-PatrickHand text-sm">{error}</span>
             </div>
           )}
-          
+
           {/* Main Content Area */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Cart Items Section */}
@@ -1056,7 +1056,7 @@ return (
                     Clear All Items
                   </button>
                 </div>
-                
+
                 {/* Cart Items List */}
                 <div className="space-y-4">
                   {isCartLoading ? (
@@ -1081,7 +1081,7 @@ return (
                               Continue Shopping
                             </button>
                           </Link>
-                          
+
                           {isGuest && (
                             <div className="bg-blue-50 rounded-lg p-4 mt-4">
                               <p className="text-sm text-blue-700 font-PatrickHand">
@@ -1101,7 +1101,7 @@ return (
                 </div>
               </div>
             </div>
-            
+
             {/* Order Summary Section */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm sticky top-6">
@@ -1109,7 +1109,7 @@ return (
                 <div className="p-6 border-b border-gray-200">
                   <h2 className="text-xl font-semibold font-Manrope text-gray-900">Order Summary</h2>
                 </div>
-                
+
                 {/* Summary Details */}
                 <div className="p-6 space-y-4">
                   {/* Items Count */}
@@ -1123,15 +1123,15 @@ return (
                       })}
                     </span>
                   </div>
-                  
+
                   {/* Shipping Info */}
                   <div className="flex justify-between text-sm">
                     <span className="font-PatrickHand text-gray-600">Shipping</span>
                     <span className="font-medium font-PatrickHand text-gray-900">Calculated at checkout</span>
                   </div>
-                  
 
-                  
+
+
                   {/* Tax (for international) */}
                   {displayTax > 0 && (
                     <div className="flex justify-between text-sm">
@@ -1145,7 +1145,7 @@ return (
                       </span>
                     </div>
                   )}
-                  
+
                   {/* Divider */}
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-lg font-bold">
@@ -1159,7 +1159,7 @@ return (
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* Checkout Button */}
                   {cart.warning || cart.items.some((item) => item.item.stock_quantity === 0) ? (
                     <div className="relative">
@@ -1189,7 +1189,7 @@ return (
                       </button>
                     </Link>
                   )}
-                  
+
                   {/* Enhanced Warning for brief minimum quantity */}
                   {cart.warning && cart.warning.includes('brief') && (
                     <div className="mt-3 p-4 bg-orange-50 rounded-lg border-2 border-orange-300">
@@ -1205,7 +1205,7 @@ return (
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Other warnings (non-brief related) */}
                   {cart.warning && !cart.warning.includes('brief') && (
                     <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
@@ -1215,7 +1215,7 @@ return (
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Warning for out of stock items */}
                   {cart.items.some((item) => item.item.stock_quantity === 0) && (
                     <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-200">
@@ -1225,7 +1225,7 @@ return (
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Guest Notice */}
                   {isGuest && (
                     <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -1237,7 +1237,7 @@ return (
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Shipping Note */}
                   <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                     <p className="text-xs text-gray-600 font-PatrickHand text-center">
@@ -1246,7 +1246,7 @@ return (
                         : '✈️ International shipping fees will be provided via email after order confirmation.'}
                     </p>
                   </div>
-                  
+
                   {/* Security Badge */}
                   <div className="flex items-center justify-center gap-2 pt-2">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
