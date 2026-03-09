@@ -616,7 +616,7 @@ const ProductDetails = () => {
 
   const sizeOptions = isProduct
     ? sortSizes(Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [])
-    : sortSizes(Array.isArray(data?.items?.[0]?.all_variants?.[0]?.sizes) ? data.items[0].all_variants[0].sizes : [])
+    : sortSizes(Array.isArray(data?.items?.[0]?.all_variants?.[0]?.sizes) ? data?.items?.[0]?.all_variants?.[0]?.sizes : [])
   const bundleTypes = ["3-in-1", "5-in-1"]
   return (
     <div className="min-h-screen bg-gray-50">
