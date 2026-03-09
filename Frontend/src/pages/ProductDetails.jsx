@@ -53,9 +53,16 @@ const ProductDetails = () => {
     White: "#FFFFFF",
     Gray: "#808080",
     Blue: "#0066CC",
+    "Navy Blue": "#000080",
+    Navy: "#000080",
     Brown: "#8B4513",
     Cream: "#F5F5DC",
     Pink: "#FFC0CB",
+    Red: "#FF0000",
+    Green: "#008000",
+    Yellow: "#FFFF00",
+    Purple: "#800080",
+    Orange: "#FFA500",
   }
   // Helper function to decode JWT token
   const decodeToken = (token) => {
