@@ -114,6 +114,11 @@ export const initializePayment = async (req, res) => {
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
+        console.error('Paystack API Error Response:', JSON.stringify(err.response.data, null, 2));
+        
+        // If 401, it means backend key is invalid. 
+        // If 400, maybe duplicate reference or bad data.
+        
         return res.status(err.response.status).json({ 
           error: err.response.data?.message || 'Payment provider error',
           details: err.response.data 
