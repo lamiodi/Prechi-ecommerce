@@ -474,11 +474,13 @@ export const createOrder = async (req, res) => {
             console.warn(`No bundle_items provided for bundle ${item.bundle_id}; assuming no stock update needed`);
           }
 
-          // Validate bundle price
+          // Validate bundle price — account for 5-in-1 bundles which cost 1.5x the base bundle_price
+          const bundlePriceMultiplier = (item.bundle_items && item.bundle_items.length === 5) ? 1.5 : 1;
+          const baseBundlePrice = Number(bundle.bundle_price) * bundlePriceMultiplier;
           const expectedPrice = currency === 'USD' && exchange_rate > 0
-            ? Number((bundle.bundle_price * exchange_rate).toFixed(2))
-            : bundle.bundle_price;
-          if (Math.abs(expectedPrice - item.price) > 0.01) {
+            ? Number((baseBundlePrice * exchange_rate).toFixed(2))
+            : baseBundlePrice;
+          if (Math.abs(expectedPrice - item.price) > 1) { // Allow ₦1 tolerance for rounding
             console.error(`Validation failed: Price mismatch for bundle ${item.bundle_id}: expected ${expectedPrice} ${currency}, got ${item.price} ${currency}`);
             throw new Error(`Price mismatch for bundle ${item.bundle_id}: expected ${expectedPrice} ${currency}, got ${item.price} ${currency}`);
           }
@@ -618,10 +620,10 @@ export const createOrder = async (req, res) => {
           console.warn(`⚠️ Missing size_name for variant ${item.variant_id}, size ${item.size_id} in order ${orderId}`);
           // Try to get size name from sizes table as fallback
           try {
-            const [sizeInfo] = await sql`SELECT name FROM sizes WHERE id = ${item.size_id}`;
+            const [sizeInfo] = await sql`SELECT size_name FROM sizes WHERE id = ${item.size_id}`;
             if (sizeInfo) {
-              item.size_name = sizeInfo.name;
-              console.log(`✅ Retrieved size name from sizes table: ${sizeInfo.name}`);
+              item.size_name = sizeInfo.size_name;
+              console.log(`✅ Retrieved size name from sizes table: ${sizeInfo.size_name}`);
             }
           } catch (sizeError) {
             console.error(`❌ Failed to retrieve size name for size_id ${item.size_id}:`, sizeError.message);
@@ -914,7 +916,9 @@ export const getOrdersByUser = async (req, res) => {
 
     const formattedOrders = orders.map(order => ({
       ...order,
-      shipping_country_name: Country.getAllCountries().find(c => c.name.toLowerCase() === order.shipping_country.toLowerCase())?.name || order.shipping_country,
+      shipping_country_name: order.shipping_country
+        ? (Country.getAllCountries().find(c => c.name.toLowerCase() === order.shipping_country.toLowerCase())?.name || order.shipping_country)
+        : 'Nigeria',
     }));
 
     console.log('getOrdersByUser: Fetched orders for user:', { userId: String(userId).replace(/[^a-zA-Z0-9-_]/g, ''), orderCount: orders.length });
@@ -986,7 +990,9 @@ export const getOrderById = async (req, res) => {
 
     const formattedOrder = {
       ...order,
-      shipping_country_name: Country.getAllCountries().find(c => c.name.toLowerCase() === order.shipping_country.toLowerCase())?.name || order.shipping_country,
+      shipping_country_name: order.shipping_country
+        ? (Country.getAllCountries().find(c => c.name.toLowerCase() === order.shipping_country.toLowerCase())?.name || order.shipping_country)
+        : 'Nigeria',
       items,
     };
 

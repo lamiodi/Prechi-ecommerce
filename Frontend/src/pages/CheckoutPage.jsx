@@ -24,30 +24,30 @@ const CheckoutPage = () => {
   // Get user data from both AuthContext and our custom hook
   const { user: authUser, loading: authLoading, login } = useAuth();
   const { user: hookUser, refreshUser, refreshCount } = useUserManager();
-  
+
   // Use the user from our custom hook, fall back to AuthContext if needed
   const user = hookUser || authUser;
-  
+
   let currencyContext;
   try {
     currencyContext = useContext(CurrencyContext);
   } catch (error) {
     console.error('Error accessing CurrencyContext:', error);
-    currencyContext = { 
-      currency: 'NGN', 
-      exchangeRate: 1, 
-      country: 'Nigeria', 
-      contextLoading: false 
+    currencyContext = {
+      currency: 'NGN',
+      exchangeRate: 1,
+      country: 'Nigeria',
+      contextLoading: false
     };
   }
-  
-  const { 
-    currency = 'NGN', 
-    exchangeRate = 1, 
-    country = 'Nigeria', 
-    contextLoading = false 
+
+  const {
+    currency = 'NGN',
+    exchangeRate = 1,
+    country = 'Nigeria',
+    contextLoading = false
   } = currencyContext || {};
-  
+
   const navigate = useNavigate();
   const [cart, setCart] = useState({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [] });
   const [shippingAddresses, setShippingAddresses] = useState([]);
@@ -91,10 +91,10 @@ const CheckoutPage = () => {
     zip_code: '',
     country: 'Nigeria',
   });
-  
+
   // New state for billing address option
   const [billingAddressOption, setBillingAddressOption] = useState('same'); // 'same' or 'different'
-  
+
   // Discount states
   const [firstOrderDiscount, setFirstOrderDiscount] = useState(0);
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -103,10 +103,10 @@ const CheckoutPage = () => {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
-  
+
   // Add state to track if user data has been refreshed
   const [userDataRefreshed, setUserDataRefreshed] = useState(false);
-  
+
   // Guest user states
   const [isGuest, setIsGuest] = useState(false);
   const [guestForm, setGuestForm] = useState({
@@ -118,39 +118,39 @@ const CheckoutPage = () => {
   const [guestFormErrors, setGuestFormErrors] = useState({});
   const [createdUserId, setCreatedUserId] = useState(null);
   const [existingUserType, setExistingUserType] = useState(null); // 'temporary', 'permanent', or null
-  
+
   // State to track which form needs to be filled
   const [requiredForm, setRequiredForm] = useState(null); // 'guest', 'shipping', 'billing'
-  
+
   // State to track if guest form has been submitted
   const [guestFormSubmitted, setGuestFormSubmitted] = useState(false);
-  
+
   // NEW: State to prevent duplicate submissions
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   // NEW: Generate idempotency key once per session
   const [idempotencyKey] = useState(() => uuidv4());
-  
+
   // Memoize functions to prevent unnecessary re-renders
   const handleGuestFormChange = useCallback((field, value) => {
-    setGuestForm(prev => ({...prev, [field]: value}));
+    setGuestForm(prev => ({ ...prev, [field]: value }));
     if (field === 'name' || field === 'email') {
       setExistingUserType(null);
     }
   }, []);
-  
+
   const handleOrderNoteChange = useCallback((e) => {
     setOrderNote(e.target.value);
   }, []);
-  
+
   const handleCouponCodeChange = useCallback((e) => {
     setCouponCode(e.target.value.toUpperCase());
   }, []);
-  
+
   const handleLoginRedirect = useCallback(() => {
     navigate('/login', { state: { from: '/checkout' } });
   }, [navigate]);
-  
+
   const decodeToken = (token) => {
     try {
       const base64Url = token.split('.')[1];
@@ -164,31 +164,31 @@ const CheckoutPage = () => {
       return null;
     }
   };
-  
+
   const getToken = () => {
     if (user && user.token) return user.token;
     return localStorage.getItem('token');
   };
-  
+
   const getUserId = () => {
     const token = getToken();
     if (!token) return null;
     const tokenData = decodeToken(token);
     return tokenData?.id;
   };
-  
+
   const isAuthenticated = () => {
     return !!getToken();
   };
-  
+
   // Replace your refreshUserData function with this
   const refreshUserData = async () => {
     try {
       console.log('Refreshing user data...');
-      
+
       // Use the refreshUser function from our custom hook
       const updatedUser = await refreshUser();
-      
+
       if (updatedUser) {
         console.log('User data refreshed successfully');
         setUserDataRefreshed(true);
@@ -202,7 +202,7 @@ const CheckoutPage = () => {
       return null;
     }
   };
-  
+
   // Force refresh user data on component mount
   useEffect(() => {
     const refreshUserDataOnMount = async () => {
@@ -217,15 +217,15 @@ const CheckoutPage = () => {
     };
     refreshUserDataOnMount();
   }, [user, userDataRefreshed]);
-  
+
   // Update the useEffect that calculates the first order discount
   useEffect(() => {
     const currentSubtotal = cart.subtotal; // Always in NGN
-    
+
     // Guest users (temporary) don't get first order discount
     if (isGuest) {
       setFirstOrderDiscount(0);
-    } 
+    }
     // For authenticated users, check if it's their first order
     else if (user && (user.first_order === true || user.first_order === 1) && currentSubtotal > 0) {
       const discountAmount = Number((currentSubtotal * 0.05).toFixed(2));
@@ -234,20 +234,20 @@ const CheckoutPage = () => {
       setFirstOrderDiscount(0);
     }
   }, [user?.first_order, cart.subtotal, userDataRefreshed, refreshCount, isGuest]); // Added isGuest to dependencies
-  
+
   // Apply coupon code
   const handleApplyCoupon = async (e) => {
     e.preventDefault();
-    
+
     if (!couponCode.trim()) {
       setCouponError('Please enter a coupon code');
       return;
     }
-    
+
     setCouponLoading(true);
     setCouponError('');
     setCouponSuccess('');
-    
+
     try {
       const token = getToken();
       const response = await axios.post(
@@ -255,10 +255,10 @@ const CheckoutPage = () => {
         { code: couponCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       if (response.data.valid) {
         const discount = response.data.discount;
-        
+
         // Calculate discount amount
         let discountAmount = 0;
         if (discount.type === 'percentage') {
@@ -266,17 +266,17 @@ const CheckoutPage = () => {
         } else if (discount.type === 'fixed') {
           discountAmount = discount.value;
         }
-        
+
         // Ensure discount doesn't exceed subtotal
         discountAmount = Math.min(discountAmount, cart.subtotal);
-        
+
         setAppliedCoupon({
           code: discount.code,
           type: discount.type,
           value: discount.value,
           amount: discountAmount
         });
-        
+
         setCouponDiscount(discountAmount);
         setCouponSuccess(`Coupon applied! You saved ${discount.type === 'percentage' ? `${discount.value}%` : `₦${discount.value}`}`);
       } else {
@@ -289,7 +289,7 @@ const CheckoutPage = () => {
       setCouponLoading(false);
     }
   };
-  
+
   // Remove coupon
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
@@ -297,34 +297,34 @@ const CheckoutPage = () => {
     setCouponDiscount(0);
     setCouponSuccess('');
   };
-  
+
   const shippingOptions = [
-    { 
-      id: 1, 
-      method: 'Delivery within Lagos Island', 
-      total_cost: 4000, 
+    {
+      id: 1,
+      method: 'Delivery within Lagos Island',
+      total_cost: 4000,
       estimated_delivery: '3–5 business days',
       icon: 'truck',
       description: 'Fast delivery within Lagos Island'
     },
-    { 
-      id: 2, 
-      method: 'Delivery within Lagos Mainland', 
-      total_cost: 6000, 
+    {
+      id: 2,
+      method: 'Delivery within Lagos Mainland',
+      total_cost: 6000,
       estimated_delivery: '5–7 business days',
       icon: 'package',
       description: 'Reliable delivery within Lagos Mainland'
     },
-    { 
-      id: 3, 
-      method: 'Outside Lagos', 
-      total_cost: 7000, 
+    {
+      id: 3,
+      method: 'Outside Lagos',
+      total_cost: 7000,
       estimated_delivery: '7–10 business days',
       icon: 'home',
       description: 'Delivery outside Lagos state'
     },
   ];
-  
+
   const getShippingIcon = (iconType) => {
     switch (iconType) {
       case 'truck':
@@ -337,7 +337,7 @@ const CheckoutPage = () => {
         return <Truck className="h-5 w-5" />;
     }
   };
-  
+
   // Memoized guest form validation to prevent unnecessary recalculations
   const validateGuestForm = useCallback(() => {
     const errors = {};
@@ -356,28 +356,28 @@ const CheckoutPage = () => {
     } else if (guestForm.phone_number.trim().length < 10) {
       errors.phone_number = 'Phone number must be at least 10 digits';
     }
-    
+
     if (Object.keys(errors).length > 0) {
       setGuestFormErrors(errors);
       return false;
     }
-    
+
     setGuestFormErrors({});
     return true;
   }, [guestForm.name, guestForm.email, guestForm.phone_number]);
-  
+
   // Handle guest form submission
   const handleGuestFormSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateGuestForm()) {
       setRequiredForm('guest');
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       // Call the createTemporaryUser API endpoint
       const response = await axios.post(`${API_BASE_URL}/api/auth/create-temp-user`, {
@@ -385,16 +385,16 @@ const CheckoutPage = () => {
         email: guestForm.email,
         phone_number: guestForm.phone_number
       });
-      
+
       const { user, isExisting } = response.data;
       const userId = user.id;
-      
+
       // Update all state at once
       setCreatedUserId(userId);
       // Keep isGuest as true for both new and existing temporary users
       setShowGuestModal(false); // Close the modal instead of setting showGuestForm
       setGuestFormSubmitted(true);
-      
+
       if (isExisting) {
         setExistingUserType('temporary');
         toast.success('Welcome back! We found your temporary account.');
@@ -402,7 +402,7 @@ const CheckoutPage = () => {
         setExistingUserType(null);
         toast.success('Account created successfully!');
       }
-      
+
       // Update shipping and billing forms with guest information
       setShippingForm(prev => ({
         ...prev,
@@ -416,7 +416,7 @@ const CheckoutPage = () => {
         country: 'Nigeria',
         phone_number: guestForm.phone_number
       }));
-      
+
       setBillingForm(prev => ({
         ...prev,
         full_name: guestForm.name,
@@ -429,24 +429,24 @@ const CheckoutPage = () => {
         zip_code: '',
         country: 'Nigeria',
       }));
-      
+
       // Set the billing address option to 'same' by default
       setBillingAddressOption('same');
-      
+
       // Return the user ID to use in processOrder
       return userId;
     } catch (err) {
       console.error('Error in guest submission:', err);
-      
+
       // Check if the error is because the user already exists
-      if (err.response?.status === 400 && 
-          (err.response?.data?.error?.includes('already exists') || 
-           err.response?.data?.message?.includes('already registered'))) {
-        
+      if (err.response?.status === 400 &&
+        (err.response?.data?.error?.includes('already exists') ||
+          err.response?.data?.message?.includes('already registered'))) {
+
         // Check if the error response includes existingUser data
         if (err.response?.data?.existingUser) {
           const { existingUser } = err.response.data;
-          
+
           if (existingUser.is_temporary === false) {
             // It's a permanent user
             setExistingUserType('permanent');
@@ -470,20 +470,20 @@ const CheckoutPage = () => {
         toast.error('Server error occurred while creating your account. Please try again later.');
       } else {
         // Some other error occurred
-        const errorMessage = err.response?.data?.error || 
-                            err.response?.data?.message || 
-                            err.message || 
-                            'Failed to create account';
+        const errorMessage = err.response?.data?.error ||
+          err.response?.data?.message ||
+          err.message ||
+          'Failed to create account';
         setError(errorMessage);
         toast.error(errorMessage);
       }
-      
+
       return false;
     } finally {
       setShippingAddressLoading(false);
     }
   };
-  
+
   // Validate shipping address
   const validateShippingAddress = () => {
     if (!shippingForm.address_line_1) {
@@ -493,7 +493,7 @@ const CheckoutPage = () => {
     }
     return true;
   };
-  
+
   // Validate billing address
   const validateBillingAddress = () => {
     if (!billingForm.address_line_1) {
@@ -503,19 +503,19 @@ const CheckoutPage = () => {
     }
     return true;
   };
-  
+
   // NEW: Generate a unique order reference
   const generateOrderReference = () => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 10000);
     return `ORD-${timestamp}-${random}`;
   };
-  
+
   // Modified processOrder function with better error handling and loading state management
   const processOrder = async (guestUserId = null) => {
     // Use the provided guestUserId if available, otherwise fall back to state
     const userId = guestUserId || createdUserId || getUserId();
-    
+
     // Skip guest form check if we have a guestUserId
     if (!guestUserId && isGuest && !guestFormSubmitted) {
       setError('Please complete the guest form to continue');
@@ -523,50 +523,50 @@ const CheckoutPage = () => {
       setLoading(false); // Reset loading state
       return;
     }
-    
+
     // Check if user has provided shipping address (either form data or selected address ID)
-    const hasShippingAddress = isAuthenticated() 
+    const hasShippingAddress = isAuthenticated()
       ? (shippingAddressId && shippingAddresses.length > 0) || shippingForm.address_line_1
       : shippingForm.address_line_1;
-    
+
     if (!hasShippingAddress) {
       setError('Please add a shipping address');
       setRequiredForm('shipping');
       setLoading(false); // Reset loading state
       return;
     }
-    
+
     // Check if user has provided billing address (either form data, selected address ID, or same as shipping)
-    const hasBillingAddress = isAuthenticated() 
+    const hasBillingAddress = isAuthenticated()
       ? (billingAddressOption === 'same' && hasShippingAddress) || (billingAddressId && billingAddresses.length > 0)
       : billingForm.address_line_1;
-    
+
     if (!hasBillingAddress) {
       setError('Please add a billing address');
       setRequiredForm('billing');
       setLoading(false); // Reset loading state
       return;
     }
-    
+
     const addressCountry = shippingForm.country;
     const isNigeria = addressCountry.toLowerCase() === 'nigeria';
-    
+
     if (isNigeria && !shippingMethod) {
       setError('Please select a shipping method');
       setLoading(false); // Reset loading state
       return;
     }
-    
+
     if (!cart?.items?.length) {
       setError('Cart is empty');
       toast.error('Cart is empty');
       setLoading(false); // Reset loading state
       return;
     }
-    
+
     try {
       const orderCurrency = 'NGN'; // Force NGN due to Paystack limitation
-      
+
       // Calculate amounts in NGN
       const baseSubtotal = Number(cart?.subtotal) || 0;
       const baseFirstOrderDiscount = firstOrderDiscount; // Use the calculated discount
@@ -577,10 +577,10 @@ const CheckoutPage = () => {
       const baseShippingCost = isNigeria ? shippingMethod?.total_cost || 0 : 0;
       const baseDiscountedSubtotal = Number((baseSubtotal - baseFinalDiscount).toFixed(2));
       const baseTotal = Number((baseDiscountedSubtotal + baseTax + baseShippingCost).toFixed(2));
-      
+
       // Format payment method as a string to match backend expectations
       const formattedPaymentMethod = paymentMethod;
-      
+
       const orderData = {
         user_id: userId,
         // For guests, we send shipping_data and billing_data
@@ -588,7 +588,7 @@ const CheckoutPage = () => {
         shipping_data: !isAuthenticated() ? shippingForm : null,
         billing_data: !isAuthenticated() ? billingForm : null,
         address_id: isAuthenticated() ? parseInt(shippingAddressId) : null,
-        billing_address_id: isAuthenticated() ? 
+        billing_address_id: isAuthenticated() ?
           (billingAddressOption === 'same' ? parseInt(shippingAddressId) : parseInt(billingAddressId)) : null,
         cart_id: isAuthenticated() ? cart.cartId : null,
         total: baseTotal,
@@ -604,20 +604,35 @@ const CheckoutPage = () => {
         reference: generateOrderReference(),
         items: cart.items.map(item => {
           const basePrice = Number(item.item?.price || 0);
+
+          // Resolve variant_id correctly:
+          // - Auth users: item_data from DB has item.item.id = PRODUCT id, actual variant id is in item.item.variant.variant_id
+          // - Guest users: variant_id stored directly at item.variant_id (top level)
+          const resolvedVariantId = item.item?.is_product
+            ? (item.item?.variant?.variant_id ?? item.variant_id ?? null)
+            : null;
+
+          // Resolve bundle id
+          const resolvedBundleId = item.item?.is_product ? null : (item.item?.id ?? item.bundle_id ?? null);
+
+          // Resolve size_id: auth cart items have it at top level; guest items too
+          const resolvedSizeId = item.size_id ?? null;
+
           const orderItem = {
-            variant_id: item.item?.is_product ? item.item.id : null,
-            bundle_id: item.item?.is_product ? null : item.item.id,
+            variant_id: resolvedVariantId,
+            bundle_id: resolvedBundleId,
             quantity: item.quantity || 1,
             price: basePrice,
-            size_id: item.size_id || null,
-            image_url: item.item?.image_url || item.item?.image || (item.item?.is_product ? 
-              (item.item?.product_images?.find(img => img.is_primary)?.image_url || null) : 
-              (item.item?.bundle_images?.find(img => img.is_primary)?.image_url || null)),
+            size_id: resolvedSizeId,
+            image_url: item.item?.image || item.item?.image_url ||
+              (item.item?.is_product
+                ? (item.item?.variant?.images?.[0] ?? null)
+                : (item.item?.images?.[0] ?? null)),
             product_name: item.item?.name || 'Unknown Item',
-            color_name: item.item?.color || null,
-            size_name: item.size_name || null,
+            color_name: item.item?.color || item.item?.variant?.color_name || null,
+            size_name: item.item?.size || item.size_name || null,
           };
-          
+
           // Add bundle_items array for bundle orders
           if (!item.item?.is_product && item.item?.items) {
             orderItem.bundle_items = item.item.items.map(bundleItem => ({
@@ -625,7 +640,7 @@ const CheckoutPage = () => {
               size_id: bundleItem.size_id
             }));
           }
-          
+
           return orderItem;
         }),
         note: orderNote,
@@ -634,9 +649,9 @@ const CheckoutPage = () => {
         converted_total: baseTotal,
         tax: baseTax,
       };
-      
 
-      
+
+
       let orderResponse;
       try {
         // NEW: Include idempotency key in headers
@@ -645,11 +660,11 @@ const CheckoutPage = () => {
             'X-Idempotency-Key': idempotencyKey
           }
         });
-        
+
         // Handle case where backend returns 200 with 'Order already exists with pending payment'
         if (orderResponse.data.message === 'Order already exists with pending payment') {
           const existingOrderId = orderResponse.data.order.id;
-          
+
           // Continue with payment initialization using existing order
           orderResponse = { data: { order: { id: existingOrderId, reference: orderResponse.data.order.reference } } };
         }
@@ -657,41 +672,41 @@ const CheckoutPage = () => {
         // Handle case where order with same reference already exists
         if (err.response?.status === 409 && err.response?.data?.order_id) {
           const existingOrderId = err.response.data.order_id;
-          
+
           // If payment is already completed, redirect to thank you page
           if (err.response.data.payment_status === 'completed') {
             toast.success('Order already exists with completed payment');
             navigate(`/thank-you?reference=${err.response.data.reference || orderData.reference}&orderId=${existingOrderId}`);
             return;
           }
-          
+
           // If payment is pending, continue with payment initialization
-          orderResponse = { 
-            data: { 
-              order: { 
-                id: existingOrderId, 
-                reference: err.response.data.reference || orderData.reference 
-              } 
-            } 
+          orderResponse = {
+            data: {
+              order: {
+                id: existingOrderId,
+                reference: err.response.data.reference || orderData.reference
+              }
+            }
           };
         } else {
           throw err;
         }
       }
-      
 
-      
+
+
       const orderId = orderResponse.data.order?.id || orderResponse.data.id || orderResponse.data.data?.id;
       if (!orderId) {
         console.error('Order ID not found in response:', orderResponse.data);
         throw new Error('Order ID not found in response');
       }
-      
+
       const paymentCurrency = 'NGN';
       const paymentAmount = baseTotal;
-      
+
       const callbackUrl = `${window.location.origin}/thank-you?reference=${orderResponse.data.order?.reference || orderData.reference}&orderId=${orderId}`;
-      
+
       const paymentData = {
         order_id: orderId,
         reference: orderResponse.data.order?.reference || orderData.reference,
@@ -700,57 +715,57 @@ const CheckoutPage = () => {
         currency: paymentCurrency,
         callback_url: callbackUrl,
       };
-      
 
-      
+
+
       // Try to initialize payment with multiple retries
       let paymentResponse;
       let retryCount = 0;
       const maxRetries = 3;
-      
+
       while (retryCount < maxRetries) {
         try {
           // Increase timeout for each retry
           const timeout = 15000 * (retryCount + 1); // 15s, 30s, 45s
-          
+
           paymentResponse = await Promise.race([
             axios.post(`${API_BASE_URL}/api/paystack/initialize`, paymentData),
-            new Promise((_, reject) => 
+            new Promise((_, reject) =>
               setTimeout(() => reject(new Error('Payment initialization timeout')), timeout)
             )
           ]);
-          
+
           // If we get here, the request was successful
           break;
         } catch (err) {
           retryCount++;
-          
+
           if (retryCount >= maxRetries) {
             throw new Error('Payment initialization failed after multiple attempts');
           }
-          
+
           // Wait before retrying
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
-      
+
       let paymentInfo = paymentResponse.data;
       if (paymentResponse.data.data) {
         paymentInfo = paymentResponse.data.data;
       }
-      
+
       const accessCode = paymentInfo.access_code;
       const authorizationUrl = paymentInfo.authorization_url;
-      
+
       // Clear guest cart from localStorage
       if (isGuest) {
         localStorage.removeItem('guestCart');
       }
-      
+
       toast.success('Order placed successfully!');
       localStorage.setItem('lastOrderReference', orderResponse.data.order?.reference || orderData.reference);
       localStorage.setItem('pendingOrderId', orderId); // Store the order ID
-      
+
       if (accessCode) {
         const paystack = new PaystackPop();
         paystack.newTransaction({
@@ -781,9 +796,9 @@ const CheckoutPage = () => {
     } catch (err) {
       // Handle specific error cases
       let errorMessage = 'Failed to process order';
-      
-      if (err.message === 'Payment initialization timeout' || 
-          err.message === 'Payment initialization failed after multiple attempts') {
+
+      if (err.message === 'Payment initialization timeout' ||
+        err.message === 'Payment initialization failed after multiple attempts') {
         errorMessage = 'Payment service is currently experiencing high traffic. Please try again later.';
       } else if (err.response?.data?.error) {
         errorMessage = err.response.data.error;
@@ -792,28 +807,28 @@ const CheckoutPage = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
+
       setError(`Failed to process order: ${errorMessage}`);
       toast.error(`Failed to process order: ${errorMessage}`);
       setLoading(false); // Reset loading state
-      
+
       // If order was created but payment failed, redirect to order page
       if (err.orderId) {
         navigate(`/orders/${err.orderId}`);
       }
     }
   };
-  
+
   // Updated handlePlaceOrder to ensure loading state is reset and prevent duplicate submissions
   const handlePlaceOrder = async () => {
     // Prevent multiple submissions
     if (isProcessing) return;
-    
+
     setIsProcessing(true);
     setLoading(true);
     setError('');
     setRequiredForm(null);
-    
+
     try {
       // For guest users, first process the guest form to get the user ID
       if (isGuest && !guestFormSubmitted) {
@@ -823,7 +838,7 @@ const CheckoutPage = () => {
           setIsProcessing(false);
           return;
         }
-        
+
         // Now process the order with the returned user ID
         await processOrder(guestUserId);
       } else {
@@ -836,17 +851,17 @@ const CheckoutPage = () => {
       setIsProcessing(false);
     }
   };
-  
+
   // Fixed handleShippingSubmit to close the form after saving
   const handleShippingSubmit = async (data) => {
     try {
       setShippingAddressLoading(true);
-      
+
       // For authenticated users, save address to backend
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
         const userId = getUserId();
-        
+
         const addressData = {
           user_id: userId,
           title: data.title || 'Home',
@@ -857,17 +872,17 @@ const CheckoutPage = () => {
           zip_code: data.zip_code,
           country: data.country
         };
-        
+
         let response;
         if (editingShippingAddress) {
           // Update existing address
           response = await axios.put(`${API_BASE_URL}/api/addresses/${editingShippingAddress.id}`, addressData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          
+
           // Update the address in the list
           const updatedAddress = response.data;
-          setShippingAddresses(prev => 
+          setShippingAddresses(prev =>
             prev.map(addr => addr.id === editingShippingAddress.id ? updatedAddress : addr)
           );
           setShippingAddressId(String(updatedAddress.id));
@@ -876,19 +891,19 @@ const CheckoutPage = () => {
           response = await axios.post(`${API_BASE_URL}/api/addresses/`, addressData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          
+
           // Add the new address to the list and set it as selected
           const newAddress = response.data;
           setShippingAddresses(prev => [newAddress, ...prev]);
           setShippingAddressId(String(newAddress.id));
         }
       }
-      
+
       // Update shipping form state
       setShippingForm(data);
       setShowShippingForm(false); // This ensures the form closes after saving
       setEditingShippingAddress(null); // Clear editing state
-      
+
       // If billing address option is 'same', update billing address to match
       if (billingAddressOption === 'same') {
         // Create a billing address object from the shipping address
@@ -904,11 +919,11 @@ const CheckoutPage = () => {
           zip_code: data.zip_code,
           country: data.country,
         };
-        
+
         // Update billing form state
         setBillingForm(billingAddress);
       }
-      
+
       const successMessage = editingShippingAddress ? 'Shipping address updated successfully.' : 'Shipping address added successfully.';
       setSuccess(successMessage);
       toast.success(editingShippingAddress ? 'Shipping address updated' : 'Shipping address added');
@@ -924,16 +939,16 @@ const CheckoutPage = () => {
       setShippingAddressLoading(false);
     }
   };
-  
+
   const handleBillingSubmit = async (data) => {
     try {
       setBillingAddressLoading(true);
-      
+
       // For authenticated users, save billing address to backend
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
         const userId = getUserId();
-        
+
         const billingData = {
           user_id: userId,
           full_name: data.full_name,
@@ -945,17 +960,17 @@ const CheckoutPage = () => {
           zip_code: data.zip_code,
           country: data.country
         };
-        
+
         let response;
         if (editingBillingAddress) {
           // Update existing billing address
           response = await axios.put(`${API_BASE_URL}/api/billing-addresses/${editingBillingAddress.id}`, billingData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          
+
           // Update the billing address in the list
           const updatedBillingAddress = response.data;
-          setBillingAddresses(prev => 
+          setBillingAddresses(prev =>
             prev.map(addr => addr.id === editingBillingAddress.id ? updatedBillingAddress : addr)
           );
           setBillingAddressId(String(updatedBillingAddress.id));
@@ -964,19 +979,19 @@ const CheckoutPage = () => {
           response = await axios.post(`${API_BASE_URL}/api/billing-addresses/`, billingData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-          
+
           // Add the new billing address to the list and set it as selected
           const newBillingAddress = response.data;
           setBillingAddresses(prev => [newBillingAddress, ...prev]);
           setBillingAddressId(String(newBillingAddress.id));
         }
       }
-      
+
       // Update billing form state
       setBillingForm(data);
       setShowBillingForm(false);
       setEditingBillingAddress(null); // Clear editing state
-      
+
       const successMessage = editingBillingAddress ? 'Billing address updated successfully.' : 'Billing address added successfully.';
       setSuccess(successMessage);
       toast.success(editingBillingAddress ? 'Billing address updated' : 'Billing address added');
@@ -992,7 +1007,7 @@ const CheckoutPage = () => {
       setBillingAddressLoading(false);
     }
   };
-  
+
   const handleEditAddress = (type, address) => {
     if (type === 'addresses') {
       setShippingForm(address);
@@ -1047,20 +1062,20 @@ const CheckoutPage = () => {
     const confirmDelete = window.confirm(
       `Are you sure you want to delete this ${addressType} address?\n\nThis action cannot be undone.`
     );
-    
+
     if (!confirmDelete) {
       return;
     }
-  
+
     try {
       setLoading(true);
-      
+
       // 1. Delete address from backend
       const token = localStorage.getItem('token');
       await axios.delete(`${API_BASE_URL}/api/${type}/${addressId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-  
+
       if (type === 'addresses') {
         // Remove from local state
         const remaining = shippingAddresses.filter(addr => String(addr.id) !== String(addressId));
@@ -1070,7 +1085,7 @@ const CheckoutPage = () => {
         if (String(shippingAddressId) === String(addressId)) {
           const newShippingId = remaining.length ? String(remaining[0].id) : null;
           setShippingAddressId(newShippingId);
-          
+
           // If no addresses remain, automatically show the shipping form
           if (remaining.length === 0) {
             setShowShippingForm(true);
@@ -1083,14 +1098,14 @@ const CheckoutPage = () => {
         if (String(billingAddressId) === String(addressId)) {
           const newBillingId = remaining.length ? String(remaining[0].id) : null;
           setBillingAddressId(newBillingId);
-          
+
           // If no addresses remain, automatically show the billing form
           if (remaining.length === 0) {
             setShowBillingForm(true);
           }
         }
       }
-  
+
       setSuccess(`Successfully deleted ${addressType} address.`);
       toast.success(`Deleted ${addressType} address`);
     } catch (err) {
@@ -1101,14 +1116,14 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   };
-  
+
   // Optimized copyShippingToBilling to not copy phone number for guest users
   const copyShippingToBilling = () => {
     if (!shippingForm.address_line_1) {
       toast.error('Please add a shipping address first');
       return;
     }
-    
+
     // Create a billing address object from the shipping address
     const billingAddress = {
       full_name: guestForm.name || billingForm.full_name,
@@ -1122,12 +1137,12 @@ const CheckoutPage = () => {
       zip_code: shippingForm.zip_code,
       country: shippingForm.country,
     };
-    
+
     // Update billing form state
     setBillingForm(billingAddress);
     toast.success('Billing address updated to match shipping address');
   };
-  
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://js.paystack.co/v1/inline.js';
@@ -1135,7 +1150,7 @@ const CheckoutPage = () => {
     document.body.appendChild(script);
     return () => document.body.removeChild(script);
   }, []);
-  
+
   // Memoized fetch function to prevent unnecessary re-creation
   const fetchCartAndAddresses = useCallback(async () => {
     // Check if user is authenticated
@@ -1160,20 +1175,20 @@ const CheckoutPage = () => {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     try {
       const userId = createdUserId || getUserId();
-      
+
       // If we have a createdUserId but no token, we don't need to fetch addresses
       if (createdUserId && !isAuthenticated()) {
         setIsGuest(true);
         setLoading(false);
         return;
       }
-      
+
       const token = getToken();
-      
+
       // Use Promise.allSettled for parallel API calls with better error handling
       const [cartResult, shippingResult, billingResult] = await Promise.allSettled([
         axios.get(`${API_BASE_URL}/api/cart/${userId}`, {
@@ -1186,24 +1201,24 @@ const CheckoutPage = () => {
           headers: { Authorization: `Bearer ${token}` },
         })
       ]);
-      
+
       // Handle cart data
       if (cartResult.status === 'fulfilled') {
         const cartData = cartResult.value.data?.data || cartResult.value.data;
-        
+
         if (!cartData.cartId || !cartData.items?.length) {
           setError('Your cart is empty. Please add items to proceed.');
           toast.error('Your cart is empty. Please add items to proceed.');
           navigate('/cart');
           return;
         }
-        
+
         setCart(cartData);
         setIsGuest(false);
       } else {
         throw new Error('Failed to fetch cart data');
       }
-      
+
       // Handle shipping addresses
       if (shippingResult.status === 'fulfilled') {
         let shippingData = shippingResult.value.data;
@@ -1214,7 +1229,7 @@ const CheckoutPage = () => {
         } else if (!shippingData) {
           shippingData = [];
         }
-        
+
         setShippingAddresses(shippingData);
         if (shippingData.length > 0) {
           setShippingAddressId(String(shippingData[0].id));
@@ -1225,7 +1240,7 @@ const CheckoutPage = () => {
         console.error('Error fetching shipping addresses:', shippingResult.reason);
         setShippingAddresses([]);
       }
-      
+
       // Handle billing addresses
       if (billingResult.status === 'fulfilled') {
         let billingData = billingResult.value.data;
@@ -1236,7 +1251,7 @@ const CheckoutPage = () => {
         } else if (!billingData) {
           billingData = [];
         }
-        
+
         setBillingAddresses(billingData);
         if (billingData.length > 0) {
           setBillingAddressId(String(billingData[0].id));
@@ -1247,7 +1262,7 @@ const CheckoutPage = () => {
         console.error('Error fetching billing addresses:', billingResult.reason);
         setBillingAddresses([]);
       }
-      
+
       toast.success('Checkout data loaded successfully');
     } catch (err) {
       const errorMessage = err.message || 'Unknown error';
@@ -1257,13 +1272,13 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   }, [createdUserId, navigate]);
-  
+
   useEffect(() => {
     if (!authLoading && !contextLoading) {
       fetchCartAndAddresses();
     }
   }, [authLoading, contextLoading, fetchCartAndAddresses]);
-  
+
   // Update billing address when shipping address changes if option is 'same'
   useEffect(() => {
     if (billingAddressOption === 'same' && shippingForm.address_line_1) {
@@ -1280,11 +1295,11 @@ const CheckoutPage = () => {
         zip_code: shippingForm.zip_code,
         country: shippingForm.country,
       };
-      
+
       setBillingForm(billingAddress);
     }
   }, [shippingForm, billingAddressOption, guestForm.name, guestForm.email, guestForm.phone_number, isGuest, billingForm.full_name, billingForm.email]);
-  
+
   useEffect(() => {
     if (shippingAddresses.length > 0 && !shippingAddressId) {
       setShippingAddressId(String(shippingAddresses[0].id));
@@ -1293,7 +1308,7 @@ const CheckoutPage = () => {
       setBillingAddressId(String(billingAddresses[0].id));
     }
   }, [shippingAddresses, billingAddresses, shippingAddressId, billingAddressId]);
-  
+
   // Initialize billing form with user data for logged-in users
   useEffect(() => {
     if (user && isAuthenticated() && billingAddresses.length === 0 && !billingForm.full_name && !billingForm.email) {
@@ -1304,21 +1319,21 @@ const CheckoutPage = () => {
       }));
     }
   }, [user, billingAddresses.length, billingForm.full_name, billingForm.email]);
-  
+
   useEffect(() => {
     const addressCountry = shippingForm.country || country;
     const isNigeria = addressCountry.toLowerCase() === 'nigeria';
-    
+
     if (isNigeria && !shippingMethod) {
       const defaultMethod = shippingOptions[0];
       setShippingMethod(defaultMethod);
     }
-    
+
     if (!isNigeria && shippingMethod) {
       setShippingMethod(null);
     }
   }, [shippingForm, country]);
-  
+
   // Add this useEffect to check for pending orders
   useEffect(() => {
     const checkPendingOrder = async () => {
@@ -1329,7 +1344,7 @@ const CheckoutPage = () => {
           const response = await axios.get(`${API_BASE_URL}/api/orders/${pendingOrderId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
+
           const order = response.data;
           if (order.payment_status === 'pending') {
             toast.info('You have a pending order. Please complete the payment.');
@@ -1347,28 +1362,28 @@ const CheckoutPage = () => {
         }
       }
     };
-    
+
     if (user && !authLoading && !contextLoading) {
       checkPendingOrder();
     }
   }, [user, authLoading, contextLoading, navigate]);
-  
+
   const addressCountry = shippingForm.country || country;
   const isNigeria = addressCountry.toLowerCase() === 'nigeria';
-  
+
   // Memoize expensive calculations to prevent unnecessary recalculations
   const calculatedValues = useMemo(() => {
     const subtotal = Number(cart?.subtotal) || 0;
     const tax = isNigeria ? 0 : Number((subtotal * 0.05).toFixed(2));
     const shippingCost = isNigeria ? shippingMethod?.total_cost || 0 : 0;
-    
+
     // Calculate total discount (first order + coupon)
     const totalDiscount = Number((firstOrderDiscount + couponDiscount).toFixed(2));
     // Ensure total discount doesn't exceed subtotal
     const finalDiscount = Math.min(totalDiscount, subtotal);
     const discountedSubtotal = Number((subtotal - finalDiscount).toFixed(2));
     const total = Number((discountedSubtotal + tax + shippingCost).toFixed(2));
-    
+
     return {
       subtotal,
       tax,
@@ -1383,7 +1398,7 @@ const CheckoutPage = () => {
       displayTotal: total
     };
   }, [cart?.subtotal, isNigeria, shippingMethod?.total_cost, firstOrderDiscount, couponDiscount]);
-  
+
   const {
     subtotal,
     tax,
@@ -1397,7 +1412,7 @@ const CheckoutPage = () => {
     displayTax,
     displayTotal
   } = calculatedValues;
-  
+
   const handleWhatsAppPayment = () => {
     const message = `Hello, I would like to pay for my order with Bitcoin.\n\nOrder Details:\n- Subtotal: ${displaySubtotal.toLocaleString('en-NG', {
       style: 'currency',
@@ -1420,12 +1435,12 @@ const CheckoutPage = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     })}\n- Currency: NGN\n- Order Reference: order_${createdUserId || getUserId()}_${Date.now()}\n\nI have attached a screenshot of my checkout for your reference.`;
-    
+
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
     toast.success('Opening WhatsApp to complete your Bitcoin payment...');
   };
-  
+
   if (authLoading || contextLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -1436,7 +1451,7 @@ const CheckoutPage = () => {
       </div>
     );
   }
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -1494,7 +1509,7 @@ const CheckoutPage = () => {
       </div>
     );
   }
-  
+
   // Updated empty cart handling to check for pending orders
   if (!cart?.items?.length) {
     // Check if there's a pending order
@@ -1511,7 +1526,7 @@ const CheckoutPage = () => {
         </div>
       );
     }
-    
+
     // Original empty cart message
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -1524,11 +1539,11 @@ const CheckoutPage = () => {
       </div>
     );
   }
-  
 
-  
+
+
   return (
-    <div 
+    <div
       className="min-h-screen bg-gray-100 typography"
       style={{
         '--color-Primarycolor': '#1E1E1E',
@@ -1544,21 +1559,21 @@ const CheckoutPage = () => {
           <ArrowLeft className="h-5 w-5 mr-1" /> Back to Cart
         </Link>
         <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Checkout</h2>
-        
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
             <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
             <span className="text-sm text-red-700 font-PatrickHand">{error}</span>
           </div>
         )}
-        
+
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
             <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
             <span className="text-sm text-green-600 font-PatrickHand">{success}</span>
           </div>
         )}
-        
+
         {showBitcoinInstructions && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-md w-full p-6">
@@ -1567,21 +1582,21 @@ const CheckoutPage = () => {
                   <Bitcoin className="h-5 w-5 mr-2 text-orange-500" />
                   Bitcoin Payment Instructions
                 </h3>
-                <button 
+                <button
                   onClick={() => setShowBitcoinInstructions(false)}
                   className="text-Accent hover:text-Primarycolor"
                 >
                   ✕
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                   <p className="text-sm text-orange-800 font-PatrickHand">
                     To complete your purchase with Bitcoin, please follow these steps:
                   </p>
                 </div>
-                
+
                 <ol className="list-decimal pl-5 space-y-2 text-sm text-Accent font-PatrickHand">
                   <li>Take a screenshot of your checkout page showing the order total and items</li>
                   <li>Click the button below to open WhatsApp</li>
@@ -1589,13 +1604,13 @@ const CheckoutPage = () => {
                   <li>Our team will provide you with Bitcoin payment instructions</li>
                   <li>Once payment is confirmed, we'll process your order immediately</li>
                 </ol>
-                
+
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                   <p className="text-sm text-blue-800 font-PatrickHand">
                     <strong>Note:</strong> Your order will be reserved for 2 hours to allow time for Bitcoin payment completion.
                   </p>
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                   <button
                     onClick={handleWhatsAppPayment}
@@ -1615,7 +1630,7 @@ const CheckoutPage = () => {
             </div>
           </div>
         )}
-        
+
         {/* Guest Modal */}
         {isGuest && showGuestModal && (
           <GuestCheckoutModal
@@ -1630,7 +1645,7 @@ const CheckoutPage = () => {
             navigate={navigate}
           />
         )}
-        
+
         {/* Only show the checkout content if the guest form has been submitted or user is authenticated */}
         {(!isGuest || guestFormSubmitted) && (
           <>
@@ -1645,7 +1660,7 @@ const CheckoutPage = () => {
                     {/* Shipping Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
-                      
+
                       {requiredForm === 'shipping' && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                           <div className="flex items-start">
@@ -1661,7 +1676,7 @@ const CheckoutPage = () => {
                           </div>
                         </div>
                       )}
-                      
+
                       {!showShippingForm ? (
                         shippingForm.address_line_1 ? (
                           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -1710,11 +1725,11 @@ const CheckoutPage = () => {
                         </React.Suspense>
                       )}
                     </div>
-                    
+
                     {/* Billing Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
-                      
+
                       {/* Billing Address Option Selector */}
                       <div className="mb-6">
                         <div className="flex items-center space-x-6">
@@ -1742,7 +1757,7 @@ const CheckoutPage = () => {
                           </label>
                         </div>
                       </div>
-                      
+
                       {requiredForm === 'billing' && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                           <div className="flex items-start">
@@ -1758,7 +1773,7 @@ const CheckoutPage = () => {
                           </div>
                         </div>
                       )}
-                      
+
                       {billingAddressOption === 'same' ? (
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                           <div className="flex items-start">
@@ -1807,7 +1822,7 @@ const CheckoutPage = () => {
                     {/* Shipping Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
-                      
+
                       {shippingAddresses.length > 0 ? (
                         <>
                           {/* Address Selection Dropdown */}
@@ -1829,7 +1844,7 @@ const CheckoutPage = () => {
                               </select>
                             </div>
                           )}
-                          
+
                           {/* Selected Address Display */}
                           <div className="border rounded-lg p-4 bg-gray-50">
                             {shippingAddresses
@@ -1891,7 +1906,7 @@ const CheckoutPage = () => {
                     </div>
 
 
-                    
+
                     {/* Shipping Address Form for Logged-in Users */}
                     {showShippingForm && (
                       <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
@@ -1915,7 +1930,7 @@ const CheckoutPage = () => {
                     {/* Billing Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
-                      
+
                       {/* Billing Address Option Selector for Logged-in Users */}
                       <div className="mb-6">
                         <div className="flex items-center space-x-6">
@@ -1943,7 +1958,7 @@ const CheckoutPage = () => {
                           </label>
                         </div>
                       </div>
-                      
+
                       {billingAddressOption === 'same' ? (
                         /* Same as Shipping Address Display */
                         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -1975,115 +1990,115 @@ const CheckoutPage = () => {
                       ) : (
                         /* Different Billing Address Selection */
                         billingAddresses.length > 0 ? (
-                        <>
-                          {/* Address Selection Dropdown */}
-                          {billingAddresses.length > 1 && (
-                            <div className="mb-4">
-                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
-                                Select Billing Address
-                              </label>
-                              <select
-                                value={billingAddressId || ''}
-                                onChange={(e) => setBillingAddressId(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
-                              >
-                                {billingAddresses.map(address => (
-                                  <option key={address.id} value={String(address.id)}>
-                                    {address.full_name} - {address.city}, {address.state}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-                          
-                          {/* Selected Address Display */}
-                          <div className="border rounded-lg p-4 bg-gray-50">
-                            {billingAddresses
-                              .filter(addr => String(addr.id) === String(billingAddressId))
-                              .map(address => (
-                                <div key={address.id}>
-                                  <div className="flex justify-between items-start mb-2">
-                                    <p className="font-medium text-Primarycolor">{address.full_name}</p>
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => handleEditAddress('billing-addresses', address)}
-                                        className="p-1 text-Primarycolor hover:text-gray-800 transition-colors"
-                                        title="Edit address"
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteAddress('billing-addresses', address.id)}
-                                        className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                                        title="Delete address"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </button>
+                          <>
+                            {/* Address Selection Dropdown */}
+                            {billingAddresses.length > 1 && (
+                              <div className="mb-4">
+                                <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
+                                  Select Billing Address
+                                </label>
+                                <select
+                                  value={billingAddressId || ''}
+                                  onChange={(e) => setBillingAddressId(e.target.value)}
+                                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
+                                >
+                                  {billingAddresses.map(address => (
+                                    <option key={address.id} value={String(address.id)}>
+                                      {address.full_name} - {address.city}, {address.state}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            {/* Selected Address Display */}
+                            <div className="border rounded-lg p-4 bg-gray-50">
+                              {billingAddresses
+                                .filter(addr => String(addr.id) === String(billingAddressId))
+                                .map(address => (
+                                  <div key={address.id}>
+                                    <div className="flex justify-between items-start mb-2">
+                                      <p className="font-medium text-Primarycolor">{address.full_name}</p>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => handleEditAddress('billing-addresses', address)}
+                                          className="p-1 text-Primarycolor hover:text-gray-800 transition-colors"
+                                          title="Edit address"
+                                        >
+                                          <Edit className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteAddress('billing-addresses', address.id)}
+                                          className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                                          title="Delete address"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </button>
+                                      </div>
                                     </div>
+                                    <p className="text-sm text-Accent">{address.email}</p>
+                                    {address.phone_number && <p className="text-sm text-Accent">{address.phone_number}</p>}
+                                    <p className="text-sm text-Accent">{address.address_line_1}</p>
+                                    <p className="text-sm text-Accent">{address.city}, {address.state} {address.zip_code}</p>
+                                    <p className="text-sm text-Accent">{address.country}</p>
                                   </div>
-                                  <p className="text-sm text-Accent">{address.email}</p>
-                                  {address.phone_number && <p className="text-sm text-Accent">{address.phone_number}</p>}
-                                  <p className="text-sm text-Accent">{address.address_line_1}</p>
-                                  <p className="text-sm text-Accent">{address.city}, {address.state} {address.zip_code}</p>
-                                  <p className="text-sm text-Accent">{address.country}</p>
-                                </div>
-                              ))
-                            }
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <button
-                                onClick={handleAddNewBillingAddress}
-                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
-                              >
-                                <Plus className="h-4 w-4 mr-1" />
-                                Add Another Address
-                              </button>
+                                ))
+                              }
+                              <div className="mt-4 pt-4 border-t border-gray-200">
+                                <button
+                                  onClick={handleAddNewBillingAddress}
+                                  className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add Another Address
+                                </button>
+                              </div>
                             </div>
+                          </>
+                        ) : (
+                          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                            <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No billing address found</p>
+                            <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your billing address for payment processing</p>
+                            <button
+                              onClick={handleAddNewBillingAddress}
+                              className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
+                            >
+                              <CreditCard className="h-5 w-5 mr-2" />
+                              Add Billing Address
+                            </button>
                           </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                          <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No billing address found</p>
-                          <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your billing address for payment processing</p>
-                          <button
-                            onClick={handleAddNewBillingAddress}
-                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
-                          >
-                            <CreditCard className="h-5 w-5 mr-2" />
-                            Add Billing Address
-                          </button>
-                        </div>
-                      )
+                        )
                       )}
                     </div>
-                    
 
-                    
+
+
 
                   </>
                 )}
-                
-                {/* Billing Address Form for Logged-in Users */}
-                    {showBillingForm && (
-                      <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
-                        <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
-                          <BillingAddressForm
-                            address={{ state: billingForm, setState: setBillingForm }}
-                            onSubmit={handleBillingSubmit}
-                            onCancel={() => setShowBillingForm(false)}
-                            formErrors={formErrors}
-                            setFormErrors={setFormErrors}
-                            actionLoading={billingAddressLoading}
-                            isGuest={false}
-                            userData={user}
-                          />
-                        </React.Suspense>
-                      </div>
-                    )}
 
-                    {/* Order Note */}
-                    <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
+                {/* Billing Address Form for Logged-in Users */}
+                {showBillingForm && (
+                  <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
+                    <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
+                    <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
+                      <BillingAddressForm
+                        address={{ state: billingForm, setState: setBillingForm }}
+                        onSubmit={handleBillingSubmit}
+                        onCancel={() => setShowBillingForm(false)}
+                        formErrors={formErrors}
+                        setFormErrors={setFormErrors}
+                        actionLoading={billingAddressLoading}
+                        isGuest={false}
+                        userData={user}
+                      />
+                    </React.Suspense>
+                  </div>
+                )}
+
+                {/* Order Note */}
+                <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                   <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Special Instructions (optional)</h3>
                   <textarea
                     value={orderNote}
@@ -2094,7 +2109,7 @@ const CheckoutPage = () => {
                   />
                   <p className="text-sm text-Accent font-PatrickHand">Characters left: {500 - orderNote.length}/500</p>
                 </div>
-                
+
                 {/* Shipping Method */}
                 <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                   <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">
@@ -2108,8 +2123,8 @@ const CheckoutPage = () => {
                           key={option.id}
                           className={`
                             relative cursor-pointer rounded-xl border-2 transition-all duration-200
-                            ${shippingMethod?.id === option.id 
-                              ? 'border-Primarycolor bg-gradient-to-r from-gray-50 to-blue-50 shadow-md' 
+                            ${shippingMethod?.id === option.id
+                              ? 'border-Primarycolor bg-gradient-to-r from-gray-50 to-blue-50 shadow-md'
                               : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                             }
                           `}
@@ -2124,14 +2139,14 @@ const CheckoutPage = () => {
                                 onChange={() => setShippingMethod(option)}
                                 className="mt-1 h-4 w-4 text-Primarycolor focus:ring-2 focus:ring-Primarycolor"
                               />
-                              
+
                               <div className="flex-1">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                                   <div className="flex items-center gap-3">
                                     <div className={`
                                       p-2 rounded-lg
-                                      ${shippingMethod?.id === option.id 
-                                        ? 'bg-Primarycolor text-white' 
+                                      ${shippingMethod?.id === option.id
+                                        ? 'bg-Primarycolor text-white'
                                         : 'bg-gray-100 text-Accent'
                                       }
                                     `}>
@@ -2201,7 +2216,7 @@ const CheckoutPage = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Right Column - Order Summary */}
               <div className="lg:col-span-5 ">
                 <OrderSummary
