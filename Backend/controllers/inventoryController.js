@@ -53,7 +53,8 @@ export const getProducts = async (req, res) => {
                 jsonb_build_object(
                   'size_id', vs.size_id,
                   'size_name', s.size_name,
-                  'stock_quantity', vs.stock_quantity
+                  'stock_quantity', vs.stock_quantity,
+                  'price', vs.price
                 )
               )
               FROM variant_sizes vs

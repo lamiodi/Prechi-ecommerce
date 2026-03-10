@@ -4,7 +4,7 @@ import sql from '../db/index.js';
 // Helper function to validate single product
 const validateSingleProduct = async (sql, variant_id, size_id, quantity) => {
   const [variant] = await sql`
-    SELECT pv.id, p.base_price, vs.stock_quantity
+    SELECT pv.id, p.base_price, vs.stock_quantity, vs.price as size_price
     FROM product_variants pv
     JOIN products p ON pv.product_id = p.id
     JOIN variant_sizes vs ON vs.variant_id = pv.id AND vs.size_id = ${size_id}
@@ -15,7 +15,10 @@ const validateSingleProduct = async (sql, variant_id, size_id, quantity) => {
     throw new Error('Invalid variant or size.');
   }
 
-  const { base_price, stock_quantity } = variant;
+  const { base_price, stock_quantity, size_price } = variant;
+  // Use size-specific price if available (greater than 0), otherwise use base price
+  const final_price = Number(size_price) > 0 ? size_price : base_price;
+  
   if (stock_quantity < quantity) {
     throw new Error(`Only ${stock_quantity} items available in stock.`);
   }
@@ -34,7 +37,7 @@ const validateSingleProduct = async (sql, variant_id, size_id, quantity) => {
     throw new Error('Could not retrieve color or size information.');
   }
 
-  return { base_price, color_name, size_name };
+  return { base_price: final_price, color_name, size_name };
 };
 
 // Helper function to validate bundle

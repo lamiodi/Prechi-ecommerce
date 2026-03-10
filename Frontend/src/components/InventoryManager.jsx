@@ -704,33 +704,67 @@ const InventoryManager = () => {
                           {variant.sizes?.map((size) => (
                             <div
                               key={`edit-size-${variant.id}-${size.size_id}`}
-                              className="flex items-center gap-2"
+                              className="flex flex-col gap-2 p-2 border border-gray-100 rounded-lg"
                             >
-                              <span className="w-16 md:w-20 text-sm text-gray-600 truncate">{size.size_name}:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                className="flex-1 min-w-0 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                value={size.stock_quantity}
-                                onChange={(e) => {
-                                  const updatedVariants = editingItem.variants.map((v) => {
-                                    if (v.id === variant.id) {
-                                      const updatedSizes = v.sizes.map((s) => {
-                                        if (s.size_id === size.size_id) {
-                                          return { ...s, stock_quantity: e.target.value };
+                              <span className="font-medium text-sm text-gray-700">{size.size_name}</span>
+                              <div className="flex gap-2">
+                                <div className="flex-1">
+                                  <label className="text-xs text-gray-500 mb-1 block">Stock</label>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 text-sm"
+                                    value={size.stock_quantity}
+                                    onChange={(e) => {
+                                      const updatedVariants = editingItem.variants.map((v) => {
+                                        if (v.id === variant.id) {
+                                          const updatedSizes = v.sizes.map((s) => {
+                                            if (s.size_id === size.size_id) {
+                                              return { ...s, stock_quantity: e.target.value };
+                                            }
+                                            return s;
+                                          });
+                                          return { ...v, sizes: updatedSizes };
                                         }
-                                        return s;
+                                        return v;
                                       });
-                                      return { ...v, sizes: updatedSizes };
-                                    }
-                                    return v;
-                                  });
-                                  setEditingItem({
-                                    ...editingItem,
-                                    variants: updatedVariants,
-                                  });
-                                }}
-                              />
+                                      setEditingItem({
+                                        ...editingItem,
+                                        variants: updatedVariants,
+                                      });
+                                    }}
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-xs text-gray-500 mb-1 block">Price (Optional)</label>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="Use Base Price"
+                                    className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 text-sm"
+                                    value={size.price || ''}
+                                    onChange={(e) => {
+                                      const updatedVariants = editingItem.variants.map((v) => {
+                                        if (v.id === variant.id) {
+                                          const updatedSizes = v.sizes.map((s) => {
+                                            if (s.size_id === size.size_id) {
+                                              return { ...s, price: e.target.value };
+                                            }
+                                            return s;
+                                          });
+                                          return { ...v, sizes: updatedSizes };
+                                        }
+                                        return v;
+                                      });
+                                      setEditingItem({
+                                        ...editingItem,
+                                        variants: updatedVariants,
+                                      });
+                                    }}
+                                  />
+                                </div>
+                              </div>
                             </div>
                           ))}
                           {/* Existing Media Display */}
