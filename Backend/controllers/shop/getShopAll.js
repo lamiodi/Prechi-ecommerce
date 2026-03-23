@@ -44,7 +44,7 @@ export const getShopAll = async (req, res) => {
       return res.status(200).json(bundles);
     }
 
-    // 2. Handle all-bundles similarly...
+    // 2. Handle all-bundles
     if (category === 'all-bundles') {
       const bundleRes = await sql`
         SELECT 
@@ -82,41 +82,79 @@ export const getShopAll = async (req, res) => {
       return res.status(200).json(bundles);
     }
 
-    // 3. Fetch products
-    // Build base query
-    let productQuery = sql`
-      SELECT 
-        p.id AS product_id,
-        pv.id AS variant_id,
-        pv.name AS variant_name,
-        p.base_price AS price,
-        (
-          SELECT pi.image_url 
-          FROM product_images pi 
-          WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
-          LIMIT 1
-        ) AS primary_image,
-        c.color_name,
-        p.category,
-        COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
-      FROM products p
-      JOIN product_variants pv ON p.id = pv.product_id
-      JOIN colors c ON pv.color_id = c.id
-      WHERE p.is_active = TRUE AND pv.is_active = TRUE
-    `;
+    // 3. Fetch products — use separate complete queries per filter case
+    //    postgres.js does NOT support embedding a sql`` object inside another sql``,
+    //    so we use distinct queries for each branch.
+    let productRes;
 
-    // Add category filter safely using parameterized queries
-    if (category) {
-      if (category.toLowerCase() === 'new') {
-        productQuery = sql`${productQuery} AND p.is_new_release = TRUE`;
-      } else {
-        // Use parameterized query - postgres.js will handle the escaping
-        const cat = category.toLowerCase();
-        productQuery = sql`${productQuery} AND LOWER(p.category) = LOWER(${cat})`;
-      }
+    if (category && category.toLowerCase() === 'new') {
+      productRes = await sql`
+        SELECT 
+          p.id AS product_id,
+          pv.id AS variant_id,
+          pv.name AS variant_name,
+          p.base_price AS price,
+          (
+            SELECT pi.image_url 
+            FROM product_images pi 
+            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            LIMIT 1
+          ) AS primary_image,
+          c.color_name,
+          p.category,
+          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+        FROM products p
+        JOIN product_variants pv ON p.id = pv.product_id
+        JOIN colors c ON pv.color_id = c.id
+        WHERE p.is_active = TRUE AND pv.is_active = TRUE
+          AND p.is_new_release = TRUE
+      `;
+    } else if (category) {
+      const cat = category.toLowerCase();
+      productRes = await sql`
+        SELECT 
+          p.id AS product_id,
+          pv.id AS variant_id,
+          pv.name AS variant_name,
+          p.base_price AS price,
+          (
+            SELECT pi.image_url 
+            FROM product_images pi 
+            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            LIMIT 1
+          ) AS primary_image,
+          c.color_name,
+          p.category,
+          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+        FROM products p
+        JOIN product_variants pv ON p.id = pv.product_id
+        JOIN colors c ON pv.color_id = c.id
+        WHERE p.is_active = TRUE AND pv.is_active = TRUE
+          AND LOWER(p.category) = LOWER(${cat})
+      `;
+    } else {
+      productRes = await sql`
+        SELECT 
+          p.id AS product_id,
+          pv.id AS variant_id,
+          pv.name AS variant_name,
+          p.base_price AS price,
+          (
+            SELECT pi.image_url 
+            FROM product_images pi 
+            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            LIMIT 1
+          ) AS primary_image,
+          c.color_name,
+          p.category,
+          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+        FROM products p
+        JOIN product_variants pv ON p.id = pv.product_id
+        JOIN colors c ON pv.color_id = c.id
+        WHERE p.is_active = TRUE AND pv.is_active = TRUE
+      `;
     }
 
-    const productRes = await productQuery; // <- must await the query
     const products = productRes.map(row => ({
       id: row.product_id,
       name: row.variant_name,
@@ -131,7 +169,7 @@ export const getShopAll = async (req, res) => {
 
     return res.status(200).json(products);
   } catch (err) {
-    console.error('Database error:', err);
+    console.error('Database error in getShopAll:', err);
 
     res.status(500).json({
       message: 'Failed to fetch products or bundles',

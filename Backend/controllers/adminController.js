@@ -13,7 +13,7 @@ export const getAllOrdersForAdmin = async (req, res) => {
     const status = req.query.status || 'all';
 
     let queryConditions = sql`o.deleted_at IS NULL`;
-    
+
     if (search) {
       const searchPattern = `%${search}%`;
       queryConditions = sql`${queryConditions} AND (
@@ -35,7 +35,7 @@ export const getAllOrdersForAdmin = async (req, res) => {
       JOIN users u ON o.user_id = u.id
       WHERE ${queryConditions}
     `;
-    
+
     const totalOrders = parseInt(countResult.count);
     const totalPages = Math.ceil(totalOrders / limit);
 
@@ -43,28 +43,36 @@ export const getAllOrdersForAdmin = async (req, res) => {
       SELECT 
         o.id,
         o.user_id,
-        o.created_at AS order_date,
+        o.created_at,
         o.total AS total_amount,
         o.status,
         o.subtotal,
         o.discount,
         o.payment_method,
         o.payment_status,
+        o.shipping_method,
+        o.shipping_cost,
         o.reference,
+        o.currency,
         o.updated_at,
         o.delivery_fee,
+        o.delivery_fee_paid,
+        o.note,
         o.email_sent,
         o.idempotency_key,
         u.email AS user_email,
         u.first_name,
-        u.last_name
+        u.last_name,
+        COALESCE(u.is_temporary, false) AS is_temporary,
+        a.country AS shipping_country
       FROM orders o
       JOIN users u ON o.user_id = u.id
+      LEFT JOIN addresses a ON o.address_id = a.id
       WHERE ${queryConditions}
       ORDER BY o.created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `;
-    
+
     console.log('getAllOrdersForAdmin: Fetched orders:', orders.length);
     res.json({
       orders,
@@ -114,11 +122,11 @@ export const getUserAddresses = async (req, res) => {
     const { userId } = req.params;
     const parsedUserId = parseInt(userId, 10);
     console.log('getUserAddresses: Received userId:', parsedUserId, 'Type:', typeof parsedUserId);
-    
+
     if (!parsedUserId || isNaN(parsedUserId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
-    
+
     const addresses = await sql`
       SELECT 
         a.id,
@@ -133,7 +141,7 @@ export const getUserAddresses = async (req, res) => {
       LEFT JOIN users u ON a.user_id = u.id
       WHERE a.user_id = ${parsedUserId} AND a.deleted_at IS NULL
     `;
-    
+
     console.log('getUserAddresses: Fetched addresses for user', parsedUserId, ':', addresses);
     res.json(addresses);
   } catch (error) {
@@ -148,9 +156,9 @@ export const getCompleteOrderDetails = async (req, res) => {
     if (!orderId || isNaN(orderId)) {
       return res.status(400).json({ error: 'Invalid order ID' });
     }
-    
+
     console.log(`Starting fetch for orderId: ${orderId}`);
-    
+
     await sql.begin(async (sql) => {
       const [order] = await sql`
         SELECT 
@@ -164,11 +172,11 @@ export const getCompleteOrderDetails = async (req, res) => {
         LEFT JOIN users u ON o.user_id = u.id
         WHERE o.id = ${orderId} AND o.deleted_at IS NULL
       `;
-      
+
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
-      
+
       let shippingAddress = null;
       if (order.address_id) {
         [shippingAddress] = await sql`
@@ -179,7 +187,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           WHERE a.id = ${order.address_id} AND a.deleted_at IS NULL
         `;
       }
-      
+
       let billingAddress = null;
       if (order.billing_address_id) {
         [billingAddress] = await sql`
@@ -191,7 +199,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           WHERE ba.id = ${order.billing_address_id} AND ba.deleted_at IS NULL
         `;
       }
-      
+
       const items = await sql`
         SELECT 
           oi.id, oi.variant_id, oi.quantity, oi.price, oi.size_id, 
@@ -199,7 +207,7 @@ export const getCompleteOrderDetails = async (req, res) => {
         FROM order_items oi
         WHERE oi.order_id = ${orderId} AND oi.bundle_id IS NULL
       `;
-      
+
       const bundleItems = await sql`
         SELECT 
           oi.id, oi.quantity, oi.price, oi.bundle_id, oi.product_name, 
@@ -209,14 +217,14 @@ export const getCompleteOrderDetails = async (req, res) => {
         LEFT JOIN bundles b ON oi.bundle_id = b.id
         WHERE oi.order_id = ${orderId} AND oi.bundle_id IS NOT NULL
       `;
-      
+
       const variantsNeedingImages = [];
       items.forEach(item => {
         if (!item.image_url && item.variant_id) {
           variantsNeedingImages.push(item.variant_id);
         }
       });
-      
+
       bundleItems.forEach(item => {
         if (item.bundle_details) {
           try {
@@ -231,7 +239,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           }
         }
       });
-      
+
       let variantImages = {};
       if (variantsNeedingImages.length > 0) {
         const images = await sql`
@@ -239,12 +247,12 @@ export const getCompleteOrderDetails = async (req, res) => {
           FROM product_images
           WHERE variant_id = ANY(${variantsNeedingImages}) AND is_primary = true
         `;
-        
+
         images.forEach(row => {
           variantImages[row.variant_id] = row.image_url;
         });
       }
-      
+
       const processedItems = items.map(item => {
         const itemImageUrl = item.image_url || (item.variant_id ? variantImages[item.variant_id] : null);
         const images = itemImageUrl ? [itemImageUrl] : [];
@@ -255,7 +263,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           images: images,
         };
       });
-      
+
       const processedBundleItems = await Promise.all(bundleItems.map(async item => {
         // Use the bundle_details field which contains the user's actual selections
         let bundleContents = [];
@@ -263,11 +271,11 @@ export const getCompleteOrderDetails = async (req, res) => {
         try {
           if (item.bundle_details) {
             parsedBundleDetails = typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details;
-            
+
             // Get additional details for each selected item
             const variantIds = parsedBundleDetails.map(detail => detail.variant_id).filter(id => id);
             const sizeIds = parsedBundleDetails.map(detail => detail.size_id).filter(id => id);
-            
+
             if (variantIds.length > 0 && sizeIds.length > 0) {
               bundleContents = await sql`
                 SELECT 
@@ -316,20 +324,20 @@ export const getCompleteOrderDetails = async (req, res) => {
           console.error(`Failed to parse bundle_details for order item: ${item.id}: ${e.message}`);
           bundleContents = [];
         }
-        
+
         const images = item.image_url ? [item.image_url] : [];
         // Process each bundle item individually (don't aggregate)
         const processedBundleContents = parsedBundleDetails.map(detail => {
           try {
             // Find the corresponding content from the database query
-            const content = bundleContents.find(c => 
-              c.variant_id === detail.variant_id && 
+            const content = bundleContents.find(c =>
+              c.variant_id === detail.variant_id &&
               c.size_id === detail.size_id
             ) || {};
-            
+
             const contentImageUrl = content.image_url || (detail.variant_id ? variantImages[detail.variant_id] : null);
             const contentImages = contentImageUrl ? [contentImageUrl] : [];
-            
+
             return {
               product_id: content.product_id || detail.product_id,
               product_name: content.product_name || detail.product_name || 'N/A',
@@ -347,7 +355,7 @@ export const getCompleteOrderDetails = async (req, res) => {
             throw error; // Re-throw to maintain error behavior
           }
         });
-        
+
         const bundleImageUrl = item.image_url;
         return {
           ...item,
@@ -359,7 +367,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           bundle_type: item.bundle_type || 'N/A',
         };
       }));
-      
+
       const completeOrder = {
         user: {
           id: order.user_id,
@@ -395,7 +403,7 @@ export const getCompleteOrderDetails = async (req, res) => {
           delivery_fee_paid: order.delivery_fee_paid || false,
         },
       };
-      
+
       res.status(200).json(completeOrder);
     });
   } catch (err) {
@@ -414,7 +422,7 @@ export const getAnalyticsData = async (req, res) => {
         WHERE deleted_at IS NULL AND payment_status = 'completed'
       `;
       const totalRevenue = parseFloat(revenueResult.total_revenue) || 0;
-      
+
       // Total Orders
       const [ordersResult] = await sql`
         SELECT COUNT(*) AS total_orders
@@ -422,7 +430,7 @@ export const getAnalyticsData = async (req, res) => {
         WHERE deleted_at IS NULL
       `;
       const totalOrders = parseInt(ordersResult.total_orders) || 0;
-      
+
       // Total Customers
       const [customersResult] = await sql`
         SELECT COUNT(DISTINCT user_id) AS total_customers
@@ -430,7 +438,7 @@ export const getAnalyticsData = async (req, res) => {
         WHERE deleted_at IS NULL
       `;
       const totalCustomers = parseInt(customersResult.total_customers) || 0;
-      
+
       // Average Order Value
       const [avgOrderResult] = await sql`
         SELECT COALESCE(AVG(total), 0) AS avg_order_value
@@ -438,7 +446,7 @@ export const getAnalyticsData = async (req, res) => {
         WHERE deleted_at IS NULL AND payment_status = 'completed'
       `;
       const avgOrderValue = parseFloat(avgOrderResult.avg_order_value) || 0;
-      
+
       // Revenue Growth (vs previous 30 days)
       const [revenueGrowthResult] = await sql`
         SELECT 
@@ -449,7 +457,7 @@ export const getAnalyticsData = async (req, res) => {
           AND created_at >= NOW() - INTERVAL '30 days'
       `;
       const currentRevenue = parseFloat(revenueGrowthResult.current_revenue) || 0;
-      
+
       const [prevRevenueResult] = await sql`
         SELECT COALESCE(SUM(total), 0) AS prev_revenue
         FROM orders
@@ -460,7 +468,7 @@ export const getAnalyticsData = async (req, res) => {
       `;
       const prevRevenue = parseFloat(prevRevenueResult.prev_revenue) || 0;
       const revenueGrowth = prevRevenue > 0 ? ((currentRevenue - prevRevenue) / prevRevenue * 100).toFixed(1) : 0;
-      
+
       // Order Growth (vs previous 30 days)
       const [orderGrowthResult] = await sql`
         SELECT COUNT(*) AS current_orders
@@ -469,7 +477,7 @@ export const getAnalyticsData = async (req, res) => {
           AND created_at >= NOW() - INTERVAL '30 days'
       `;
       const currentOrders = parseInt(orderGrowthResult.current_orders) || 0;
-      
+
       const [prevOrderResult] = await sql`
         SELECT COUNT(*) AS prev_orders
         FROM orders
@@ -479,7 +487,7 @@ export const getAnalyticsData = async (req, res) => {
       `;
       const prevOrders = parseInt(prevOrderResult.prev_orders) || 0;
       const orderGrowth = prevOrders > 0 ? ((currentOrders - prevOrders) / prevOrders * 100).toFixed(1) : 0;
-      
+
       // Customer Growth (vs previous 30 days)
       const [customerGrowthResult] = await sql`
         SELECT COUNT(DISTINCT user_id) AS current_customers
@@ -488,7 +496,7 @@ export const getAnalyticsData = async (req, res) => {
           AND created_at >= NOW() - INTERVAL '30 days'
       `;
       const currentCustomers = parseInt(customerGrowthResult.current_customers) || 0;
-      
+
       const [prevCustomerResult] = await sql`
         SELECT COUNT(DISTINCT user_id) AS prev_customers
         FROM orders
@@ -498,7 +506,7 @@ export const getAnalyticsData = async (req, res) => {
       `;
       const prevCustomers = parseInt(prevCustomerResult.prev_customers) || 0;
       const customerGrowth = prevCustomers > 0 ? ((currentCustomers - prevCustomers) / prevCustomers * 100).toFixed(1) : 0;
-      
+
       res.json({
         totalRevenue,
         totalOrders,
@@ -521,7 +529,7 @@ export const getUserOrders = async (req, res) => {
     if (!userId || isNaN(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
-    
+
     const orders = await sql`
       SELECT 
         o.id,
@@ -539,7 +547,7 @@ export const getUserOrders = async (req, res) => {
       WHERE o.user_id = ${userId} AND o.deleted_at IS NULL
       ORDER BY o.created_at DESC
     `;
-    
+
     console.log('getUserOrders: Fetched orders for user', userId, ':', orders.length);
     res.json(orders);
   } catch (error) {
@@ -551,20 +559,20 @@ export const getUserOrders = async (req, res) => {
 export const deleteOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
+
     await sql.begin(async (sql) => {
       const [order] = await sql`SELECT * FROM orders WHERE id = ${orderId}`;
       if (!order) {
         return res.status(404).json({ error: 'Order not found' });
       }
-      
+
       if (order.status !== 'delivered') {
         return res.status(400).json({ error: 'Only delivered orders can be deleted' });
       }
-      
+
       await sql`DELETE FROM order_items WHERE order_id = ${orderId}`;
       await sql`DELETE FROM orders WHERE id = ${orderId}`;
-      
+
       console.log(`deleteOrder: Deleted order ${orderId}`);
       res.status(200).json({ message: 'Order deleted successfully' });
     });
@@ -578,28 +586,28 @@ export const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
-    
+
     if (!status) {
       return res.status(400).json({ error: 'Status is required' });
     }
-    
+
     const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
     }
-    
+
     const [order] = await sql`SELECT * FROM orders WHERE id = ${orderId}`;
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     const [updatedOrder] = await sql`
       UPDATE orders 
       SET status = ${status}, updated_at = NOW() 
       WHERE id = ${orderId} 
       RETURNING *
     `;
-    
+
     console.log(`updateOrderStatus: Updated status for order ${orderId} to ${status}`);
     res.status(200).json(updatedOrder);
   } catch (err) {
@@ -613,41 +621,41 @@ export const setDeliveryFee = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { delivery_fee } = req.body;
-    
+
     if (!orderId || isNaN(orderId)) {
       return res.status(400).json({ error: 'Invalid order ID' });
     }
-    
+
     if (typeof delivery_fee !== 'number' || isNaN(delivery_fee) || delivery_fee < 0) {
       return res.status(400).json({ error: 'Invalid delivery fee. Must be a positive number' });
     }
-    
+
     const [order] = await sql`
       SELECT o.*, a.country as shipping_country
       FROM orders o
       LEFT JOIN addresses a ON o.address_id = a.id
       WHERE o.id = ${orderId} AND o.deleted_at IS NULL
     `;
-    
+
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     if (order.shipping_country.toLowerCase() === 'nigeria') {
       return res.status(400).json({ error: 'Delivery fee can only be set for international orders' });
     }
-    
+
     if (order.payment_status !== 'completed') {
       return res.status(400).json({ error: 'Order payment must be completed' });
     }
-    
+
     const [updatedOrder] = await sql`
       UPDATE orders
       SET delivery_fee = ${delivery_fee}, updated_at = NOW()
       WHERE id = ${orderId}
       RETURNING *
     `;
-    
+
     console.log(`setDeliveryFee: Set fee ${delivery_fee} for order ${orderId}`);
     res.json(updatedOrder);
   } catch (error) {
@@ -659,7 +667,7 @@ export const setDeliveryFee = async (req, res) => {
 export const getOrderItemsForAdmin = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
+
     const items = await sql`
       SELECT 
         oi.id,
@@ -677,7 +685,7 @@ export const getOrderItemsForAdmin = async (req, res) => {
       LEFT JOIN product_images pi ON pv.id = pi.variant_id AND pi.is_primary = true
       WHERE oi.order_id = ${orderId} AND oi.bundle_id IS NULL
     `;
-    
+
     res.status(200).json(items);
   } catch (err) {
     console.error('❌ Error fetching order items:', err.message);
@@ -688,7 +696,7 @@ export const getOrderItemsForAdmin = async (req, res) => {
 export const getOrderBundleItemsForAdmin = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
+
     const bundleItems = await sql`
       SELECT 
         oi.id,
@@ -712,7 +720,8 @@ export const getOrderBundleItemsForAdmin = async (req, res) => {
           JOIN product_variants pv ON bi.variant_id = pv.id
           JOIN products p ON pv.product_id = p.id
           LEFT JOIN colors c ON pv.color_id = c.id
-          LEFT JOIN sizes s ON pv.size_id = s.id
+          LEFT JOIN variant_sizes vs ON pv.id = vs.variant_id
+          LEFT JOIN sizes s ON vs.size_id = s.id
           LEFT JOIN product_images pi ON pv.id = pi.variant_id AND pi.is_primary = true
           WHERE bi.bundle_id = b.id
         ) AS bundle_items
@@ -721,7 +730,7 @@ export const getOrderBundleItemsForAdmin = async (req, res) => {
       LEFT JOIN bundle_images bi ON b.id = bi.bundle_id AND bi.is_primary = true
       WHERE oi.order_id = ${orderId} AND oi.bundle_id IS NOT NULL
     `;
-    
+
     res.status(200).json(bundleItems);
   } catch (err) {
     console.error('❌ Error fetching order bundle items:', err.message);
@@ -732,18 +741,18 @@ export const getOrderBundleItemsForAdmin = async (req, res) => {
 export const getOrderShippingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
+
     // Get the order to find the user
     const [order] = await sql`
       SELECT user_id
       FROM orders 
       WHERE id = ${orderId}
     `;
-    
+
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     // Get the user's default shipping address
     const [address] = await sql`
       SELECT 
@@ -755,11 +764,11 @@ export const getOrderShippingAddress = async (req, res) => {
       ORDER BY a.is_default DESC, a.created_at DESC
       LIMIT 1
     `;
-    
+
     if (!address) {
       return res.status(404).json({ error: 'Shipping address not found' });
     }
-    
+
     res.status(200).json(address);
   } catch (err) {
     console.error('❌ Error fetching shipping address:', err.message);
@@ -770,18 +779,18 @@ export const getOrderShippingAddress = async (req, res) => {
 export const getOrderBillingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
+
     // Get the order to find the user
     const [order] = await sql`
       SELECT user_id
       FROM orders 
       WHERE id = ${orderId}
     `;
-    
+
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    
+
     // Get the user's default billing address
     const [address] = await sql`
       SELECT 
@@ -793,11 +802,11 @@ export const getOrderBillingAddress = async (req, res) => {
       ORDER BY a.created_at DESC
       LIMIT 1
     `;
-    
+
     if (!address) {
       return res.status(404).json({ error: 'Billing address not found' });
     }
-    
+
     res.status(200).json(address);
   } catch (err) {
     console.error('❌ Error fetching billing address:', err.message);
