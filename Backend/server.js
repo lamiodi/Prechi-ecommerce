@@ -38,7 +38,7 @@ dotenv.config();
 // ==== Environment Variable Validation ====
 const requiredEnvVars = [
   'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY', 
+  'CLOUDINARY_API_KEY',
   'CLOUDINARY_API_SECRET',
   'RESEND_API_KEY',
   'PAYSTACK_SECRET_KEY',
@@ -62,32 +62,12 @@ EventEmitter.defaultMaxListeners = 40;
 
 const app = express();
 
-// ==== Security Middleware ====
-app.use(helmet());
-app.use(hpp());
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again after 15 minutes',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-
-// Apply rate limiting to all requests
-app.use(limiter);
-
-// ==== Cloudinary Setup ====
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 // ==== CORS Config ====
 const allowedOrigins = [
   "https://prechi-ecommerce-frontend.onrender.com", // Production frontend
   "https://prechi-ecommerce.vercel.app",           // Vercel frontend
+  "https://www.prechiclothing.com",                // Custom Domain with www
+  "https://prechiclothing.com",                    // Custom Domain without www
   "http://localhost:5173",       // Local Vite dev
 ];
 
@@ -112,6 +92,31 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+
+
+// ==== Security Middleware ====
+app.use(helmet());
+app.use(hpp());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all requests
+app.use(limiter);
+
+// ==== Cloudinary Setup ====
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
 
 // ==== Middleware ====
 // Raw body parser for webhooks
