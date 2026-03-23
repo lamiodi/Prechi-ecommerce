@@ -142,26 +142,6 @@ const HelpPage = () => {
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-blue-600 mr-3" />
-                  Delivery within Lagos Island
-                </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-PatrickHand">3–5 business days</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-PatrickHand text-gray-600">Cost:</span>
-                    <span className="font-semibold font-PatrickHand">₦4,000</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-PatrickHand text-gray-600">Available:</span>
-                    <span className="font-semibold font-PatrickHand">Lagos Island areas</span>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
-                  <Truck className="w-6 h-6 text-purple-600 mr-3" />
                   Delivery within Lagos Mainland
                 </h4>
                 <div className="space-y-3">
@@ -171,11 +151,31 @@ const HelpPage = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Cost:</span>
-                    <span className="font-semibold font-PatrickHand">₦6,000</span>
+                    <span className="font-semibold font-PatrickHand">₦4,000</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Available:</span>
                     <span className="font-semibold font-PatrickHand">Lagos Mainland areas</span>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
+                  <Truck className="w-6 h-6 text-purple-600 mr-3" />
+                  Delivery within Lagos Island
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
+                    <span className="font-semibold font-PatrickHand">3–5 business days</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-PatrickHand text-gray-600">Cost:</span>
+                    <span className="font-semibold font-PatrickHand">₦6,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-PatrickHand text-gray-600">Available:</span>
+                    <span className="font-semibold font-PatrickHand">Lagos Island areas</span>
                   </div>
                 </div>
               </div>
@@ -465,8 +465,8 @@ const HelpPage = () => {
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center space-x-3 px-4 py-2 rounded-full text-left transition-all duration-200 font-PatrickHand ${activeTab === item.id
-                          ? 'bg-accent text-black border border-accent shadow-sm'
-                          : 'text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800'
+                        ? 'bg-accent text-black border border-accent shadow-sm'
+                        : 'text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-800'
                         }`}
                     >
                       <Icon className="w-5 h-5" />

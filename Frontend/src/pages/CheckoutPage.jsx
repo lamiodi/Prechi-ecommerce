@@ -300,20 +300,20 @@ const CheckoutPage = () => {
 
   const shippingOptions = [
     {
-      id: 1,
-      method: 'Delivery within Lagos Island',
-      total_cost: 4000,
-      estimated_delivery: '3–5 business days',
-      icon: 'truck',
-      description: 'Fast delivery within Lagos Island'
-    },
-    {
       id: 2,
       method: 'Delivery within Lagos Mainland',
-      total_cost: 6000,
+      total_cost: 4000,
       estimated_delivery: '5–7 business days',
       icon: 'package',
       description: 'Reliable delivery within Lagos Mainland'
+    },
+    {
+      id: 1,
+      method: 'Delivery within Lagos Island',
+      total_cost: 6000,
+      estimated_delivery: '3–5 business days',
+      icon: 'truck',
+      description: 'Fast delivery within Lagos Island'
     },
     {
       id: 3,
