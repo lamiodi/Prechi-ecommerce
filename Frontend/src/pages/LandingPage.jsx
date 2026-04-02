@@ -105,9 +105,9 @@ const LandingPage = () => {
     <div className="min-h-screen bg-white">
       {/* Navigation - Overlaying the hero section */}
       <Navbar2 />
-      <main className="bg-Primarycolor">
+      <main className="bg-white">
         {/* Hero Section */}
-        <section className="relative h-[85vh] md:h-[90vh] lg:h-screen bg-black overflow-hidden">
+        <section className="relative h-[85vh] md:h-[90vh] lg:h-screen bg-white overflow-hidden">
           {/* Cloudinary Videos */}
           <video
             ref={mobileVideoRef}
@@ -148,31 +148,28 @@ const LandingPage = () => {
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
-              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-white">
-                <span className="font-PatrickHand max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-Primarycolor">
+                <span className="font-PatrickHand max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">
                   Bold Fits.
                 </span>
                 <br />
-                <span className="font-PatrickHand max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2">
+                <span className="font-PatrickHand max-sm:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl block mt-2 drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]">
                   Premium Sets & Tracksuits.
                 </span>
               </h1>
               <Link to="/shop">
-                <Button
-                  label="SHOP NOW"
-                  variant="primary"
-                  size="medium"
-                  stateProp="default"
-                  className="w-44"
-                  divClassName=""
-                />
+                <button
+                  className="w-44 px-6 py-3 bg-Primarycolor text-white font-Manrope font-semibold rounded-lg hover:bg-gray-800 transition-colors shadow-lg"
+                >
+                  SHOP NOW
+                </button>
               </Link>
             </div>
           </div>
         </section>
 
         {/* Product Showcase Grid */}
-        <section className="bg-gray-50">
+        <section className="bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
             {products.length > 0 ? (
               products.map((product, index) => {

@@ -436,8 +436,8 @@ const CheckoutPage = () => {
   }, [guestForm.name, guestForm.email, guestForm.phone_number]);
 
   // Handle guest form submission
-  const handleGuestFormSubmit = async (e) => {
-    e.preventDefault();
+  const handleGuestFormSubmit = useCallback(async (e) => {
+    if (e) e.preventDefault();
 
     if (!validateGuestForm()) {
       setRequiredForm('guest');
@@ -551,7 +551,7 @@ const CheckoutPage = () => {
     } finally {
       setShippingAddressLoading(false);
     }
-  };
+  }, [guestForm, validateGuestForm]);
 
   // Validate shipping address
   const validateShippingAddress = () => {
@@ -581,7 +581,7 @@ const CheckoutPage = () => {
   };
 
   // Modified processOrder function with better error handling and loading state management
-  const processOrder = async (guestUserId = null) => {
+  const processOrder = useCallback(async (guestUserId = null) => {
     // Use the provided guestUserId if available, otherwise fall back to state
     const userId = guestUserId || createdUserId || getUserId();
 
@@ -925,10 +925,10 @@ const CheckoutPage = () => {
         navigate(`/orders/${err.orderId}`);
       }
     }
-  };
+  }, [createdUserId, getUserId, isGuest, guestFormSubmitted, isAuthenticated, shippingAddressId, shippingAddresses.length, shippingForm, billingAddressOption, billingAddressId, billingAddresses.length, billingForm, country, shippingMethod, cart, firstOrderDiscount, couponDiscount, paymentMethod, guestForm, appliedCoupon, orderNote, idempotencyKey, user, navigate]);
 
   // Updated handlePlaceOrder to ensure loading state is reset and prevent duplicate submissions
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = useCallback(async () => {
     // Prevent multiple submissions
     if (isProcessing) return;
 
@@ -958,10 +958,10 @@ const CheckoutPage = () => {
       setLoading(false);
       setIsProcessing(false);
     }
-  };
+  }, [isProcessing, isGuest, guestFormSubmitted, handleGuestFormSubmit, processOrder]);
 
-  // Fixed handleShippingSubmit to close the form after saving
-  const handleShippingSubmit = async (data) => {
+  // Optimize form updates with useCallback
+  const handleShippingSubmit = useCallback(async (data) => {
     try {
       setShippingAddressLoading(true);
 
@@ -1046,9 +1046,9 @@ const CheckoutPage = () => {
     } finally {
       setShippingAddressLoading(false);
     }
-  };
+  }, [isAuthenticated, editingShippingAddress, billingAddressOption, guestForm.name, guestForm.email, guestForm.phone_number, billingForm.full_name, billingForm.email, isGuest]);
 
-  const handleBillingSubmit = async (data) => {
+  const handleBillingSubmit = useCallback(async (data) => {
     try {
       setBillingAddressLoading(true);
 
@@ -1114,9 +1114,9 @@ const CheckoutPage = () => {
     } finally {
       setBillingAddressLoading(false);
     }
-  };
+  }, [isAuthenticated, editingBillingAddress]);
 
-  const handleEditAddress = (type, address) => {
+  const handleEditAddress = useCallback((type, address) => {
     if (type === 'addresses') {
       setShippingForm(address);
       setEditingShippingAddress(address);
@@ -1126,9 +1126,9 @@ const CheckoutPage = () => {
       setEditingBillingAddress(address);
       setShowBillingForm(true);
     }
-  };
+  }, []);
 
-  const handleAddNewShippingAddress = () => {
+  const handleAddNewShippingAddress = useCallback(() => {
     setEditingShippingAddress(null);
     setShippingForm({
       title: '',
@@ -1141,9 +1141,9 @@ const CheckoutPage = () => {
       phone_number: ''
     });
     setShowShippingForm(true);
-  };
+  }, []);
 
-  const handleAddNewBillingAddress = () => {
+  const handleAddNewBillingAddress = useCallback(() => {
     setEditingBillingAddress(null);
     setBillingForm({
       full_name: user?.name || '',
@@ -1156,9 +1156,9 @@ const CheckoutPage = () => {
       country: 'Nigeria'
     });
     setShowBillingForm(true);
-  };
+  }, [user]);
 
-  const handleDeleteAddress = async (type, addressId) => {
+  const handleDeleteAddress = useCallback(async (type, addressId) => {
     if (!isAuthenticated() && !createdUserId) {
       console.error('CheckoutPage: No user ID available');
       toast.error('Please create an account to delete address');
@@ -1223,10 +1223,10 @@ const CheckoutPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, createdUserId, shippingAddresses, billingAddresses, shippingAddressId, billingAddressId]);
 
   // Optimized copyShippingToBilling to not copy phone number for guest users
-  const copyShippingToBilling = () => {
+  const copyShippingToBilling = useCallback(() => {
     if (!shippingForm.address_line_1) {
       toast.error('Please add a shipping address first');
       return;
@@ -1249,7 +1249,7 @@ const CheckoutPage = () => {
     // Update billing form state
     setBillingForm(billingAddress);
     toast.success('Billing address updated to match shipping address');
-  };
+  }, [shippingForm, guestForm.name, guestForm.email, guestForm.phone_number, billingForm.full_name, billingForm.email, isGuest]);
 
   useEffect(() => {
     const script = document.createElement('script');
