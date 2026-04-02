@@ -128,6 +128,75 @@ const CheckoutPage = () => {
   // NEW: State to prevent duplicate submissions
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // NEW: State for step-by-step checkout and validation
+  const [currentStep, setCurrentStep] = useState(1);
+  const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
+
+
+  // Validation for Step 1
+  const validateStep1 = () => {
+    const missing = [];
+    if (isGuest && !guestFormSubmitted) {
+      missing.push("Guest contact information is required");
+    }
+    
+    const hasShipping = isAuthenticated()
+      ? (shippingAddressId && shippingAddresses.length > 0) || shippingForm.address_line_1
+      : shippingForm.address_line_1;
+      
+    if (!hasShipping) {
+      missing.push("Shipping address is missing");
+      setRequiredForm('shipping');
+    }
+    
+    const addressCountry = shippingForm.country || country;
+    const isNigeria = addressCountry.toLowerCase() === 'nigeria';
+    
+    if (isNigeria && !shippingMethod) {
+      missing.push("Delivery method is required");
+    }
+    
+    if (missing.length > 0) {
+      setMissingFieldsSummary(missing);
+      return false;
+    }
+    
+    setMissingFieldsSummary([]);
+    return true;
+  };
+
+  // Validation for Step 2
+  const validateStep2 = () => {
+    const missing = [];
+    
+    const hasBilling = isAuthenticated()
+      ? (billingAddressOption === 'same' && (shippingAddressId || shippingForm.address_line_1)) || (billingAddressId && billingAddresses.length > 0)
+      : (billingAddressOption === 'same' ? shippingForm.address_line_1 : billingForm.address_line_1);
+      
+    if (!hasBilling) {
+      missing.push("Billing address is missing");
+      setRequiredForm('billing');
+    }
+    
+    if (missing.length > 0) {
+      setMissingFieldsSummary(missing);
+      return false;
+    }
+    
+    setMissingFieldsSummary([]);
+    return true;
+  };
+
+  const handleNextStep = (step) => {
+    if (step === 2) {
+      if (validateStep1()) setCurrentStep(2);
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (step === 3) {
+      if (validateStep2()) setCurrentStep(3);
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // NEW: Generate idempotency key once per session
   const [idempotencyKey] = useState(() => uuidv4());
 
@@ -1689,13 +1758,41 @@ const CheckoutPage = () => {
         {(!isGuest || guestFormSubmitted) && (
           <>
             {/* Updated to two-column layout */}
+
+            {/* Step Progress Bar */}
+            <div className="lg:col-span-12 mb-6">
+              <div className="flex items-center justify-between w-full">
+                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 1 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>1. Shipping & Delivery</div>
+                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 2 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>2. Payment & Billing</div>
+                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 3 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>3. Review Order</div>
+              </div>
+              
+              {missingFieldsSummary.length > 0 && (
+                <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
+                  <div className="flex items-start">
+                    <AlertCircle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
+                    <div>
+                      <h4 className="text-red-800 font-bold mb-1">Please complete the following:</h4>
+                      <ul className="list-disc pl-5 text-red-700 text-sm">
+                        {missingFieldsSummary.map((err, i) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
               {/* Left Column - Forms */}
               <div className="lg:col-span-7 space-y-8">
                 {/* Address Forms - Different for guests and logged-in users */}
                 {isGuest ? (
                   // Guest Address Forms
                   <>
+                    <div className={currentStep === 1 ? "block" : "hidden"}>
                     {/* Shipping Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
@@ -1765,6 +1862,8 @@ const CheckoutPage = () => {
                       )}
                     </div>
 
+                    </div>
+                    <div className={currentStep === 2 ? "block" : "hidden"}>
                     {/* Billing Address Form for Guests */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
@@ -1854,10 +1953,12 @@ const CheckoutPage = () => {
                         </React.Suspense>
                       )}
                     </div>
+                    </div>
                   </>
                 ) : (
                   // Logged-in User Address Management
                   <>
+                    <div className={currentStep === 1 ? "block" : "hidden"}>
                     {/* Shipping Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
@@ -1966,6 +2067,8 @@ const CheckoutPage = () => {
                       </div>
                     )}
 
+                    </div>
+                    <div className={currentStep === 2 ? "block" : "hidden"}>
                     {/* Billing Address Section */}
                     <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                       <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
@@ -2110,14 +2213,12 @@ const CheckoutPage = () => {
                         )
                       )}
                     </div>
-
-
-
-
+                  </div>
                   </>
                 )}
 
                 {/* Billing Address Form for Logged-in Users */}
+                <div className={currentStep === 2 ? "block" : "hidden"}>
                 {showBillingForm && (
                   <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
                     <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
@@ -2136,6 +2237,8 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
+                </div>
+                <div className={currentStep === 1 ? "block" : "hidden"}>
                 {/* Order Note */}
                 <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
                   <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Special Instructions (optional)</h3>
@@ -2252,6 +2355,19 @@ const CheckoutPage = () => {
                   )}
                   {formErrors.shippingMethod && (
                     <p className="text-sm text-red-600 mt-2 font-PatrickHand">{formErrors.shippingMethod}</p>
+                  )}
+                </div>
+                </div>
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-6">
+                  {currentStep > 1 && (
+                    <button onClick={() => setCurrentStep(currentStep - 1)} className="px-6 py-2 bg-gray-200 text-Primarycolor rounded-md font-Manrope hover:bg-gray-300">Back</button>
+                  )}
+                  {currentStep === 1 && (
+                    <button onClick={() => handleNextStep(2)} className="px-6 py-2 bg-Primarycolor text-white rounded-md font-Manrope hover:bg-gray-800 ml-auto">Continue to Billing</button>
+                  )}
+                  {currentStep === 2 && (
+                    <button onClick={() => handleNextStep(3)} className="px-6 py-2 bg-Primarycolor text-white rounded-md font-Manrope hover:bg-gray-800 ml-auto">Continue to Review</button>
                   )}
                 </div>
               </div>
