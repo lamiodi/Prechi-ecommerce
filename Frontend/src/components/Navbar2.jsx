@@ -19,8 +19,6 @@ export default function Navbar2() {
   // Determine if current page has white background
   const isWhiteBackgroundPage = () => {
     const whiteBackgroundPages = [
-      '/home',
-      '/',
       '/shop',
       '/shopall',
       '/search',
