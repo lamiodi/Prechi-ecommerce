@@ -7,7 +7,7 @@ import NewsletterImage from '../assets/images/tinywow_IMG_4566 (1)_86252545.png'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({ baseURL: API_BASE_URL });
 
-const NewsletterForm = () => {
+const NewsletterForm = ({ inverted }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState('idle'); // idle, success, error
@@ -52,8 +52,8 @@ const NewsletterForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center relative w-full mx-auto mt-15">
-      <div className="relative w-full z-10 bg-Primarycolor overflow-visible pt-12 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-20 2xl:pt-30 pb-8 sm:pb-10 px-4 sm:px-6 md:px-12">
+    <div className={`flex justify-center items-center relative w-full mx-auto mt-15 ${inverted ? 'bg-white' : ''}`}>
+      <div className={`relative w-full z-10 ${inverted ? 'bg-Secondarycolor' : 'bg-Primarycolor'} overflow-visible pt-12 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-20 2xl:pt-30 pb-8 sm:pb-10 px-4 sm:px-6 md:px-12`}>
         
         {/* Image */}
         <div className="absolute top-[-10em] left-[-3em] sm:top-[-12em] sm:left-[-4em] md:top-[-14em] md:left-[1em] lg:top-[-16em] lg:left-10 xl:top-[-18em] xl:left-12 2xl:top-[-20em] 2xl:left-16 w-[16rem] sm:w-[20rem] md:w-[24rem] lg:w-[28rem] xl:w-[32rem] 2xl:w-[36rem] z-0">
@@ -61,7 +61,7 @@ const NewsletterForm = () => {
         </div>
         
         {/* Text + Form */}
-        <div className="relative mb-1 z-10 text-Secondarycolor text-right max-w-2xl mx-auto md:ml-auto 2xl:ml-115">
+        <div className={`relative mb-1 z-10 ${inverted ? 'text-Primarycolor' : 'text-Secondarycolor'} text-right max-w-2xl mx-auto md:ml-auto 2xl:ml-115`}>
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-extrabold font-PatrickHand tracking-tight leading-snug lg:text-nowrap lg:ms-10 lg:max-w-sm">
             SUBSCRIBE TO OUR NEWSLETTER
           </h2>
@@ -85,7 +85,7 @@ const NewsletterForm = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 w-full max-w-[95vw] sm:max-w-[75vw] md:max-w-[50vw] lg:max-w-[40vw] xl:max-w-[35vw] ml-auto lg:ml-48 xl:ml-60 2xl:ml-130">
-            <div className="flex bg-Secondarycolor font-Manrope rounded-md overflow-hidden shadow-sm">
+            <div className={`flex ${inverted ? 'bg-Primarycolor' : 'bg-Secondarycolor'} font-Manrope rounded-md overflow-hidden shadow-sm`}>
               <input
                 type="email"
                 value={email}
@@ -93,24 +93,24 @@ const NewsletterForm = () => {
                 required
                 aria-label="Email address"
                 placeholder="Enter Your Email For Alerts of Restocks and Drop"
-                className="px-3 sm:px-4 py-2.5 sm:py-3 w-full text-xs sm:text-sm text-[#6e6e6e] font-medium border-none focus:outline-none font-manrope-medium placeholder:text-xs sm:placeholder:text-sm"
+                className={`px-3 sm:px-4 py-2.5 sm:py-3 w-full text-xs sm:text-sm ${inverted ? 'text-gray-300' : 'text-[#6e6e6e]'} ${inverted ? 'bg-Primarycolor' : ''} font-medium border-none focus:outline-none font-manrope-medium placeholder:text-xs sm:placeholder:text-sm`}
               />
               <button
                 type="submit"
                 disabled={isLoading}
                 aria-label="Submit newsletter form"
-                className="w-8 sm:w-10 md:w-12 lg:w-14 h-[40px] sm:h-[45px] bg-[#d9d9d9] flex justify-center items-center hover:bg-[#c9c9c9] transition-colors duration-200 disabled:opacity-50"
+                className={`w-8 sm:w-10 md:w-12 lg:w-14 h-[40px] sm:h-[45px] ${inverted ? 'bg-[#333333] hover:bg-[#444444]' : 'bg-[#d9d9d9] hover:bg-[#c9c9c9]'} flex justify-center items-center transition-colors duration-200 disabled:opacity-50`}
               >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-Primarycolor animate-spin" />
+                  <Loader2 className={`w-4 h-4 sm:w-5 sm:h-5 ${inverted ? 'text-Secondarycolor' : 'text-Primarycolor'} animate-spin`} />
                 ) : (
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${inverted ? 'text-white' : 'text-black'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                   </svg>
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-4 text-center">
+            <p className={`text-xs ${inverted ? 'text-gray-400' : 'text-gray-500'} mt-4 text-center`}>
               We respect your privacy. Unsubscribe at any time.
             </p>
           </form>

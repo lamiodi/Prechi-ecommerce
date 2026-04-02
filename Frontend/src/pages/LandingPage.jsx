@@ -102,12 +102,12 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black">
       {/* Navigation - Overlaying the hero section */}
       <Navbar2 />
-      <main className="bg-Primarycolor">
+      <main className="bg-Secondarycolor">
         {/* Hero Section */}
-        <section className="relative h-[85vh] md:h-[90vh] lg:h-screen bg-black overflow-hidden">
+        <section className="relative h-[85vh] md:h-[90vh] lg:h-screen bg-white overflow-hidden">
           {/* Cloudinary Videos */}
           <video
             ref={mobileVideoRef}
@@ -141,14 +141,14 @@ const LandingPage = () => {
           {/* Debug overlay - shows if videos are not loading */}
           {videoError && (
             <div className="absolute inset-0 bg-red-500 bg-opacity-50 flex items-center justify-center z-30">
-              <p className="text-white text-xl font-bold">Video Loading Error</p>
+              <p className="text-black text-xl font-bold">Video Loading Error</p>
             </div>
           )}
 
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
-              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-white">
+              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-black">
                 <span className="font-PatrickHand max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
                   Bold Fits.
                 </span>
@@ -160,10 +160,10 @@ const LandingPage = () => {
               <Link to="/shop">
                 <Button
                   label="SHOP NOW"
-                  variant="primary"
+                  variant="secondary"
                   size="medium"
                   stateProp="default"
-                  className="w-44"
+                  className="w-44 hover:opacity-90"
                   divClassName=""
                 />
               </Link>
@@ -172,7 +172,7 @@ const LandingPage = () => {
         </section>
 
         {/* Product Showcase Grid */}
-        <section className="bg-gray-50">
+        <section className="bg-gray-900">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
             {products.length > 0 ? (
               products.map((product, index) => {
@@ -189,12 +189,12 @@ const LandingPage = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500?text=No+Image'; }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="absolute bottom-8 left-8 text-white">
+                      <div className="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute bottom-8 left-8 text-black">
                         <h3 className="text-3xl font-bold mb-2 uppercase font-Manrope">{product.name}</h3>
                         <p className="text-lg mb-4 font-PatrickHand">{formatPrice(product.price)}</p>
                         <Link to={productUrl}>
-                          <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors font-Manrope">
+                          <button className="bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors font-Manrope">
                             SHOP NOW
                           </button>
                         </Link>
@@ -206,7 +206,7 @@ const LandingPage = () => {
             ) : (
               // Skeleton loading state
               [...Array(4)].map((_, i) => (
-                <div key={i} className="relative group cursor-pointer overflow-hidden bg-gray-200 animate-pulse">
+                <div key={i} className="relative group cursor-pointer overflow-hidden bg-gray-800 animate-pulse">
                   <div className="aspect-[4/5]"></div>
                 </div>
               ))
@@ -215,10 +215,10 @@ const LandingPage = () => {
         </section>
 
         {/* Newsletter Section */}
-        <NewsletterForm />
+        <NewsletterForm inverted={true} />
       </main>
       {/* Footer */}
-      <Footer />
+      <Footer inverted={true} />
 
       {/* Lazy-loaded components for better performance */}
       <Suspense fallback={null}>
