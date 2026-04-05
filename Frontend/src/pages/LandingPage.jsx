@@ -148,7 +148,7 @@ const LandingPage = () => {
           {/* Content overlay with transparent background */}
           <div className="relative z-30 container mx-auto lg:mx-5 h-full flex items-center md:items-end justify-start pt-12 sm:pt-16 md:pt-20 md:pb-16 lg:pt-0 lg:pb-32">
             <div className="typography flex flex-col w-full items-start space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 z-20 ml-2 lg:ml-8">
-              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-black">
+              <h1 className="text-left lgx:text-5xl leading-tight sm:leading-normal md:leading-relaxed text-white">
                 <span className="font-PatrickHand max-sm:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
                   Bold Fits.
                 </span>
@@ -190,7 +190,7 @@ const LandingPage = () => {
                         onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500?text=No+Image'; }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="absolute bottom-8 left-8 text-black">
+                      <div className="absolute bottom-8 left-8 text-white">
                         <h3 className="text-3xl font-bold mb-2 uppercase font-Manrope">{product.name}</h3>
                         <p className="text-lg mb-4 font-PatrickHand">{formatPrice(product.price)}</p>
                         <Link to={productUrl}>
