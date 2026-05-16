@@ -23,6 +23,7 @@ import ReviewSection from "../components/ReviewSection"
 import DescriptionSection from "../components/DescriptionSection"
 import { toastSuccess, toastError } from "../utils/toastConfig"
 import ProductSchema from "../components/ProductSchema"
+import SEO from "../components/SEO"
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
   : 'https://prechi-ecommerce.onrender.com'
@@ -641,8 +642,20 @@ const ProductDetails = () => {
     ? sortSizes(Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [])
     : sortSizes(Array.isArray(data?.items?.[0]?.all_variants?.[0]?.sizes) ? data?.items?.[0]?.all_variants?.[0]?.sizes : [])
   const bundleTypes = ["3-in-1", "5-in-1"]
+  
+  const currentProductName = data?.name || "Product"
+  const plainDescription = description.replace(/<[^>]+>/g, '').substring(0, 160)
+  const currentImageUrl = data?.images?.[0] || ""
+  
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO 
+        title={currentProductName} 
+        description={plainDescription}
+        image={currentImageUrl}
+        url={window.location.pathname}
+        type="product"
+      />
       {/* Product Schema for SEO */}
       <ProductSchema
         productData={productData}

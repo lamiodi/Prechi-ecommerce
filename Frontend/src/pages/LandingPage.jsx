@@ -7,6 +7,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import SEO from '../components/SEO';
 // Hero video from public folder (portrait MP4)
 const heroVideo = '/IMG_9987.mp4';
 
@@ -103,6 +104,11 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-black">
+      <SEO 
+        title="Home" 
+        description="Shop premium tracksuits, coordinated sets, and exclusive streetwear from Prechi Clothing. Bold designs and unmatched comfort for everyday excellence."
+        url="/"
+      />
       {/* Navigation - Overlaying the hero section */}
       <Navbar2 />
       <main className="bg-Secondarycolor">

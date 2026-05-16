@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
+import SEO from '../components/SEO';
 
 // Hook to update meta tags dynamically
 const useMetaTags = (title, description) => {
@@ -347,6 +348,11 @@ const ShopAllPage = () => {
     <div className="flex flex-col min-h-screen">
       {/* CollectionPage Schema for SEO */}
       <CollectionPageSchema />
+      <SEO 
+        title="Shop All" 
+        description="Browse our complete collection of premium tracksuits, coordinated sets, and exclusive streetwear. Find your perfect fit at Prechi Clothing."
+        url="/shop"
+      />
       <Navbar2 />
       <div className="typography container-padding flex flex-col pt-20 py-8 px-2 sm:px-3 lg:px-4 flex-1">
         <div className="mb-8">
