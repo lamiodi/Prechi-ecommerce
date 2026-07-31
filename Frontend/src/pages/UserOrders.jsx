@@ -204,7 +204,17 @@ const UserOrders = () => {
                 </div>
                 <div>
                   <span className="text-text-tertiary block mb-1">Status</span>
-                  <span className="font-medium capitalize text-Primarycolor">{selectedOrder.payment_status}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium capitalize text-Primarycolor">{selectedOrder.payment_status}</span>
+                    {selectedOrder.payment_status === 'pending' && (
+                      <button
+                        onClick={() => navigate(`/thank-you?reference=${selectedOrder.reference}`)}
+                        className="text-[11px] px-2 py-1 bg-Primarycolor text-white rounded hover:bg-black transition-colors"
+                      >
+                        Pay / Verify
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <span className="text-text-tertiary block mb-1">Country</span>

@@ -7,11 +7,14 @@ import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 
+import { useCartDrawer } from '../context/CartDrawerContext';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { clearCart } = useCartDrawer();
   const reference = searchParams.get('reference') || localStorage.getItem('lastOrderReference');
   const [order, setOrder] = useState(null);
   const [user, setUser] = useState(null);
@@ -70,11 +73,23 @@ const ThankYou = () => {
       try {
         let pollResponse;
         
-        // For guest orders (token is null), call without authentication
+        // Check real-time Paystack status first
+        try {
+          const paystackRes = await axios.get(`${API_BASE_URL}/api/paystack/verify?reference=${reference}&json=true`);
+          if (paystackRes.data?.order?.payment_status === 'completed') {
+            setOrder(paystackRes.data.order);
+            setPolling(false);
+            if (clearCart) clearCart();
+            clearInterval(pollIntervalRef.current);
+            toast.success('Payment verified successfully!');
+            return;
+          }
+        } catch (e) {}
+
+        // Fallback to order status check
         if (token === null) {
           pollResponse = await axios.get(`${API_BASE_URL}/api/orders/verify/${reference}`);
         } else {
-          // For authenticated users, use the token
           pollResponse = await axios.get(`${API_BASE_URL}/api/orders/verify/${reference}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -83,17 +98,17 @@ const ThankYou = () => {
         if (pollResponse.data.payment_status === 'completed') {
           setOrder(pollResponse.data);
           setPolling(false);
+          if (clearCart) clearCart();
           clearInterval(pollIntervalRef.current);
           toast.success('Payment verified successfully!');
         }
       } catch (err) {
         console.error('Error polling payment status:', err);
       }
-    }, 5000); // Poll every 5 seconds
+    }, 5000);
     
-    // Clear interval after 2 minutes to prevent infinite polling
     timeoutRef.current = setTimeout(() => {
-      clearInterval(pollIntervalRef.current);
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
       setPolling(false);
     }, 120000);
   };
@@ -113,36 +128,36 @@ const ThankYou = () => {
     const token = localStorage.getItem('token');
     
     try {
-        console.log(`📡 Fetching order for reference: ${reference}, attempt ${retryCount + 1}`);
-        
-        // For guest orders, we can verify without authentication
-        if (!token) {
-          const response = await axios.get(`${API_BASE_URL}/api/orders/verify/${reference}`);
-          const orderData = response.data;
-          setOrder(orderData);
-          console.log('✅ Guest order verified:', orderData);
-          
-          // If payment is still pending, start polling with guest verification
-          if (orderData.payment_status === 'pending') {
-            startPolling(null); // Pass null token for guest polling
+      console.log(`📡 Fetching order for reference: ${reference}, attempt ${retryCount + 1}`);
+      
+      // Attempt direct Paystack verification check
+      try {
+        const paystackRes = await axios.get(`${API_BASE_URL}/api/paystack/verify?reference=${reference}&json=true`);
+        if (paystackRes.data?.order) {
+          const pOrder = paystackRes.data.order;
+          setOrder(pOrder);
+          if (pOrder.payment_status === 'completed') {
+            if (clearCart) clearCart();
+            setLoading(false);
+            return;
           }
-          
-          setLoading(false);
-          return;
         }
-        
-        // For authenticated users, use the token
-        const response = await axios.get(`${API_BASE_URL}/api/orders/verify/${reference}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      } catch (e) {}
+
+      // Fetch base order details
+      const response = await axios.get(
+        `${API_BASE_URL}/api/orders/verify/${reference}`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
       
       const orderData = response.data;
       setOrder(orderData);
       console.log('✅ Order verified:', orderData);
       
-      // If payment is still pending, start polling
-      if (orderData.payment_status === 'pending') {
-        startPolling(token);
+      if (orderData.payment_status === 'completed') {
+        if (clearCart) clearCart();
+      } else if (orderData.payment_status === 'pending') {
+        startPolling(token || null);
       }
       
       setLoading(false);
@@ -150,8 +165,6 @@ const ThankYou = () => {
       console.error('❌ Error verifying order:', err.response?.data || err.message);
       
       if (err.response?.status === 401 || err.response?.status === 403) {
-        // For guest users, don't redirect to login - allow them to stay on the page
-        const token = localStorage.getItem('token');
         if (!token) {
           setError('Order verification failed. Please try verifying manually or contact support.');
         } else {
@@ -181,29 +194,83 @@ const ThankYou = () => {
     
     setVerifying(true);
     try {
+      // 1. Check Paystack status real-time
+      try {
+        const paystackRes = await axios.get(`${API_BASE_URL}/api/paystack/verify?reference=${reference}&json=true`);
+        if (paystackRes.data?.order) {
+          const pOrder = paystackRes.data.order;
+          setOrder(pOrder);
+          if (pOrder.payment_status === 'completed') {
+            if (clearCart) clearCart();
+          }
+          setError(null);
+          toast.success('Payment verified successfully!');
+          setVerifying(false);
+          return;
+        }
+      } catch (e) {}
+
+      // 2. Fallback to order endpoint
       const token = localStorage.getItem('token');
-      let response;
+      const response = await axios.get(
+        `${API_BASE_URL}/api/orders/verify/${reference}`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
       
-      // For guest orders, call without authentication
-      if (!token) {
-        response = await axios.get(
-          `${API_BASE_URL}/api/orders/verify/${reference}`
-        );
-      } else {
-        // For authenticated users, use the token
-        response = await axios.get(
-          `${API_BASE_URL}/api/orders/verify/${reference}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-      
-      if (response.data.order) {
-        setOrder(response.data.order);
+      const orderRes = response.data.order || response.data;
+      if (orderRes) {
+        setOrder(orderRes);
+        if (orderRes.payment_status === 'completed') {
+          if (clearCart) clearCart();
+        }
         setError(null);
-        toast.success('Payment verified successfully!');
+        toast.success('Payment status updated!');
       }
     } catch (err) {
       setError('Failed to verify payment. Please try again later or contact support.');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleRetryPayment = async () => {
+    if (!order) return;
+    try {
+      setVerifying(true);
+      const email = order.billing_address_email || order.user_email || user?.email;
+      const paymentData = {
+        order_id: order.id,
+        reference: order.reference,
+        email: email,
+        amount: Math.round(order.total * 100),
+        currency: order.currency || 'NGN',
+        callback_url: `${window.location.origin}/thank-you?reference=${order.reference}&orderId=${order.id}`,
+      };
+
+      const res = await axios.post(`${API_BASE_URL}/api/paystack/initialize`, paymentData);
+      const paymentInfo = res.data.data || res.data;
+
+      if (paymentInfo.access_code && window.PaystackPop) {
+        const paystack = new window.PaystackPop();
+        paystack.newTransaction({
+          key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+          email: paymentData.email,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          reference: paymentData.reference,
+          callback: () => {
+            toast.success('Payment successful!');
+            verifyOrder();
+          },
+          onClose: () => {
+            verifyOrder();
+          }
+        });
+      } else if (paymentInfo.authorization_url) {
+        window.location.href = paymentInfo.authorization_url;
+      }
+    } catch (err) {
+      toast.error('Could not initialize payment. Please try again.');
     } finally {
       setVerifying(false);
     }
@@ -398,15 +465,33 @@ const ThankYou = () => {
           </h2>
           
           {order && order.payment_status === 'pending' && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 max-w-2xl mx-auto">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <Loader2 className="h-5 w-5 text-yellow-400 animate-spin" />
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm md:text-base text-yellow-700 font-PatrickHand">
-                    Payment is still being processed. This page will update automatically once payment is confirmed.
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 max-w-2xl mx-auto rounded-r-lg shadow-sm">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center text-left">
+                  <Loader2 className="h-5 w-5 text-yellow-500 animate-spin flex-shrink-0 mr-3" />
+                  <p className="text-sm md:text-base text-yellow-800 font-medium font-PatrickHand">
+                    Payment is pending verification. If you have completed payment, click verify below.
                   </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+                  <Button
+                    onClick={handleManualVerify}
+                    disabled={verifying}
+                    variant="outline"
+                    size="sm"
+                    className="w-1/2 sm:w-auto text-xs md:text-sm font-PatrickHand"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                    Verify
+                  </Button>
+                  <Button
+                    onClick={handleRetryPayment}
+                    disabled={verifying}
+                    size="sm"
+                    className="w-1/2 sm:w-auto text-xs md:text-sm bg-Primarycolor text-white hover:bg-black font-PatrickHand"
+                  >
+                    Pay Now
+                  </Button>
                 </div>
               </div>
             </div>

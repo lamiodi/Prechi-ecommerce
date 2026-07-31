@@ -601,6 +601,49 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
 
+    // Restock items if transitioning to cancelled status and was not already cancelled
+    if (status === 'cancelled' && order.status !== 'cancelled') {
+      const items = await sql`SELECT * FROM order_items WHERE order_id = ${orderId}`;
+      await sql.begin(async (tx) => {
+        for (const item of items) {
+          if (item.variant_id) {
+            if (item.size_id) {
+              await tx`
+                UPDATE variant_sizes 
+                SET stock_quantity = stock_quantity + ${item.quantity} 
+                WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+              `;
+            } else {
+              await tx`
+                UPDATE variant_sizes 
+                SET stock_quantity = stock_quantity + ${item.quantity} 
+                WHERE variant_id = ${item.variant_id}
+              `;
+            }
+          } else if (item.bundle_id) {
+            const bundleItems = item.bundle_details ? (typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details) : [];
+            for (const bi of bundleItems) {
+              if (bi.size_id && bi.variant_id) {
+                await tx`
+                  UPDATE variant_sizes 
+                  SET stock_quantity = stock_quantity + ${item.quantity} 
+                  WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
+                `;
+              }
+            }
+          }
+        }
+        await tx`
+          UPDATE orders 
+          SET status = ${status}, updated_at = NOW() 
+          WHERE id = ${orderId}
+        `;
+      });
+      const [updatedOrder] = await sql`SELECT * FROM orders WHERE id = ${orderId}`;
+      console.log(`updateOrderStatus: Restocked items and updated status for order ${orderId} to ${status}`);
+      return res.status(200).json(updatedOrder);
+    }
+
     const [updatedOrder] = await sql`
       UPDATE orders 
       SET status = ${status}, updated_at = NOW() 

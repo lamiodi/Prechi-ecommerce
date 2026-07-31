@@ -187,6 +187,20 @@ export const CartDrawerProvider = ({ children }) => {
     }
   };
 
+  const clearCart = useCallback(async () => {
+    localStorage.removeItem('guestCart');
+    setCart({ items: [], subtotal: 0 });
+    const userId = getUserId();
+    const token = user?.token || localStorage.getItem('token');
+    if (token && userId) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/cart/clear/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (e) {}
+    }
+  }, [getUserId, user]);
+
   return (
     <CartDrawerContext.Provider value={{
       isCartOpen,
@@ -197,6 +211,7 @@ export const CartDrawerProvider = ({ children }) => {
       addToCart,
       removeFromCart,
       updateQuantity,
+      clearCart,
       loading
     }}>
       {children}

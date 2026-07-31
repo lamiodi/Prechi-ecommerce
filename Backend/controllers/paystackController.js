@@ -160,13 +160,15 @@ export const verifyPayment = async (req, res) => {
     }
 
     const order = orderCheck[0];
+    const wantsJson = req.headers.accept?.includes('application/json') || req.query.json === 'true' || req.method === 'POST';
 
     if (order.payment_status === 'completed') {
       console.warn(`Payment already verified for reference=${reference}`);
+      if (wantsJson) {
+        return res.status(200).json({ message: 'Payment already verified', order });
+      }
       const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
-      return req.method === 'GET'
-        ? res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=already_verified`)
-        : res.status(200).json({ message: 'Payment already verified', order });
+      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=already_verified`);
     }
 
     const response = await axios.get(`${PAYSTACK_BASE_URL}/transaction/verify/${reference}`, {
@@ -225,10 +227,12 @@ export const verifyPayment = async (req, res) => {
         `;
       });
 
+      if (wantsJson) {
+        return res.status(400).json({ error: 'Payment not successful', order });
+      }
+
       const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
-      return req.method === 'GET'
-        ? res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=failed`)
-        : res.status(400).json({ error: 'Payment not successful', order });
+      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=failed`);
     }
 
     await sql.begin(async sql => {
@@ -251,7 +255,7 @@ export const verifyPayment = async (req, res) => {
 
     console.log(`✅ Payment verified for reference=${reference}, order_id=${order.id}`);
 
-    if (req.method === 'GET') {
+    if (!wantsJson && req.method === 'GET') {
       const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
       return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=success`);
     }

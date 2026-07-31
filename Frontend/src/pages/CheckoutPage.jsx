@@ -121,6 +121,33 @@ const CheckoutPage = () => {
   const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
   const [idempotencyKey] = useState(() => uuidv4());
 
+  const shippingOptions = [
+    {
+      id: 2,
+      method: 'Delivery within Lagos Mainland',
+      total_cost: 4000,
+      estimated_delivery: '5–7 business days',
+      icon: 'package',
+      description: 'Reliable delivery within Lagos Mainland'
+    },
+    {
+      id: 1,
+      method: 'Delivery within Lagos Island',
+      total_cost: 6000,
+      estimated_delivery: '3–5 business days',
+      icon: 'truck',
+      description: 'Fast delivery within Lagos Island'
+    },
+    {
+      id: 3,
+      method: 'Outside Lagos',
+      total_cost: 7000,
+      estimated_delivery: '7–10 business days',
+      icon: 'home',
+      description: 'Delivery outside Lagos state'
+    },
+  ];
+
   const decodeToken = (token) => {
     try {
       const base64Url = token.split('.')[1];
