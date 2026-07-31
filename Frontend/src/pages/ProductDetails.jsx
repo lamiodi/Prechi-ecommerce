@@ -789,7 +789,7 @@ const ProductDetails = () => {
                   <span>100% authentic Prechi guaranteed performance materials</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ArrowRotateCcw size={18} weight="light" className="text-Primarycolor flex-shrink-0" />
+                  <ArrowCounterClockwise size={18} weight="light" className="text-Primarycolor flex-shrink-0" />
                   <span>Hassle-free exchange policy within 7 days</span>
                 </div>
               </div>
