@@ -1,279 +1,131 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Button from './Button';
+import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRight } from '@phosphor-icons/react';
+
 const HeroSection = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const [needsUserInteraction, setNeedsUserInteraction] = useState(false);
-  const mobileVideoRef = useRef(null);
-  const desktopVideoRef = useRef(null);
+  const videoRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Local hero video (portrait MP4 from public folder)
-  const mobileVideoURL = '/IMG_9987.mp4';
-  const desktopVideoURL = '/IMG_9987.mp4';
-
-  // Poster images for immediate display (using local image as fallback)
-  const mobilePosterURL = '/src/assets/images/IMG_4571.JPG';
-  const desktopPosterURL = '/src/assets/images/IMG_4571.JPG';
-
-  // Detect iOS devices
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-  // Memoized resize handler
-  const handleResize = useCallback(() => {
-    const newIsMobile = window.innerWidth < 1024;
-    if (newIsMobile !== isMobile) {
-      setIsMobile(newIsMobile);
-    }
-  }, [isMobile]);
+  const desktopVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867614/Prechi_Clothing_-_Made_for_You._1_hj54pu.mp4";
+  const mobileVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867619/Prechi_Clothing_-_Made_for_You._2_j9h7aw.mp4";
 
   useEffect(() => {
-    let timeoutId;
-    const throttledResize = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleResize, 100);
-    };
-    window.addEventListener('resize', throttledResize);
-    return () => {
-      window.removeEventListener('resize', throttledResize);
-      clearTimeout(timeoutId);
-    };
-  }, [handleResize]);
-
-  // Handle user interaction for iOS autoplay
-  const handleUserInteraction = useCallback(() => {
-    const activeVideoRef = isMobile ? mobileVideoRef : desktopVideoRef;
-    const video = activeVideoRef.current;
-    if (video && needsUserInteraction) {
-      video.play().then(() => {
-        setNeedsUserInteraction(false);
-      }).catch((error) => {
-        console.warn('Video play failed after user interaction:', error);
-      });
-    }
-  }, [isMobile, needsUserInteraction]);
-
-  // Aggressive video preloading
-  useEffect(() => {
-    // Preload videos immediately
-    const preloadVideo = (url) => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'video';
-      link.href = url;
-      document.head.appendChild(link);
-    };
-
-    preloadVideo(mobileVideoURL);
-    preloadVideo(desktopVideoURL);
-  }, []);
-
-  // Video loading optimization
-  useEffect(() => {
-    const activeVideoRef = isMobile ? mobileVideoRef : desktopVideoRef;
-    const video = activeVideoRef.current;
+    const video = videoRef.current;
     if (!video) return;
 
-    const handleCanPlay = () => {
-      setVideoLoaded(true);
-      setVideoError(false);
-
-      // Try to start playback immediately
-      video.play().then(() => {
-        setNeedsUserInteraction(false);
-      }).catch((error) => {
-        console.warn('Video autoplay failed:', error);
-        // On iOS, this is expected - set flag for user interaction
-        if (isIOS) {
-          setNeedsUserInteraction(true);
-        }
-      });
-    };
-
-    const handleError = (error) => {
-      console.error('Video loading error:', error);
-      setVideoError(true);
-    };
-
-    const handleLoadedData = () => {
-      console.log('Video data loaded');
-      setVideoLoaded(true);
-    };
-
+    const handleCanPlay = () => setIsLoaded(true);
     video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('error', handleError);
 
-    // Force immediate loading with highest priority
-    video.preload = 'metadata';
+    // Determine video source based on viewport
+    const isMobile = window.innerWidth < 768;
+    video.src = isMobile ? mobileVideoUrl : desktopVideoUrl;
     video.load();
 
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('error', handleError);
-    };
-  }, [isMobile, isIOS]);
-
-  // Add click handler to entire hero section for iOS
-  useEffect(() => {
-    if (needsUserInteraction) {
-      document.addEventListener('click', handleUserInteraction);
-      document.addEventListener('touchstart', handleUserInteraction);
-      return () => {
-        document.removeEventListener('click', handleUserInteraction);
-        document.removeEventListener('touchstart', handleUserInteraction);
-      };
-    }
-  }, [needsUserInteraction, handleUserInteraction]);
+    return () => video.removeEventListener('canplay', handleCanPlay);
+  }, []);
 
   return (
-    <div
-      className="flex container-padding flex-col justify-start items-center h-[77dvh] sm:h-[84dvh] md:h-[82dvh] lg:h-[740px] relative overflow-hidden"
-      onClick={needsUserInteraction ? handleUserInteraction : undefined}
+    <section
+      ref={sectionRef}
+      className="relative min-h-[100dvh] flex items-end overflow-hidden bg-Primarycolor"
     >
-      {/* Poster Image for Immediate Display */}
-      <img
-        src={isMobile ? mobilePosterURL : desktopPosterURL}
-        alt="Hero background"
-        className={`absolute top-0 left-0 object-cover w-full h-full transition-opacity duration-300 ${videoLoaded ? 'opacity-0' : 'opacity-100'
+      {/* Video background */}
+      <div className="absolute inset-0">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1.2s] ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
-        style={{
-          transform: 'translateZ(0)',
-          willChange: 'opacity'
-        }}
-      />
+          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          aria-hidden="true"
+        />
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-Primarycolor/40 to-transparent" />
+      </div>
 
-      {/* Loading State */}
-      {!videoLoaded && !videoError && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center z-10 opacity-50">
-          <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"></div>
-        </div>
-      )}
+      {/* Content */}
+      <div className="relative z-10 w-full section-container pb-16 sm:pb-20 md:pb-24 lg:pb-28 pt-32">
+        <div className="max-w-2xl">
+          {/* Eyebrow */}
+          <div
+            className={`transition-all duration-700 delay-300 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          >
+            <span className="inline-block text-xs sm:text-[0.8125rem] font-display font-medium tracking-[0.15em] uppercase text-white/50 mb-4 sm:mb-6">
+              Summer 2025 Collection
+            </span>
+          </div>
 
-      {/* iOS Autoplay Notice */}
-      {needsUserInteraction && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
-          <div className="text-white text-center p-4">
-            <p className="mb-2">Tap to play video</p>
-            <div className="w-12 h-12 mx-auto border-2 border-white rounded-full flex items-center justify-center">
-              <div className="w-0 h-0 border-l-4 border-l-white border-t-2 border-t-transparent border-b-2 border-b-transparent ml-1"></div>
-            </div>
+          {/* Headline */}
+          <h1
+            className={`text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold text-white leading-[1.05] tracking-[-0.03em] mb-5 sm:mb-6 transition-all duration-700 delay-500 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+            }`}
+            style={{
+              transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+              textWrap: 'balance',
+            }}
+          >
+            Made for the way you move
+          </h1>
+
+          {/* Subline */}
+          <p
+            className={`text-base sm:text-lg text-white/60 font-display font-light leading-relaxed max-w-md mb-8 sm:mb-10 transition-all duration-700 delay-700 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          >
+            Premium comfort, crafted for movement. Designed to fit your everyday.
+          </p>
+
+          {/* CTAs */}
+          <div
+            className={`flex items-center gap-4 transition-all duration-700 delay-[900ms] ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          >
+            <Link to="/shop">
+              <button className="h-12 sm:h-[3.25rem] px-8 sm:px-10 bg-white text-Primarycolor text-[0.8125rem] sm:text-sm font-display font-medium tracking-[0.04em] uppercase transition-all duration-500 active:scale-[0.98] hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+              >
+                Shop now
+              </button>
+            </Link>
+            <Link
+              to="/shop?category=new"
+              className="group inline-flex items-center gap-2 h-12 sm:h-[3.25rem] px-4 sm:px-6 text-[0.8125rem] sm:text-sm font-display font-medium tracking-[0.04em] uppercase text-white/70 hover:text-white transition-colors duration-300"
+            >
+              New arrivals
+              <ArrowRight
+                size={16}
+                weight="bold"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </Link>
           </div>
         </div>
-      )}
-
-      {/* Mobile Video */}
-      <video
-        ref={mobileVideoRef}
-        src={mobileVideoURL}
-        poster={mobilePosterURL}
-        type="video/mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        controlsList="nodownload nofullscreen noremoteplayback"
-        className={`absolute top-0 left-0 object-cover w-full h-full lg:hidden transition-opacity duration-300 ${videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
-          }`}
-        style={{
-          pointerEvents: 'none',
-          transform: 'translateZ(0)',
-          willChange: 'transform, opacity',
-          WebkitTapHighlightColor: 'transparent',
-          WebkitUserSelect: 'none',
-          WebkitTouchCallout: 'none',
-          WebkitAppearance: 'none',
-          outline: 'none'
-        }}
-        onContextMenu={(e) => e.preventDefault()}
-      />
-
-      {/* Desktop Video — portrait video scaled to cover landscape container */}
-      <video
-        ref={desktopVideoRef}
-        src={desktopVideoURL}
-        poster={desktopPosterURL}
-        type="video/mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        className={`absolute hidden lg:block transition-opacity duration-300 ${videoLoaded && !videoError ? 'opacity-100' : 'opacity-0'
-          }`}
-        style={{
-          pointerEvents: 'none',
-          transform: 'translateZ(0)',
-          willChange: 'transform, opacity',
-          top: '50%',
-          left: '50%',
-          minWidth: '100%',
-          minHeight: '100%',
-          width: 'auto',
-          height: 'auto',
-          transform: 'translate(-50%, -50%)',
-          objectFit: 'cover',
-          objectPosition: 'center center',
-        }}
-      />
-
-      {/* Quick Nav */}
-      <nav
-        className="container quicknav flex flex-row justify-between lg:max-w-[800px] mb-[40dvh] sm:mb-38 md:mb-50 lg:mb-[50dvh] z-25"
-        role="navigation"
-        aria-label="Product categories"
-      >
-        <Link
-          to="/shop?category=new"
-          className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
-        >
-          NEW ARRIVALS
-        </Link>
-        <Link
-          to="/shop?category=Sets"
-          className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
-        >
-          SETS
-        </Link>
-        <Link
-          to="/shop?category=Tracksuits"
-          className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
-        >
-          TRACKSUITS
-        </Link>
-        <Link
-          to="/shop"
-          className="text-white hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded px-2 py-1"
-        >
-          SHOP ALL
-        </Link>
-      </nav>
-
-      {/* Hero Content */}
-      <div className="typography flex flex-col w-full items-center lgx:items-start space-y-3 md:space-y-4 min-lgx:space-y-[3rem] z-20">
-        <h1 className="text-center lgx:text-left text-nowrap lgx:text-5xl font-Manrope">
-          Unmatched Comfort.
-          <span className="max-sm:hidden"> Bold Performance.</span>
-          <br />
-          <span className="max-sm:text-base sm:text-3xl lg:text-5xl">Everyday Style.</span>
-        </h1>
-        <Link to="/shop">
-          <Button
-            label="SHOP NOW"
-            variant="primary"
-            size="medium"
-            stateProp="default"
-            className="w-44 font-Manrope"
-            divClassName=""
-          />
-        </Link>
       </div>
-    </div>
+
+      {/* Scroll indicator */}
+      <div
+        className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-700 delay-[1100ms] ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/30" />
+      </div>
+    </section>
   );
 };
 

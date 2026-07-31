@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from './Button';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
+import { Funnel, Rows, SquaresFour } from '@phosphor-icons/react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -32,51 +32,31 @@ const ProductGrid = () => {
       setLoading(true);
       setError(null);
       let url = `${API_BASE_URL}/api/shopall`;
-
-      // For "All" category, we want to get everything
       if (filter !== 'All' && categoryMap[filter]) {
         url += `?category=${categoryMap[filter]}`;
       }
-
       const res = await axios.get(url);
       let productsData = res.data || [];
 
-      // If "All" category is selected, sort to show briefs first
       if (filter === 'All') {
         productsData = [...productsData].sort((a, b) => {
-          // Helper function to check if a product is a brief
           const isBrief = (product) => {
             if (!product) return false;
-
-            // For bundles, check bundle_types
             if (!product.is_product && product.bundle_types && product.bundle_types.length > 0) {
               return product.bundle_types.some(type => {
                 const typeLower = type.toLowerCase();
-                return typeLower.includes('brief') ||
-                  typeLower.includes('underwear') ||
-                  typeLower.includes('boxer') ||
-                  typeLower.includes('trunk');
+                return typeLower.includes('brief') || typeLower.includes('underwear') || typeLower.includes('boxer') || typeLower.includes('trunk');
               });
             }
-
-            // For products, check the name and category
             const name = (product.name || '').toLowerCase();
             const category = (product.category || '').toLowerCase();
-
-            return name.includes('brief') ||
-              name.includes('boxer') ||
-              name.includes('underwear') ||
-              name.includes('trunk') ||
-              category === 'briefs';
+            return name.includes('brief') || name.includes('boxer') || name.includes('underwear') || name.includes('trunk') || category === 'briefs';
           };
-
           const aIsBrief = isBrief(a);
           const bIsBrief = isBrief(b);
-
-          // Sort briefs first, then everything else
-          if (aIsBrief && !bIsBrief) return -1; // a comes before b
-          if (!aIsBrief && bIsBrief) return 1;  // b comes before a
-          return 0; // maintain original order for non-briefs
+          if (aIsBrief && !bIsBrief) return -1;
+          if (!aIsBrief && bIsBrief) return 1;
+          return 0;
         });
       }
 
@@ -108,181 +88,149 @@ const ProductGrid = () => {
   };
 
   const handleImageError = useCallback((e) => {
-    e.target.src = 'https://via.placeholder.com/400x500?text=No+Image';
+    e.target.style.opacity = '0';
   }, []);
 
+  // Skeleton card
+  const SkeletonCard = () => (
+    <div className="flex flex-col">
+      <div className="w-full aspect-[3/4] skeleton rounded-sm" />
+      <div className="pt-4 space-y-2.5">
+        <div className="h-3.5 skeleton rounded-sm w-3/4" />
+        <div className="h-3 skeleton rounded-sm w-1/3" />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="my-5">
-      <div className="typography flex flex-col container-padding space-y-1 lg:py-8">
-        <h3 className="text-2xl font-bold mb-2">Shop Our Collection</h3>
-        <div className="flex flex-row justify-between items-center gap-y-4">
-          <h4 className="font-light text-gray-600 text-balance sm:text-nowrap max-w-[320px]">
-            Premium comfort, tailored for everyday movement.
-          </h4>
-          <Link to="/shop" className="text-black hover:text-accent transition-colors">
-            <h4 className="font-semibold font-Manrope">SHOP <span className='hidden font-semibold sm:inline font-Manrope'>ALL</span></h4>
+    <section className="py-12 md:py-16 lg:py-20">
+      {/* Section header */}
+      <div className="section-container mb-8 md:mb-10">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight text-Primarycolor">
+              Shop Collection
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-text-secondary font-display">
+              Premium comfort, tailored for everyday movement.
+            </p>
+          </div>
+          <Link
+            to="/shop"
+            className="hidden sm:inline-flex text-sm font-display font-medium tracking-[0.04em] uppercase text-text-secondary hover:text-text-primary transition-colors duration-300 whitespace-nowrap"
+          >
+            View all
           </Link>
         </div>
       </div>
-      <div className="flex flex-col items-center container-padding my-6">
-        <Button
-          label="FILTER & SORT"
-          variant="primary"
-          size="large"
-          stateProp="default"
-          className="w-60 mb-4"
-          divClassName="bg-Softcolor w-full gap-x-1.5 font-Manrope rounded-sm"
-          iconclassname="text-base"
-          showIcon={true}
-        />
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-          {categories.map((category) => (
-            <div
-              key={category}
-              onClick={() => handleFilterChange(category)}
-              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 font-Manrope ${filter === category
-                  ? 'bg-accent text-black font-bold'
-                  : 'text-gray-700 hover:text-accent hover:bg-gray-100'
+
+      {/* Filter bar */}
+      <div className="section-container mb-6 md:mb-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => handleFilterChange(category)}
+                className={`px-4 py-2 text-[0.8125rem] font-display font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-300 ${
+                  filter === category
+                    ? 'text-Primarycolor bg-surface'
+                    : 'text-text-tertiary hover:text-text-primary'
                 }`}
-              aria-pressed={filter === category}
+                style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+                aria-pressed={filter === category}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* Layout toggle (mobile only) */}
+          <div className="flex sm:hidden items-center gap-0.5 border border-border rounded-sm p-0.5">
+            <button
+              onClick={() => setMobileLayout('one')}
+              className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'one' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
+              aria-label="Single column"
             >
-              {category}
-            </div>
-          ))}
+              <Rows size={14} weight="bold" />
+            </button>
+            <button
+              onClick={() => setMobileLayout('two')}
+              className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'two' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
+              aria-label="Two column"
+            >
+              <SquaresFour size={14} weight="bold" />
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Grid */}
       {loading || contextLoading ? (
-        <div className="container-padding ">
-          <div className="flex justify-end sm:hidden mb-2">
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setMobileLayout('one')}
-                className={`p-2 rounded-md transition-colors ${mobileLayout === 'one'
-                    ? 'bg-white shadow-sm text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                title="Single column view"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setMobileLayout('two')}
-                className={`p-2 rounded-md transition-colors ${mobileLayout === 'two'
-                    ? 'bg-white shadow-sm text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                title="Two column view"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h7M4 12h7M4 18h7M15 6h5M15 12h5M15 18h5" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${mobileLayout === 'one'
-              ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-              : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-            } p-3`}>
-            {[...Array(12)].map((_, index) => (
-              <div key={index} className="bg-gray-100 rounded-xl p-3 animate-pulse shadow-sm">
-                <div className="w-full aspect-[3/4] bg-gray-200 rounded-lg mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
-                <div className="h-8 bg-gray-200 rounded-lg"></div>
-              </div>
-            ))}
+        <div className="section-container">
+          <div className={`grid gap-x-3 gap-y-8 sm:gap-x-4 sm:gap-y-10 lg:gap-x-5 lg:gap-y-12 ${
+            mobileLayout === 'one'
+              ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+          }`}>
+            {[...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
         </div>
       ) : error ? (
-        <div className="container-padding text-center py-8">
-          <p className="text-red-600 mb-4">Error: {error}</p>
+        <div className="section-container text-center py-16">
+          <p className="text-text-secondary font-display text-sm mb-4">Something went wrong loading products.</p>
           <button
             onClick={fetchProducts}
-            className="bg-accent text-black py-2 px-4 rounded hover:bg-accent-dark transition-colors"
+            className="btn btn-primary btn-sm"
           >
-            Try Again
+            Try again
           </button>
         </div>
+      ) : displayedProducts.length === 0 ? (
+        <div className="section-container text-center py-16">
+          <p className="text-text-tertiary font-display text-sm">No products found for this filter.</p>
+        </div>
       ) : (
-        <>
-          {displayedProducts.length === 0 ? (
-            <div className="container-padding text-center py-8">
-              <p className="text-gray-500">No products found for the selected filter.</p>
-            </div>
-          ) : (
-            <div className="container-padding px-1">
-              <div className="flex justify-end sm:hidden mb-2">
-                <div className="flex bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setMobileLayout('one')}
-                    className={`p-2 rounded-md transition-colors ${mobileLayout === 'one'
-                        ? 'bg-white shadow-sm text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                    title="Single column view"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setMobileLayout('two')}
-                    className={`p-2 rounded-md transition-colors ${mobileLayout === 'two'
-                        ? 'bg-white shadow-sm text-gray-900'
-                        : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                    title="Two column view"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h7M4 12h7M4 18h7M15 6h5M15 12h5M15 18h5" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className={`grid px-0 gap-x-2 gap-y-[0.7em] sm:gap-x-3 sm:gap-y-[1.05em] md:gap-x-4 md:gap-y-[1.4em] lg:gap-x-3 lg:gap-y-[0.95em] mb-8 ${mobileLayout === 'one'
-                  ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-                  : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-                }`}>
-                {displayedProducts.map((product, index) => (
-                  <ProductCard
-                    key={`${product.is_product ? 'product' : 'bundle'}-${product.id}-${index}`}
-                    product={product}
-                    onImageError={handleImageError}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          {hasMoreProducts && (
-            <div className="flex justify-center mt-8 mb-4">
-              <Button
-                label={`Load More (${products.length - displayedProducts.length} remaining)`}
-                variant="tertiary"
-                size="medium"
-                stateProp="default"
-                className="w-38"
-                divClassName="w-full h-9"
-                iconclassname="text-base"
-                onClick={handleLoadMore}
+        <div className="section-container">
+          <div className={`grid gap-x-3 gap-y-8 sm:gap-x-4 sm:gap-y-10 lg:gap-x-5 lg:gap-y-12 ${
+            mobileLayout === 'one'
+              ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+          }`}>
+            {displayedProducts.map((product, index) => (
+              <ProductCard
+                key={`${product.is_product ? 'p' : 'b'}-${product.id}-${index}`}
+                product={product}
+                onImageError={handleImageError}
               />
+            ))}
+          </div>
+
+          {/* Load more */}
+          {hasMoreProducts && (
+            <div className="flex justify-center mt-12 md:mt-16">
+              <button
+                onClick={handleLoadMore}
+                className="btn btn-outline"
+              >
+                Load more ({products.length - displayedProducts.length} remaining)
+              </button>
             </div>
           )}
-        </>
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 
+// ─── Product Card ─────────────────────────────────────────────────
 const ProductCard = ({ product, onImageError }) => {
   const { id, name, price, image, color, is_product, variantId, bundle_types, total_stock } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Calculate sold out status
   const isSoldOut = is_product ? (total_stock === 0) : false;
 
-  // Clean product name (remove trailing "– Color")
   let displayName = name || 'Unnamed Product';
   if (displayName.includes('–')) {
     displayName = displayName.split('–')[0].trim();
@@ -292,69 +240,74 @@ const ProductCard = ({ product, onImageError }) => {
     ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
     : `/bundle/${id}`;
 
-  // Price in NGN for Nigeria, USD for others
   const parsedPrice = parseFloat(price) || 0;
   const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
   const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
 
   return (
-    <div className="group bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100">
-      <Link to={productUrl} className="block relative overflow-hidden">
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="group flex flex-col">
+      <Link to={productUrl} className="block relative overflow-hidden bg-surface">
+        {/* Image container */}
+        <div className="relative w-full aspect-[3/4] overflow-hidden">
+          {/* Skeleton placeholder */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 skeleton" />
+          )}
           <img
             src={image}
             alt={displayName}
-            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-out"
+            className={`w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-[1.03] ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
             onError={onImageError}
+            onLoad={() => setImageLoaded(true)}
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
-          {/* Sold Out Overlay */}
+
+          {/* Sold out overlay */}
           {isSoldOut && (
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center z-10">
-              <span className="bg-red-600 text-white px-6 py-2 rounded-full font-bold transform -rotate-12 shadow-lg border-2 border-white/20">
-                SOLD OUT
+            <div className="absolute inset-0 bg-Primarycolor/50 flex items-center justify-center">
+              <span className="text-xs font-display font-medium tracking-[0.1em] uppercase text-white">
+                Sold out
               </span>
             </div>
           )}
-          {/* Updated to show all bundle types */}
+
+          {/* Bundle type badges */}
           {bundle_types && bundle_types.length > 0 && (
-            <div className="absolute top-3 right-3 flex flex-col gap-1">
+            <div className="absolute top-3 left-3 flex flex-col gap-1.5">
               {bundle_types.map((type, index) => (
-                <span key={index} className="bg-Primarycolor text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-md backdrop-blur-sm">
+                <span
+                  key={index}
+                  className="bg-Primarycolor text-white text-[0.625rem] font-display font-medium tracking-[0.08em] uppercase px-2.5 py-1"
+                >
                   {type}
                 </span>
               ))}
             </div>
           )}
-        </div>
-        <div className="p-3 sm:p-4">
-          <h3 className="text-sm sm:text-base font-semibold font-Manrope text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200">
-            {displayName}
-          </h3>
-          <p className="text-lg sm:text-xl font-semibold font-Manrope text-Accent">
-            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-              style: 'currency',
-              currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-            })}
-          </p>
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-Primarycolor/0 group-hover:bg-Primarycolor/5 transition-colors duration-500" />
         </div>
       </Link>
 
-      <div className="p-3 sm:p-4 pt-1 mt-auto">
-        <Link to={productUrl} onClick={(e) => isSoldOut && e.preventDefault()}>
-          <button
-            disabled={isSoldOut}
-            className={`w-full font-semibold py-3 px-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0 ${isSoldOut
-                ? 'bg-gray-400 text-white cursor-not-allowed hover:bg-gray-400'
-                : 'bg-gradient-to-r from-black to-gray-800 text-white hover:from-gray-800 hover:to-black active:scale-95'
-              }`}
-          >
-            {isSoldOut ? 'Sold Out' : 'Shop Now'}
-          </button>
+      {/* Info */}
+      <div className="pt-3 sm:pt-4">
+        <Link to={productUrl}>
+          <h3 className="text-sm font-display font-medium text-text-primary leading-snug line-clamp-1 group-hover:text-text-secondary transition-colors duration-300">
+            {displayName}
+          </h3>
         </Link>
+        <p className="mt-1 text-sm font-display text-text-secondary tabular-nums">
+          {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+            style: 'currency',
+            currency: displayCurrency,
+            minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+            maximumFractionDigits: country === 'Nigeria' ? 0 : 2
+          })}
+        </p>
       </div>
     </div>
   );

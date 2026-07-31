@@ -1,8 +1,11 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'motion/react';
 import { AuthProvider } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
 import { CurrencyProvider } from './pages/CurrencyContext';
+import { CartDrawerProvider } from './context/CartDrawerContext';
+import SideCartDrawer from './components/SideCartDrawer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -36,54 +39,61 @@ import ScrollToTop from './components/ScrollToTop';
 
 // Loading Component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+  <div className="min-h-[100dvh] flex items-center justify-center bg-Secondarycolor font-display">
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-Primarycolor border-t-transparent"></div>
   </div>
 );
 
 function App() {
+  const location = useLocation();
+
   return (
     <AuthProvider>
       <CurrencyProvider>
         <AdminAuthProvider>
-          <ScrollToTop />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/home" element={<LandingPage />} />
-              <Route path="/shop" element={<ShopAllPage />} />
-              <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/bundle/:id" element={<ProductDetails />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password/:token" element={<ResetPassword />} />
-              <Route path="/more" element={<MorePage />} />
-              <Route path="/help" element={<HelpPage />} />
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/cart" element={<CartErrorBoundary><Cart /></CartErrorBoundary>} /> {/* Removed ProtectedRoute for guest access */}
-              <Route path="/orders" element={<ProtectedRoute><UserOrders /></ProtectedRoute>} />
-              <Route path="/checkout" element={<Checkoutprocess />} /> {/* Removed ProtectedRoute for guest access */}
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="/thank-you" element={<ThankYou />} /> {/* Removed ProtectedRoute for guest access */}
-              <Route path="/delivery-fee-thank-you" element={<DeliveryFeeThankYou />} /> {/* Removed ProtectedRoute for guest access */}
+          <CartDrawerProvider>
+            <ScrollToTop />
+            <SideCartDrawer />
+            <Suspense fallback={<PageLoader />}>
+              <AnimatePresence mode="wait">
+                <Routes location={location} key={location.pathname}>
+                  <Route path="/search" element={<SearchResults />} />
+                  <Route path="/home" element={<LandingPage />} />
+                  <Route path="/shop" element={<ShopAllPage />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/bundle/:id" element={<ProductDetails />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password/:token" element={<ResetPassword />} />
+                  <Route path="/more" element={<MorePage />} />
+                  <Route path="/help" element={<HelpPage />} />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/cart" element={<CartErrorBoundary><Cart /></CartErrorBoundary>} />
+                  <Route path="/orders" element={<ProtectedRoute><UserOrders /></ProtectedRoute>} />
+                  <Route path="/checkout" element={<Checkoutprocess />} />
+                  <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                  <Route path="/thank-you" element={<ThankYou />} />
+                  <Route path="/delivery-fee-thank-you" element={<DeliveryFeeThankYou />} />
 
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            </Routes>
-          </Suspense>
-          <ToastContainer
-            position="top-right"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                </Routes>
+              </AnimatePresence>
+            </Suspense>
+            <ToastContainer
+              position="top-right"
+              autoClose={2000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </CartDrawerProvider>
         </AdminAuthProvider>
       </CurrencyProvider>
     </AuthProvider>

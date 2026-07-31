@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Package, ChevronDown, ChevronUp, X, AlertCircle } from 'lucide-react';
+import { Package, X, WarningCircle, CaretRight, CircleNotch } from '@phosphor-icons/react';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import SEO from '../components/SEO';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -17,9 +18,7 @@ const UserOrders = () => {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedImages, setSelectedImages] = useState({});
-  
-  // Fetch orders on mount
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -34,10 +33,9 @@ const UserOrders = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setOrders(response.data);
-        // Check for orderId in URL params
         const orderId = searchParams.get('orderId');
         if (orderId) {
-          const order = response.data.find((order) => order.id === parseInt(orderId));
+          const order = response.data.find((o) => o.id === parseInt(orderId));
           setSelectedOrder(order || null);
         }
       } catch (error) {
@@ -49,150 +47,104 @@ const UserOrders = () => {
     };
     fetchOrders();
   }, [user, navigate, searchParams]);
-  
-  // Handle image navigation
-  const handleImageChange = (itemId, index) => {
-    setSelectedImages((prev) => ({ ...prev, [itemId]: index }));
-  };
-  
-  // Format currency
+
   const formatCurrency = (amount, currency) => {
     if (currency === 'NGN') {
-      return `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
+      return `₦${Number(amount).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
     } else if (currency === 'USD') {
       const totalAmount = amount > 1000 ? amount / 100 : amount;
-      return `$${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      return `$${Number(totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     }
     return `${amount} ${currency}`;
   };
-  
-  // Format date
+
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
     });
   };
-  
-  // Render image gallery
-  const renderImageGallery = (images, itemId, productName) => {
-    const imageArray = Array.isArray(images) ? images : images ? [images] : [];
-    if (imageArray.length === 0) {
-      return (
-        <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
-          <span className="text-gray-400 text-xs font-PatrickHand">No Image</span>
-        </div>
-      );
-    }
-    const currentImageIndex = selectedImages[itemId] || 0;
-    const currentImage = imageArray[currentImageIndex];
-    return (
-      <div className="flex flex-col">
-        <img
-          src={currentImage}
-          alt={productName}
-          className="w-16 h-16 object-cover rounded-md border border-gray-200"
-          onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/100';
-          }}
-        />
-        {imageArray.length > 1 && (
-          <div className="flex mt-1 space-x-1">
-            <button
-              onClick={() => handleImageChange(itemId, (currentImageIndex - 1 + imageArray.length) % imageArray.length)}
-              className="p-1 bg-gray-100 rounded-full hover:bg-gray-200"
-            >
-              <ChevronDown className="w-3 h-3" />
-            </button>
-            <span className="text-xs flex items-center px-1 font-PatrickHand">
-              {currentImageIndex + 1}/{imageArray.length}
-            </span>
-            <button
-              onClick={() => handleImageChange(itemId, (currentImageIndex + 1) % imageArray.length)}
-              className="p-1 bg-gray-100 rounded-full hover:bg-gray-200"
-            >
-              <ChevronUp className="w-3 h-3" />
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  };
-  
-  if (!user) {
-    return null;
-  }
-  
+
+  if (!user) return null;
+
   return (
-    <div 
-      className="min-h-screen bg-gray-50"
-      style={{
-        '--color-Primarycolor': '#1E1E1E',
-        '--color-Secondarycolor': '#ffffff',
-        '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", "sans-serif"',
-        '--font-PatrickHand': '"Jost", "sans-serif"'
-      }}
-    >
+    <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor">
+      <SEO title="My Orders" description="View your Prechi Clothing order history and status." url="/orders" />
       <Navbar2 />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 font-Manrope">My Orders</h1>
-        {/* Orders Section */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center font-Manrope">
-              <Package className="h-5 w-5 mr-2" /> Order History
-            </h2>
+
+      <main className="flex-1 pt-24 sm:pt-28 pb-16 md:pb-20">
+        <div className="section-container">
+          {/* Header */}
+          <div className="mb-8 md:mb-12">
+            <h1 className="text-3xl sm:text-4xl font-display font-semibold tracking-tight text-Primarycolor">
+              Order history
+            </h1>
+            <p className="mt-2 text-sm text-text-secondary font-display">
+              Track and view details of your past purchases.
+            </p>
           </div>
-          <div className="p-6">
-            {ordersError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-PatrickHand">{ordersError}</span>
-              </div>
-            )}
-            {ordersLoading ? (
-              <div className="flex justify-center items-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
-              </div>
-            ) : orders.length === 0 ? (
-              <p className="text-gray-600 text-center font-PatrickHand">No orders found.</p>
-            ) : (
+
+          {/* Orders card */}
+          {ordersError && (
+            <div className="flex items-center gap-2 p-4 bg-error/10 border border-error/20 rounded-sm mb-6">
+              <WarningCircle size={18} className="text-error flex-shrink-0" weight="fill" />
+              <p className="text-sm font-display text-error">{ordersError}</p>
+            </div>
+          )}
+
+          {ordersLoading ? (
+            <div className="py-20 text-center">
+              <CircleNotch size={24} className="animate-spin text-Primarycolor mx-auto mb-3" />
+              <p className="text-sm font-display text-text-tertiary">Loading orders...</p>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="py-20 text-center bg-surface rounded-sm border border-border">
+              <Package size={32} weight="light" className="text-text-tertiary mx-auto mb-3" />
+              <p className="text-base font-display font-medium text-Primarycolor mb-1">No orders yet</p>
+              <p className="text-xs font-display text-text-tertiary mb-6">When you place an order, it will appear here.</p>
+              <button onClick={() => navigate('/shop')} className="btn btn-primary btn-sm">
+                Start shopping
+              </button>
+            </div>
+          ) : (
+            <div className="bg-surface border border-border overflow-hidden rounded-sm">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider font-PatrickHand">Actions</th>
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-border bg-Secondarycolor/50 text-[0.75rem] font-display font-medium uppercase tracking-[0.08em] text-text-tertiary">
+                      <th className="py-3.5 px-6">Order</th>
+                      <th className="py-3.5 px-6">Date</th>
+                      <th className="py-3.5 px-6">Total</th>
+                      <th className="py-3.5 px-6">Payment</th>
+                      <th className="py-3.5 px-6 text-right">Details</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-border text-sm font-display">
                     {orders.map((order) => (
-                      <tr key={order.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-PatrickHand">#{order.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-PatrickHand">{formatDate(order.created_at)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-PatrickHand">{formatCurrency(order.total, order.currency)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-PatrickHand">
-                          {order.payment_status}
-                          {order.shipping_country !== 'Nigeria' && (
-                            <span className="ml-2 font-PatrickHand">
-                              ({order.delivery_fee_paid ? 'Delivery Fee Paid' : 'Delivery Fee Pending'})
-                            </span>
-                          )}
+                      <tr key={order.id} className="hover:bg-white/50 transition-colors">
+                        <td className="py-4 px-6 font-medium text-Primarycolor">#{order.id}</td>
+                        <td className="py-4 px-6 text-text-secondary">{formatDate(order.created_at)}</td>
+                        <td className="py-4 px-6 text-Primarycolor tabular-nums">{formatCurrency(order.total, order.currency)}</td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                            order.payment_status === 'completed'
+                              ? 'bg-success/10 text-success'
+                              : 'bg-warning/10 text-warning'
+                          }`}>
+                            {order.payment_status}
+                          </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium font-PatrickHand">
+                        <td className="py-4 px-6 text-right">
                           <button
                             onClick={() => {
                               setSelectedOrder(order);
                               setSearchParams({ orderId: order.id });
                             }}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.04em] text-Primarycolor hover:text-text-secondary transition-colors"
                           >
-                            View Details
+                            View
+                            <CaretRight size={14} weight="bold" />
                           </button>
                         </td>
                       </tr>
@@ -200,150 +152,120 @@ const UserOrders = () => {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-        {/* Order Details Modal */}
-        {selectedOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 p-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 font-Manrope">Order #{selectedOrder.id} Details</h2>
-                <button
-                  onClick={() => {
-                    setSelectedOrder(null);
-                    setSearchParams({});
-                  }}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  <X className="h-6 w-6" />
-                </button>
+      </main>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-Primarycolor/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-sm border border-border max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 sm:p-8">
+            <div className="flex items-center justify-between pb-6 mb-6 border-b border-border">
+              <div>
+                <span className="text-xs font-display font-medium uppercase tracking-[0.08em] text-text-tertiary block mb-1">
+                  Order details
+                </span>
+                <h2 className="text-xl font-display font-semibold text-Primarycolor">
+                  #{selectedOrder.id}
+                </h2>
               </div>
-              <div className="space-y-6">
-                {/* Order Summary */}
+              <button
+                onClick={() => {
+                  setSelectedOrder(null);
+                  setSearchParams({});
+                }}
+                className="p-2 text-text-tertiary hover:text-Primarycolor transition-colors"
+                aria-label="Close"
+              >
+                <X size={20} weight="light" />
+              </button>
+            </div>
+
+            <div className="space-y-6 font-display">
+              {/* Summary grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 bg-surface rounded-sm border border-border text-xs">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Order Summary</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 text-sm">
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Order ID</p>
-                      <p className="font-medium font-PatrickHand">{selectedOrder.id}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Reference</p>
-                      <p className="font-medium font-PatrickHand">{selectedOrder.reference}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Total</p>
-                      <p className="font-medium font-PatrickHand">{formatCurrency(selectedOrder.total, selectedOrder.currency)}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Payment Status</p>
-                      <p className={`font-medium ${selectedOrder.payment_status === 'completed' ? 'text-green-600' : 'text-yellow-600'} font-PatrickHand`}>
-                        {selectedOrder.payment_status}
-                      </p>
-                    </div>
-                    {selectedOrder.shipping_country !== 'Nigeria' && (
-                      <div>
-                        <p className="text-gray-500 font-PatrickHand">Delivery Fee</p>
-                        <p className={`font-medium ${selectedOrder.delivery_fee_paid ? 'text-green-600' : 'text-yellow-600'} font-PatrickHand`}>
-                          {selectedOrder.delivery_fee_paid ? formatCurrency(selectedOrder.delivery_fee, selectedOrder.currency) : 'Pending'}
-                        </p>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Shipping Country</p>
-                      <p className="font-medium font-PatrickHand">{selectedOrder.shipping_country}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-PatrickHand">Order Date</p>
-                      <p className="font-medium font-PatrickHand">{formatDate(selectedOrder.created_at)}</p>
-                    </div>
+                  <span className="text-text-tertiary block mb-1">Reference</span>
+                  <span className="font-medium text-Primarycolor truncate block">{selectedOrder.reference}</span>
+                </div>
+                <div>
+                  <span className="text-text-tertiary block mb-1">Date</span>
+                  <span className="font-medium text-Primarycolor">{formatDate(selectedOrder.created_at)}</span>
+                </div>
+                <div>
+                  <span className="text-text-tertiary block mb-1">Total</span>
+                  <span className="font-medium text-Primarycolor tabular-nums">{formatCurrency(selectedOrder.total, selectedOrder.currency)}</span>
+                </div>
+                <div>
+                  <span className="text-text-tertiary block mb-1">Status</span>
+                  <span className="font-medium capitalize text-Primarycolor">{selectedOrder.payment_status}</span>
+                </div>
+                <div>
+                  <span className="text-text-tertiary block mb-1">Country</span>
+                  <span className="font-medium text-Primarycolor">{selectedOrder.shipping_country}</span>
+                </div>
+              </div>
+
+              {/* Shipping address */}
+              <div>
+                <h3 className="text-xs font-medium uppercase tracking-[0.08em] text-text-tertiary mb-2">
+                  Shipping Address
+                </h3>
+                {selectedOrder.shipping_address_title ? (
+                  <div className="text-xs text-text-secondary space-y-0.5 p-3 bg-surface rounded-sm">
+                    <p className="font-medium text-Primarycolor">{selectedOrder.shipping_address_title}</p>
+                    <p>{selectedOrder.shipping_address_line_1}</p>
+                    {selectedOrder.shipping_address_landmark && <p>Landmark: {selectedOrder.shipping_address_landmark}</p>}
+                    <p>{selectedOrder.shipping_address_city}, {selectedOrder.shipping_address_state || ''} {selectedOrder.shipping_address_zip_code}</p>
+                    <p>{selectedOrder.shipping_address_country}</p>
                   </div>
-                </div>
-                {/* Shipping Address */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Shipping Address</h3>
-                  {selectedOrder.shipping_address_title ? (
-                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
-                      <p>{selectedOrder.shipping_address_title}</p>
-                      <p>{selectedOrder.shipping_address_line_1}</p>
-                      {selectedOrder.shipping_address_landmark && <p>Landmark: {selectedOrder.shipping_address_landmark}</p>}
-                      <p>
-                        {selectedOrder.shipping_address_city}, {selectedOrder.shipping_address_state || ''}{' '}
-                        {selectedOrder.shipping_address_zip_code}
-                      </p>
-                      <p>{selectedOrder.shipping_address_country}</p>
-                    </div>
-                  ) : (
-                    <p className="mt-2 text-sm text-gray-500 font-PatrickHand">No shipping address provided</p>
-                  )}
-                </div>
-                {/* Billing Address */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Billing Address</h3>
-                  {selectedOrder.billing_address_full_name ? (
-                    <div className="mt-2 text-sm text-gray-600 space-y-1 font-PatrickHand">
-                      <p>{selectedOrder.billing_address_full_name}</p>
-                      <p>{selectedOrder.billing_address_line_1}</p>
-                      <p>
-                        {selectedOrder.billing_address_city}, {selectedOrder.billing_address_state || ''}{' '}
-                        {selectedOrder.billing_address_zip_code}
-                      </p>
-                      <p>{selectedOrder.billing_address_country}</p>
-                      <p>Email: {selectedOrder.billing_address_email}</p>
-                      <p>Phone: {selectedOrder.billing_address_phone_number}</p>
-                    </div>
-                  ) : (
-                    <p className="mt-2 text-sm text-gray-500 font-PatrickHand">No billing address provided</p>
-                  )}
-                </div>
-                {/* Items */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 font-Manrope">Items</h3>
-                  <div className="mt-2 space-y-4">
-                    {selectedOrder.items.map((item, index) => (
-                      <div key={item.id} className="flex items-start p-2 bg-gray-50 rounded">
-                        {renderImageGallery([item.image_url], `order-item-${selectedOrder.id}-${item.id}`, item.product_name)}
-                        <div className="flex-1 ml-4">
-                          <p className="text-sm font-medium text-gray-900 font-PatrickHand">{item.product_name}</p>
-                          <div className="text-xs text-gray-600 space-y-1 font-PatrickHand">
-                            <p>Quantity: {item.quantity}</p>
-                            <p>Price: {formatCurrency(item.price, selectedOrder.currency)}</p>
-                            <p>Total: {formatCurrency(item.price * item.quantity, selectedOrder.currency)}</p>
-                            {item.color_name && <p>Color: {item.color_name}</p>}
-                            {item.size_name && <p>Size: {item.size_name}</p>}
-                            {item.bundle_id && item.bundle_details && (
-                              <div className="mt-2">
-                                <p className="text-xs font-medium text-gray-700 font-PatrickHand">Bundle Contents:</p>
-                                <ul className="pl-4 list-disc text-xs text-gray-600 font-PatrickHand">
-                                  {item.bundle_details.map((bundleItem, bIndex) => (
-                                    <li key={bIndex} className="flex items-start mt-1">
-                                      {renderImageGallery(
-                                        [bundleItem.image_url],
-                                        `bundle-item-${selectedOrder.id}-${item.id}-${bIndex}`,
-                                        bundleItem.product_name
-                                      )}
-                                      <div className="ml-2">
-                                        <span>{bundleItem.product_name}</span>
-                                        {bundleItem.color_name && <span>, Color: {bundleItem.color_name}</span>}
-                                        {bundleItem.size_name && <span>, Size: {bundleItem.size_name}</span>}
-                                      </div>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
+                ) : (
+                  <p className="text-xs text-text-tertiary">No shipping address provided</p>
+                )}
+              </div>
+
+              {/* Items */}
+              <div>
+                <h3 className="text-xs font-medium uppercase tracking-[0.08em] text-text-tertiary mb-3">
+                  Items ({selectedOrder.items?.length || 0})
+                </h3>
+                <div className="space-y-3">
+                  {selectedOrder.items?.map((item) => (
+                    <div key={item.id} className="flex items-center gap-4 p-3 bg-surface rounded-sm border border-border">
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt={item.product_name}
+                          className="w-14 h-18 object-cover rounded-sm border border-border flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-18 bg-Secondarycolor rounded-sm border border-border flex items-center justify-center flex-shrink-0">
+                          <Package size={20} weight="light" className="text-text-tertiary" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-Primarycolor truncate">{item.product_name}</p>
+                        <div className="text-xs text-text-secondary space-y-0.5 mt-1">
+                          <p>Qty: {item.quantity} &times; {formatCurrency(item.price, selectedOrder.currency)}</p>
+                          {item.color_name && <p>Color: {item.color_name}</p>}
+                          {item.size_name && <p>Size: {item.size_name}</p>}
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-Primarycolor tabular-nums">
+                          {formatCurrency(item.price * item.quantity, selectedOrder.currency)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

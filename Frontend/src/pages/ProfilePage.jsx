@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { User, Mail, Phone, Lock, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Eye, EyeSlash, WarningCircle, CheckCircle, CircleNotch } from '@phosphor-icons/react';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import SEO from '../components/SEO';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -34,11 +35,8 @@ const ProfilePage = () => {
   const [profileError, setProfileError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  // Email and username validation regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 
-  // Fetch user data on mount
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -57,7 +55,6 @@ const ProfilePage = () => {
         const { first_name, last_name, email, phone_number } = res.data;
         setProfileForm({ first_name, last_name, email, phone_number: phone_number || '' });
       } catch (err) {
-        console.error('Fetch profile error:', err);
         toast.error(err.response?.data?.error || 'Failed to fetch profile');
         if (err.response?.status === 401 || err.response?.status === 403) {
           navigate('/login');
@@ -67,32 +64,27 @@ const ProfilePage = () => {
     fetchProfile();
   }, [user, navigate]);
 
-  // Handle profile form changes
   const handleProfileChange = (e) => {
     setProfileForm({ ...profileForm, [e.target.name]: e.target.value });
     setProfileError('');
     setProfileSuccess(false);
   };
 
-  // Handle password form changes
   const handlePasswordChange = (e) => {
     setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
     setPasswordError('');
   };
 
-  // Toggle password visibility
   const togglePasswordVisibility = (field) => {
-    setShowPassword({ ...showPassword, [field]: !showPassword[field] });
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
-  // Handle profile update
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setProfileError('');
     setProfileSuccess(false);
 
-    // Validate inputs
     if (!profileForm.first_name || !profileForm.last_name) {
       setProfileError('First name and last name are required');
       setLoading(false);
@@ -115,15 +107,12 @@ const ProfilePage = () => {
       const response = await axios.put(`${API_BASE_URL}/api/users/profile`, profileForm, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (typeof updateUser !== 'function') {
-        console.warn('updateUser is not a function, skipping context update');
-      } else {
+      if (typeof updateUser === 'function') {
         updateUser(response.data);
       }
       setProfileSuccess(true);
       toast.success('Profile updated successfully');
     } catch (err) {
-      console.error('Profile update error:', err);
       const errorMsg = err.response?.data?.error || 'Failed to update profile';
       setProfileError(errorMsg);
       toast.error(errorMsg);
@@ -135,7 +124,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle password update
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     setPasswordError('');
@@ -174,7 +162,6 @@ const ProfilePage = () => {
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       toast.success('Password updated successfully');
     } catch (err) {
-      console.error('Password update error:', err);
       const errorMsg = err.response?.data?.error || 'Failed to update password';
       setPasswordError(errorMsg);
       toast.error(errorMsg);
@@ -186,247 +173,241 @@ const ProfilePage = () => {
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return (
-    <div 
-      className="min-h-screen bg-gray-50 typography"
-      style={{
-        '--color-Primarycolor': '#1E1E1E',
-        '--color-Secondarycolor': '#ffffff',
-        '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", sans-serif',
-        '--font-PatrickHand': '"Jost", "sans-serif"'
-      }}
-    >
+    <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor">
+      <SEO title="Profile Settings" description="Manage your Prechi account preferences." url="/profile" />
       <Navbar2 />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Edit Profile</h1>
 
-        {/* Profile Update Section */}
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Manrope">
-              <User className="h-5 w-5 mr-2" /> Profile Information
-            </h2>
+      <main className="flex-1 pt-24 sm:pt-28 pb-16 md:pb-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          {/* Header */}
+          <div className="mb-8 md:mb-10">
+            <h1 className="text-3xl sm:text-4xl font-display font-semibold tracking-tight text-Primarycolor">
+              Account settings
+            </h1>
+            <p className="mt-2 text-sm text-text-secondary font-display">
+              Manage your personal information and security credentials.
+            </p>
           </div>
-          <form onSubmit={handleProfileSubmit} className="p-6">
-            {profileSuccess && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-sm text-green-700 font-PatrickHand">Profile updated successfully!</span>
-              </div>
-            )}
-            {profileError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-PatrickHand">{profileError}</span>
-              </div>
-            )}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">First Name</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={profileForm.first_name}
-                    onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Last Name</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={profileForm.last_name}
-                    onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
-                    required
-                  />
-                </div>
+
+          <div className="space-y-8 font-display">
+            {/* Profile Section */}
+            <div className="bg-surface border border-border rounded-sm p-6 sm:p-8">
+              <div className="flex items-center gap-3 pb-6 mb-6 border-b border-border">
+                <User size={20} weight="light" className="text-Primarycolor" />
+                <h2 className="text-base font-semibold text-Primarycolor">
+                  Personal Information
+                </h2>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Email Address</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+              {profileSuccess && (
+                <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-sm mb-6">
+                  <CheckCircle size={16} className="text-success flex-shrink-0" weight="fill" />
+                  <p className="text-xs text-success">Profile updated successfully.</p>
+                </div>
+              )}
+
+              {profileError && (
+                <div className="flex items-center gap-2 p-3 bg-error/10 border border-error/20 rounded-sm mb-6">
+                  <WarningCircle size={16} className="text-error flex-shrink-0" weight="fill" />
+                  <p className="text-xs text-error">{profileError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleProfileSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                      First name
+                    </label>
+                    <input
+                      type="text"
+                      name="first_name"
+                      value={profileForm.first_name}
+                      onChange={handleProfileChange}
+                      className="w-full h-11 px-3.5 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+                      required
+                    />
                   </div>
+                  <div>
+                    <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                      Last name
+                    </label>
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={profileForm.last_name}
+                      onChange={handleProfileChange}
+                      className="w-full h-11 px-3.5 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                    Email address
+                  </label>
                   <input
                     type="email"
                     name="email"
                     value={profileForm.email}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
+                    className="w-full h-11 px-3.5 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
                     required
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Phone Number</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Phone className="h-5 w-5 text-gray-400" />
-                  </div>
+
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                    Phone number
+                  </label>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone_number"
                     value={profileForm.phone_number}
                     onChange={handleProfileChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
+                    placeholder="+234..."
+                    className="w-full h-11 px-3.5 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
                   />
                 </div>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-PatrickHand"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Update Profile
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
 
-        {/* Change Password Section */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-Primarycolor flex items-center font-Manrope">
-              <Lock className="h-5 w-5 mr-2" /> Change Password
-            </h2>
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn btn-primary btn-md"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <CircleNotch size={16} className="animate-spin" />
+                        Saving...
+                      </span>
+                    ) : (
+                      'Save changes'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Password Section */}
+            <div className="bg-surface border border-border rounded-sm p-6 sm:p-8">
+              <div className="flex items-center gap-3 pb-6 mb-6 border-b border-border">
+                <Lock size={20} weight="light" className="text-Primarycolor" />
+                <h2 className="text-base font-semibold text-Primarycolor">
+                  Password & Security
+                </h2>
+              </div>
+
+              {passwordSuccess && (
+                <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-sm mb-6">
+                  <CheckCircle size={16} className="text-success flex-shrink-0" weight="fill" />
+                  <p className="text-xs text-success">Password updated successfully.</p>
+                </div>
+              )}
+
+              {passwordError && (
+                <div className="flex items-center gap-2 p-3 bg-error/10 border border-error/20 rounded-sm mb-6">
+                  <WarningCircle size={16} className="text-error flex-shrink-0" weight="fill" />
+                  <p className="text-xs text-error">{passwordError}</p>
+                </div>
+              )}
+
+              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                    Current password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.current ? 'text' : 'password'}
+                      name="currentPassword"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full h-11 pl-3.5 pr-10 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('current')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-Primarycolor transition-colors p-1"
+                    >
+                      {showPassword.current ? <EyeSlash size={16} weight="light" /> : <Eye size={16} weight="light" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                    New password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.new ? 'text' : 'password'}
+                      name="newPassword"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full h-11 pl-3.5 pr-10 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('new')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-Primarycolor transition-colors p-1"
+                    >
+                      {showPassword.new ? <EyeSlash size={16} weight="light" /> : <Eye size={16} weight="light" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                    Confirm new password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword.confirm ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full h-11 pl-3.5 pr-10 text-sm bg-white border border-border text-Primarycolor rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('confirm')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-Primarycolor transition-colors p-1"
+                    >
+                      {showPassword.confirm ? <EyeSlash size={16} weight="light" /> : <Eye size={16} weight="light" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn btn-secondary btn-md"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <CircleNotch size={16} className="animate-spin" />
+                        Updating...
+                      </span>
+                    ) : (
+                      'Update password'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-          <form onSubmit={handlePasswordSubmit} className="p-6">
-            {passwordSuccess && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                <span className="text-sm text-green-700 font-PatrickHand">Password updated successfully!</span>
-              </div>
-            )}
-            {passwordError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-sm text-red-700 font-PatrickHand">{passwordError}</span>
-              </div>
-            )}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Current Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type={showPassword.current ? 'text' : 'password'}
-                    name="currentPassword"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => togglePasswordVisibility('current')}
-                  >
-                    {showPassword.current ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">New Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type={showPassword.new ? 'text' : 'password'}
-                    name="newPassword"
-                    value={passwordForm.newPassword}
-                    onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => togglePasswordVisibility('new')}
-                  >
-                    {showPassword.new ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
-                  </button>
-                </div>
-                <p className="mt-1 text-xs text-Accent font-PatrickHand">Must be at least 6 characters</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-Accent mb-1 font-PatrickHand">Confirm New Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type={showPassword.confirm ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={passwordForm.confirmPassword}
-                    onChange={handlePasswordChange}
-                    className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-Primarycolor font-PatrickHand"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                    onClick={() => togglePasswordVisibility('confirm')}
-                  >
-                    {showPassword.confirm ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center justify-center px-4 py-2 bg-Primarycolor text-Secondarycolor rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-Primarycolor disabled:opacity-75 font-PatrickHand"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="h-4 w-4 mr-2" />
-                    Update Password
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
+      </main>
+
       <Footer />
     </div>
   );

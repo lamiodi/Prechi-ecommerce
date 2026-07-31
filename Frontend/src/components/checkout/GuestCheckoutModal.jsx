@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, X, CheckCircle, AlertCircle, Smartphone, ArrowLeft } from 'lucide-react';
+import { User, X, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Smartphone, Mail } from 'lucide-react';
 
 const GuestCheckoutModal = React.memo(({ 
   guestForm, 
@@ -10,246 +10,175 @@ const GuestCheckoutModal = React.memo(({
   onLoginRedirect,
   onSubmitGuestForm,
   loading,
-  navigate
+  navigate,
+  onClose
 }) => (
-  // Backdrop with blur effects
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl border border-gray-200">
-      {/* Simplified header */}
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
-          <div className="p-2 bg-Primarycolor rounded-lg mr-3">
-            <User className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-Primarycolor font-Manrope">
-              Complete Your Order
-            </h3>
-            <p className="text-sm text-Accent font-PatrickHand">
-              Enter your details to proceed
-            </p>
-          </div>
-        </div>
-        <button 
-          onClick={() => {}} // Prevent closing the modal
-          className="p-2 text-gray-400 hover:text-Accent hover:bg-gray-100 rounded-lg transition-colors cursor-not-allowed"
-          title="Please complete the form to continue"
+  <div className="fixed inset-0 bg-Primarycolor/60 backdrop-blur-md flex items-center justify-center z-50 p-4 font-display animate-fadeIn">
+    <div className="bg-Secondarycolor rounded-sm max-w-md w-full p-6 shadow-2xl border border-border relative animate-slideUp">
+      {/* Close button if optional */}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 text-text-tertiary hover:text-Primarycolor transition-colors"
+          aria-label="Close"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
-      </div>
-      
+      )}
 
-      
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2.5 bg-Primarycolor text-white rounded-sm">
+          <User className="h-5 w-5" />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold text-Primarycolor uppercase tracking-[0.06em]">
+            Guest Checkout
+          </h3>
+          <p className="text-xs text-text-tertiary">
+            Quick order setup without creating an account
+          </p>
+        </div>
+      </div>
+
       {existingUserType && (
-        <div className={`mb-4 p-3 rounded-lg ${
+        <div className={`mb-4 p-3 rounded-sm text-xs ${
           existingUserType === 'temporary' 
-            ? 'bg-blue-50 border border-blue-200' 
-            : 'bg-yellow-50 border border-yellow-200'
+            ? 'bg-amber-50 border border-amber-200 text-amber-900' 
+            : 'bg-blue-50 border border-blue-200 text-blue-900'
         }`}>
-          <div className="flex items-start">
-            {existingUserType === 'temporary' ? (
-              <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
-            )}
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <div>
-              <p className={`text-sm font-medium ${
-                existingUserType === 'temporary' 
-                  ? 'text-blue-800' 
-                  : 'text-yellow-800'
-              } font-PatrickHand`}>
+              <p className="font-semibold">
                 {existingUserType === 'temporary' 
-                  ? 'A temporary account with this email already exists' 
-                  : 'An account with this email already exists'}
+                  ? 'A temporary account already exists for this email' 
+                  : 'An account already exists with this email'}
               </p>
-              <p className={`text-xs mt-1 ${
-                existingUserType === 'temporary' 
-                  ? 'text-blue-700' 
-                  : 'text-yellow-700'
-              } font-PatrickHand`}>
+              <p className="text-[0.7rem] mt-0.5 opacity-90">
                 {existingUserType === 'temporary' 
-                  ? 'Please use a different email or log in if you have a password.' 
-                  : 'Please log in to continue with your existing account.'}
+                  ? 'You can continue below or sign in to save your order history.' 
+                  : 'Sign in to access saved addresses and track your orders easily.'}
               </p>
             </div>
           </div>
         </div>
       )}
-      
+
       {requiredForm === 'guest' && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-red-800 font-PatrickHand">
-                Please fill in your details to continue
-              </p>
-              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
-                All fields marked with * are required
-              </p>
-            </div>
-          </div>
+        <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-sm text-xs text-rose-800">
+          <p className="font-semibold">Please enter contact details to proceed to delivery.</p>
         </div>
       )}
-      
+
       <form onSubmit={onSubmitGuestForm} className="space-y-4">
-        {/* Enhanced form fields with better styling */}
-        <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
-            <User className="h-4 w-4 mr-2 text-Accent" />
+        {/* Full Name */}
+        <div>
+          <label className="block text-xs font-semibold text-Primarycolor uppercase tracking-[0.04em] mb-1">
             Full Name *
           </label>
           <div className="relative">
             <input
               type="text"
               name="name"
-              value={guestForm.name}
+              value={guestForm.name || ''}
               onChange={(e) => onGuestFormChange('name', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
-                guestFormErrors.name 
-                  ? 'border-red-400 bg-red-50 focus:border-red-500' 
-                  : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
+              className={`input w-full text-xs font-display ${
+                guestFormErrors.name ? 'border-rose-500 bg-rose-50/20' : ''
               }`}
-              placeholder="Enter your full name"
+              placeholder="e.g. Alex Morgan"
+              required
             />
-            {guestFormErrors.name && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-              </div>
-            )}
           </div>
           {guestFormErrors.name && (
-            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              {guestFormErrors.name}
-            </p>
+            <p className="text-[0.7rem] text-rose-600 mt-1">{guestFormErrors.name}</p>
           )}
         </div>
-        
-        <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
-            <svg className="h-4 w-4 mr-2 text-Accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-            </svg>
+
+        {/* Email Address */}
+        <div>
+          <label className="block text-xs font-semibold text-Primarycolor uppercase tracking-[0.04em] mb-1">
             Email Address *
           </label>
           <div className="relative">
             <input
               type="email"
               name="email"
-              value={guestForm.email}
+              value={guestForm.email || ''}
               onChange={(e) => onGuestFormChange('email', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
-                guestFormErrors.email 
-                  ? 'border-red-400 bg-red-50 focus:border-red-500' 
-                  : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
+              className={`input w-full text-xs font-display ${
+                guestFormErrors.email ? 'border-rose-500 bg-rose-50/20' : ''
               }`}
-              placeholder="Enter your email address"
+              placeholder="alex@example.com"
+              required
             />
-            {guestFormErrors.email && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-              </div>
-            )}
           </div>
           {guestFormErrors.email && (
-            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              {guestFormErrors.email}
-            </p>
+            <p className="text-[0.7rem] text-rose-600 mt-1">{guestFormErrors.email}</p>
           )}
         </div>
-        
-        <div className="space-y-1">
-          <label className="block text-sm font-semibold text-Primarycolor mb-1 font-PatrickHand flex items-center">
-            <Smartphone className="h-4 w-4 mr-2 text-Accent" />
+
+        {/* Phone Number */}
+        <div>
+          <label className="block text-xs font-semibold text-Primarycolor uppercase tracking-[0.04em] mb-1">
             Phone Number *
           </label>
           <div className="relative">
             <input
               type="tel"
               name="phone_number"
-              value={guestForm.phone_number}
+              value={guestForm.phone_number || ''}
               onChange={(e) => onGuestFormChange('phone_number', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-xl font-PatrickHand transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-Primarycolor/20 ${
-                guestFormErrors.phone_number 
-                  ? 'border-red-400 bg-red-50 focus:border-red-500' 
-                  : 'border-gray-200 bg-gray-50 hover:border-gray-300 focus:border-Primarycolor focus:bg-white'
+              className={`input w-full text-xs font-display ${
+                guestFormErrors.phone_number ? 'border-rose-500 bg-rose-50/20' : ''
               }`}
-              placeholder="Enter your phone number"
+              placeholder="+234 800 000 0000"
+              required
             />
-            {guestFormErrors.phone_number && (
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                <AlertCircle className="h-4 w-4 text-red-500" />
-              </div>
-            )}
           </div>
           {guestFormErrors.phone_number && (
-            <p className="text-xs text-red-600 mt-1 font-PatrickHand flex items-center">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              {guestFormErrors.phone_number}
-            </p>
+            <p className="text-[0.7rem] text-rose-600 mt-1">{guestFormErrors.phone_number}</p>
           )}
         </div>
-        
-        {/* Order details info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-          <p className="text-sm text-blue-800 font-PatrickHand leading-relaxed">
-            Your order details will be saved automatically. We'll send you order updates via email.
-          </p>
-        </div>
-        
+
+        {/* Existing account option */}
         {existingUserType === 'permanent' && (
-          <div className="bg-Secondarycolor/10 border border-Secondarycolor/20 rounded-xl p-3 text-center">
-            <p className="text-sm text-Secondarycolor font-PatrickHand mb-2">
-              Account already exists with this email
-            </p>
+          <div className="p-3 bg-surface border border-border rounded-sm text-center">
             <button
               type="button"
               onClick={onLoginRedirect}
-              className="inline-flex items-center px-3 py-2 bg-Secondarycolor text-white rounded-lg hover:bg-Secondarycolor/90 font-PatrickHand font-medium transition-colors"
+              className="btn btn-secondary btn-sm w-full text-xs"
             >
-              <User className="h-4 w-4 mr-2" />
-              Log in to your existing account
+              Log in to your account
             </button>
           </div>
         )}
-        
-        {/* Enhanced button section with compact spacing */}
-        <div className="pt-3 space-y-2">
-          {/* Primary action button */}
+
+        {/* Submit Actions */}
+        <div className="pt-2 space-y-2">
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 bg-Primarycolor text-white rounded-xl hover:bg-Primarycolor/90 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed font-PatrickHand font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="btn btn-primary btn-md w-full text-xs flex items-center justify-center gap-2"
           >
             {loading ? (
-              <>
-                <div className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                Processing...
-              </>
+              <span>Processing...</span>
             ) : (
               <>
-                Continue to Checkout
-                <svg className="h-4 w-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
+                <span>Continue to Shipping</span>
+                <ArrowRight className="h-4 w-4" />
               </>
             )}
           </button>
-          
-          {/* Secondary action */}
+
           <button
             type="button"
             onClick={() => navigate('/cart')}
-            className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-Accent hover:bg-gray-50 hover:border-gray-300 flex items-center justify-center font-PatrickHand font-medium transition-all duration-200"
+            className="btn btn-tertiary btn-sm w-full text-xs flex items-center justify-center gap-1 text-text-tertiary hover:text-Primarycolor"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Return to Cart
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Return to Bag</span>
           </button>
-          
-
         </div>
       </form>
     </div>

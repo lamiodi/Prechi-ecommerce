@@ -7,31 +7,34 @@ const Button = ({
   stateProp = 'default',
   className = '',
   divClassName = '',
-  iconClassName = '', // ✅ added for icon customization
+  iconClassName = '',
   showIcon = false,
   ...props
 }) => {
   const variantStyles = {
-    primary: 'bg-Secondarycolor text-Primarycolor',
-    secondary: 'bg-Primarycolor text-Secondarycolor',
+    primary:
+      'bg-Primarycolor text-Secondarycolor hover:bg-[#1a1a1a]',
+    secondary:
+      'bg-Secondarycolor text-Primarycolor hover:bg-[#f0f0f0]',
     tertiary:
-      'bg-Secondarycolor text-Primarycolor outline-solid outline-0.5 outline-Primarycolor active:bg-Primarycolor active:text-Secondarycolor',
+      'bg-transparent text-Primarycolor border border-border hover:border-Primarycolor',
   };
 
   const sizeStyles = {
-    small: 'h-8 px-2 py-1 text-sm',
-    medium: 'h-10 px-4 py-2 text-base',
-    large: 'h-12 px-6 py-3 text-lg',
+    small: 'h-9 px-5 text-xs tracking-[0.06em]',
+    medium: 'h-11 px-7 text-[0.8125rem] tracking-[0.05em]',
+    large: 'h-[3.25rem] px-9 text-sm tracking-[0.04em]',
   };
 
-  const stateStyles = {
-    default: '',
-    hover: 'hover:bg-Accent',
-    active: 'active:bg-gray-200',
-  };
-
-  const baseStyles =
-    'flex justify-center items-center rounded-sm border-[unset] overflow-[unset]';
+  const baseStyles = [
+    'inline-flex items-center justify-center',
+    'font-display font-medium',
+    'transition-all duration-500',
+    'active:scale-[0.98] active:translate-y-[1px]',
+    'focus-visible:outline-2 focus-visible:outline-Primarycolor focus-visible:outline-offset-2',
+    'cursor-pointer select-none whitespace-nowrap',
+    'relative overflow-hidden',
+  ].join(' ');
 
   const icon = (
     <svg
@@ -40,7 +43,8 @@ const Button = ({
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={`size-6 ml-2 ${iconClassName}`} // ✅ supports custom icon styling
+      className={`w-4 h-4 ml-2 ${iconClassName}`}
+      aria-hidden="true"
     >
       <path
         strokeLinecap="round"
@@ -52,15 +56,16 @@ const Button = ({
 
   return (
     <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${stateStyles[stateProp]} ${className}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+      style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
       {...props}
     >
-      <div
-        className={`flex justify-center items-center font-[351] whitespace-nowrap ${divClassName}`}
+      <span
+        className={`flex items-center justify-center leading-none ${divClassName}`}
       >
         {label}
         {showIcon && icon}
-      </div>
+      </span>
     </button>
   );
 };

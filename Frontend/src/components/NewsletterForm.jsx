@@ -1,37 +1,28 @@
 import React, { useState } from 'react';
 import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowRight } from '@phosphor-icons/react';
 import axios from 'axios';
-import NewsletterImage from '../assets/images/tinywow_IMG_4566 (1)_86252545.png';
 
-// Use environment variable for base URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({ baseURL: API_BASE_URL });
 
 const NewsletterForm = ({ inverted }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState('idle'); // idle, success, error
+  const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
-
-  const Newsletterimage = NewsletterImage;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Basic email validation
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       setStatus('error');
       setMessage('Please enter a valid email address');
       return;
     }
-
     setIsLoading(true);
     setStatus('idle');
-
     try {
-      // Call the correct endpoint
       const response = await api.post('/api/newsletter/subscribe', { email });
-
       if (response.data.success) {
         setStatus('success');
         setMessage(response.data.message);
@@ -42,8 +33,8 @@ const NewsletterForm = ({ inverted }) => {
     } catch (error) {
       setStatus('error');
       setMessage(
-        error.response?.data?.message || 
-        error.message || 
+        error.response?.data?.message ||
+        error.message ||
         'Failed to subscribe. Please try again later.'
       );
     } finally {
@@ -51,72 +42,85 @@ const NewsletterForm = ({ inverted }) => {
     }
   };
 
+  const bg = inverted ? 'bg-Primarycolor' : 'bg-surface';
+  const text = inverted ? 'text-white' : 'text-Primarycolor';
+  const textMuted = inverted ? 'text-white/50' : 'text-text-secondary';
+  const textFaint = inverted ? 'text-white/30' : 'text-text-tertiary';
+  const inputBg = inverted ? 'bg-white/10' : 'bg-white';
+  const inputBorder = inverted ? 'border-white/10 focus:border-white/30' : 'border-border focus:border-Primarycolor';
+  const inputText = inverted ? 'text-white placeholder:text-white/30' : 'text-Primarycolor placeholder:text-text-tertiary';
+
   return (
-    <div className={`flex justify-center items-center relative w-full mx-auto mt-15 ${inverted ? 'bg-white' : ''}`}>
-      <div className={`relative w-full z-10 ${inverted ? 'bg-Secondarycolor' : 'bg-Primarycolor'} overflow-visible pt-12 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-20 2xl:pt-30 pb-8 sm:pb-10 px-4 sm:px-6 md:px-12`}>
-        
-        {/* Image */}
-        <div className="absolute top-[-10em] left-[-3em] sm:top-[-12em] sm:left-[-4em] md:top-[-14em] md:left-[1em] lg:top-[-16em] lg:left-10 xl:top-[-18em] xl:left-12 2xl:top-[-20em] 2xl:left-16 w-[16rem] sm:w-[20rem] md:w-[24rem] lg:w-[28rem] xl:w-[32rem] 2xl:w-[36rem] z-0">
-          <img src={Newsletterimage} alt="Newsletter Illustration" className="w-full h-auto object-contain" />
-        </div>
-        
-        {/* Text + Form */}
-        <div className={`relative mb-1 z-10 ${inverted ? 'text-Primarycolor' : 'text-Secondarycolor'} text-right max-w-2xl mx-auto md:ml-auto 2xl:ml-115`}>
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-7xl font-extrabold font-PatrickHand tracking-tight leading-snug lg:text-nowrap lg:ms-10 lg:max-w-sm">
-            SUBSCRIBE TO OUR NEWSLETTER
+    <section className={`${bg} py-16 md:py-20 lg:py-24`}>
+      <div className="section-container">
+        <div className="max-w-2xl mx-auto text-center">
+          {/* Eyebrow */}
+          <span className={`text-xs font-display font-medium tracking-[0.15em] uppercase ${textMuted} mb-4 block`}>
+            Newsletter
+          </span>
+
+          {/* Heading */}
+          <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight leading-tight ${text} mb-4`}
+            style={{ textWrap: 'balance' }}
+          >
+            Get 10% off your first order
           </h2>
-          <p className="mt-3 sm:mt-4 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-6xl font-Manrope font-bold lg:ms-[30vw] lg:text-nowrap">
-            Get 10% Off Your First Order
+
+          {/* Description */}
+          <p className={`text-sm sm:text-base ${textMuted} font-display mb-8 max-w-md mx-auto`}>
+            Subscribe for early access to new drops, restocks, and exclusive member deals.
           </p>
 
-          {/* Status Messages */}
+          {/* Status messages */}
           {status === 'success' && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-              <p className="text-green-700 text-sm">{message}</p>
+            <div className="flex items-center justify-center gap-2 p-3 bg-success/10 border border-success/20 rounded-sm mb-6 max-w-md mx-auto">
+              <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
+              <p className="text-success text-sm font-display">{message}</p>
             </div>
           )}
           {status === 'error' && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-              <p className="text-red-700 text-sm">{message}</p>
+            <div className="flex items-center justify-center gap-2 p-3 bg-error/10 border border-error/20 rounded-sm mb-6 max-w-md mx-auto">
+              <AlertCircle className="h-4 w-4 text-error flex-shrink-0" />
+              <p className="text-error text-sm font-display">{message}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 w-full max-w-[95vw] sm:max-w-[75vw] md:max-w-[50vw] lg:max-w-[40vw] xl:max-w-[35vw] ml-auto lg:ml-48 xl:ml-60 2xl:ml-130">
-            <div className={`flex ${inverted ? 'bg-Primarycolor' : 'bg-Secondarycolor'} font-Manrope rounded-md overflow-hidden shadow-sm`}>
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+            <div className="flex">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 aria-label="Email address"
-                placeholder="Enter Your Email For Alerts of Restocks and Drop"
-                className={`px-3 sm:px-4 py-2.5 sm:py-3 w-full text-xs sm:text-sm ${inverted ? 'text-gray-300' : 'text-[#6e6e6e]'} ${inverted ? 'bg-Primarycolor' : ''} font-medium border-none focus:outline-none font-manrope-medium placeholder:text-xs sm:placeholder:text-sm`}
+                placeholder="Enter your email"
+                className={`flex-1 h-12 px-4 text-sm font-display border ${inputBg} ${inputBorder} ${inputText} focus:outline-none transition-colors duration-300`}
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                aria-label="Submit newsletter form"
-                className={`w-8 sm:w-10 md:w-12 lg:w-14 h-[40px] sm:h-[45px] ${inverted ? 'bg-[#333333] hover:bg-[#444444]' : 'bg-[#d9d9d9] hover:bg-[#c9c9c9]'} flex justify-center items-center transition-colors duration-200 disabled:opacity-50`}
+                aria-label="Subscribe to newsletter"
+                className={`h-12 px-6 text-sm font-display font-medium tracking-[0.04em] uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] ${
+                  inverted
+                    ? 'bg-white text-Primarycolor hover:bg-white/90'
+                    : 'bg-Primarycolor text-white hover:bg-[#1a1a1a]'
+                }`}
               >
                 {isLoading ? (
-                  <Loader2 className={`w-4 h-4 sm:w-5 sm:h-5 ${inverted ? 'text-Secondarycolor' : 'text-Primarycolor'} animate-spin`} />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${inverted ? 'text-white' : 'text-black'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                  </svg>
+                  <ArrowRight size={16} weight="bold" />
                 )}
               </button>
             </div>
-            <p className={`text-xs ${inverted ? 'text-gray-400' : 'text-gray-500'} mt-4 text-center`}>
+            <p className={`text-[0.6875rem] ${textFaint} font-display mt-3`}>
               We respect your privacy. Unsubscribe at any time.
             </p>
           </form>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

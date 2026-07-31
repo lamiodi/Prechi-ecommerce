@@ -5,12 +5,15 @@ import {
   Package,
   ShoppingCart,
   Users,
-  DollarSign,
-  TrendingUp,
-  Mail,
-  LogOut,
+  CurrencyNgn,
+  TrendUp,
+  Envelope,
+  SignOut,
   Tag,
-} from 'lucide-react';
+  CircleNotch,
+  WarningCircle,
+  SquaresFour
+} from '@phosphor-icons/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import InventoryManager from '../components/InventoryManager';
@@ -20,9 +23,11 @@ import Orders from '../components/Orders';
 import Customers from '../components/Customers';
 import AdminNewsletterDashboard from '../components/AdminNewsletterDashboard';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import SEO from '../components/SEO';
 
-// Define API_BASE_URL based on environment
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
+  : 'https://prechi-ecommerce.onrender.com';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -71,22 +76,13 @@ const AdminDashboard = () => {
         const authAxios = getAuthAxios();
         const response = await authAxios.get('/api/admin/analytics');
         setAnalytics(response.data);
-        toast.success('Analytics loaded successfully');
       } catch (err) {
-        console.error('Fetch analytics error:', {
-          message: err.message,
-          status: err.response?.status,
-          data: err.response?.data,
-          url: err.config?.url,
-        });
         if (err.response?.status === 401) {
           setError('Authentication expired. Please log in again.');
-          toast.error('Authentication expired. Please log in again.');
           adminLogout();
           setTimeout(() => navigate('/admin/login'), 2000);
         } else {
           setError('Failed to load analytics data');
-          toast.error('Failed to load analytics data');
         }
       } finally {
         setLoading(false);
@@ -106,137 +102,158 @@ const AdminDashboard = () => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
       currency: 'NGN',
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-NG', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const tabs = [
+    { id: 'dashboard', label: 'Overview', icon: SquaresFour },
+    { id: 'orders', label: 'Orders', icon: ShoppingCart },
+    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'discounts', label: 'Discounts', icon: Tag },
+    { id: 'newsletter', label: 'Newsletter', icon: Envelope },
+  ];
 
   const renderDashboard = () => (
-    <div className="space-y-6">
+    <div className="space-y-8 font-display">
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4">
-          <p className="text-sm text-red-700 font-PatrickHand">{error}</p>
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-sm flex items-center gap-2 text-rose-800 text-xs">
+          <WarningCircle size={16} className="text-rose-600 flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
+
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-Primarycolor"></div>
+        <div className="flex justify-center items-center py-24">
+          <CircleNotch size={24} className="animate-spin text-Primarycolor" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Revenue */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
+          <div className="bg-Secondarycolor border border-border p-5 rounded-sm flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between text-xs text-text-tertiary uppercase tracking-[0.08em] font-medium">
+              <span>Total Revenue</span>
+              <CurrencyNgn size={18} className="text-Primarycolor" />
+            </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-semibold font-display text-Primarycolor tabular-nums">
                 {formatCurrency(analytics.totalRevenue)}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
-                <TrendingUp className="w-4 h-4" />
-                {analytics.revenueGrowth}% vs last month
+              <p className="text-[0.7rem] text-emerald-600 flex items-center gap-1 mt-1 font-medium">
+                <TrendUp size={12} />
+                +{analytics.revenueGrowth}% month-over-month
               </p>
             </div>
-            <DollarSign className="w-8 h-8 text-blue-500" />
           </div>
+
           {/* Orders */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
+          <div className="bg-Secondarycolor border border-border p-5 rounded-sm flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between text-xs text-text-tertiary uppercase tracking-[0.08em] font-medium">
+              <span>Total Orders</span>
+              <ShoppingCart size={18} className="text-Primarycolor" />
+            </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Orders</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-semibold font-display text-Primarycolor tabular-nums">
                 {analytics.totalOrders}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
-                <TrendingUp className="w-4 h-4" />
-                {analytics.orderGrowth}% vs last month
+              <p className="text-[0.7rem] text-emerald-600 flex items-center gap-1 mt-1 font-medium">
+                <TrendUp size={12} />
+                +{analytics.orderGrowth}% month-over-month
               </p>
             </div>
-            <ShoppingCart className="w-8 h-8 text-blue-500" />
           </div>
+
           {/* Customers */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
+          <div className="bg-Secondarycolor border border-border p-5 rounded-sm flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between text-xs text-text-tertiary uppercase tracking-[0.08em] font-medium">
+              <span>Total Customers</span>
+              <Users size={18} className="text-Primarycolor" />
+            </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Total Customers</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-semibold font-display text-Primarycolor tabular-nums">
                 {analytics.totalCustomers}
               </p>
-              <p className="text-xs text-green-600 flex items-center gap-1 mt-1 font-PatrickHand">
-                <TrendingUp className="w-4 h-4" />
-                {analytics.customerGrowth}% vs last month
+              <p className="text-[0.7rem] text-emerald-600 flex items-center gap-1 mt-1 font-medium">
+                <TrendUp size={12} />
+                +{analytics.customerGrowth}% month-over-month
               </p>
             </div>
-            <Users className="w-8 h-8 text-blue-500" />
           </div>
+
           {/* Avg Order */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex items-center justify-between">
+          <div className="bg-Secondarycolor border border-border p-5 rounded-sm flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between text-xs text-text-tertiary uppercase tracking-[0.08em] font-medium">
+              <span>Average Order Value</span>
+              <CurrencyNgn size={18} className="text-Primarycolor" />
+            </div>
             <div>
-              <p className="text-sm font-medium text-gray-600 font-PatrickHand">Avg. Order Value</p>
-              <p className="text-2xl font-bold text-gray-900 font-Manrope">
+              <p className="text-2xl font-semibold font-display text-Primarycolor tabular-nums">
                 {formatCurrency(analytics.avgOrderValue)}
               </p>
+              <p className="text-[0.7rem] text-text-tertiary mt-1">Average cart valuation</p>
             </div>
-            <DollarSign className="w-8 h-8 text-blue-500" />
           </div>
         </div>
       )}
-      {/* Tools */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      {/* Admin Action Tools */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
         <AdminUploader />
         <BundleCreator />
-        {/* AdminDiscounts removed from here */}
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 font-Manrope">Admin Dashboard</h1>
+    <div className="min-h-[100dvh] bg-surface flex flex-col font-display">
+      <SEO title="Admin Console | Prechi" description="Prechi management system" />
+
+      {/* Linear-style Header */}
+      <header className="bg-Secondarycolor border-b border-border sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 bg-Primarycolor text-white rounded-sm flex items-center justify-center font-bold text-xs uppercase">
+              P
+            </div>
+            <span className="text-xs uppercase tracking-[0.12em] font-semibold text-Primarycolor">
+              Prechi Console
+            </span>
+          </div>
+
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+            className="flex items-center gap-2 text-xs text-text-secondary hover:text-Primarycolor transition-colors uppercase tracking-[0.08em] font-medium"
           >
-            <LogOut className="w-5 h-5" /> Logout
+            <SignOut size={16} />
+            <span>Logout</span>
           </button>
         </div>
-      </header>
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-6 py-4">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: DollarSign },
-            { id: 'orders', label: 'Orders', icon: ShoppingCart },
-            { id: 'customers', label: 'Customers', icon: Users },
-            { id: 'inventory', label: 'Inventory', icon: Package },
-            { id: 'discounts', label: 'Discounts', icon: Tag },
-            { id: 'newsletter', label: 'Newsletter', icon: Mail },
-          ].map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 py-2 px-3 text-sm font-medium ${
-                activeTab === id
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-600 hover:text-blue-600 hover:border-b-2 hover:border-blue-200'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {label}
-            </button>
-          ))}
+
+        {/* Tab Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-1 overflow-x-auto border-t border-border/40 scrollbar-none">
+          {tabs.map(({ id, label, icon: Icon }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center gap-2 py-3 px-4 text-xs font-medium uppercase tracking-[0.08em] transition-all border-b-2 whitespace-nowrap ${
+                  isActive
+                    ? 'border-Primarycolor text-Primarycolor font-semibold'
+                    : 'border-transparent text-text-tertiary hover:text-Primarycolor'
+                }`}
+              >
+                <Icon size={16} weight={isActive ? "fill" : "regular"} />
+                {label}
+              </button>
+            );
+          })}
         </div>
-      </nav>
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      </header>
+
+      {/* Main Workspace */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && renderDashboard()}
         {activeTab === 'orders' && <Orders />}
         {activeTab === 'customers' && <Customers />}

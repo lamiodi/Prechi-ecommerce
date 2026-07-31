@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle, Loader2,
-} from 'lucide-react';
+import { EnvelopeSimple, LockKey, Eye, EyeSlash, WarningCircle, CheckCircle, CircleNotch } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
 import Pic1 from '../assets/images/IMG_4552.JPG';
 import Pic2 from '../assets/images/IMG_4554.JPG';
 import Pic3 from '../assets/images/IMG_4559.JPG';
 import axios from 'axios';
+import SEO from '../components/SEO';
 
-// Create API instance with environment variable support
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
@@ -24,28 +22,21 @@ const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  // Image carousel data
   const carouselImages = [
     {
       src: Pic1,
       title: 'Unleash Your Potential',
-      description:
-        'Step into performance-ready tracksuits and sets crafted for movement, comfort, and confidence.',
-      placeholder: { bg: '#1E1E1E', pattern: 'circles' },
+      description: 'Step into performance-ready tracksuits and sets crafted for movement, comfort, and confidence.',
     },
     {
       src: Pic2,
       title: 'Built for Every Body',
-      description:
-        'From intense workouts to everyday comfort — our pieces are designed to move with you.',
-      placeholder: { bg: '#6E6E6E', pattern: 'squares' },
+      description: 'From intense workouts to everyday comfort — our pieces are designed to move with you.',
     },
     {
       src: Pic3,
       title: 'Style Meets Strength',
-      description:
-        'Elevate your activewear with bold designs and breathable fabrics made to perform.',
-      placeholder: { bg: '#1E1E1E', pattern: 'triangles' },
+      description: 'Elevate your activewear with bold designs and breathable fabrics made to perform.',
     },
   ];
 
@@ -60,7 +51,6 @@ const Login = () => {
 
   const from = location.state?.from?.pathname || '/home';
 
-  // Helper function to decode JWT token
   const decodeToken = (token) => {
     try {
       const base64Url = token.split('.')[1];
@@ -86,10 +76,9 @@ const Login = () => {
     if (location.state?.message) {
       setSuccessMsg(location.state.message);
     }
-    // Auto-rotate carousel images
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [carouselImages.length, location.state]);
 
@@ -137,7 +126,6 @@ const Login = () => {
     setErrorMsg('');
     setSuccessMsg('');
     try {
-      // Step 1: Actual API call using the configured API instance
       const response = await api.post('/auth/login', {
         email: formData.email,
         password: formData.password,
@@ -146,14 +134,12 @@ const Login = () => {
       const data = response.data;
       const { token, user } = data;
 
-      // Step 2: Block admin users (optional rule)
       if (user?.isAdmin) {
         setErrorMsg('Admins are not allowed to log in from the user portal.');
         setLoading(false);
         return;
       }
 
-      // Step 3: Decode token to extract id
       const tokenData = decodeToken(token);
       const userWithId = {
         ...user,
@@ -163,23 +149,17 @@ const Login = () => {
         throw new Error('No valid user ID found in user data or token');
       }
 
-      // Step 4: Persist user in context
-
       await login(userWithId, token);
 
-      // Step 5: Remember email if user checked the box
       if (rememberMe) {
         localStorage.setItem('userEmail', formData.email);
       } else {
         localStorage.removeItem('userEmail');
       }
 
-
-      // Step 7: Redirect to intended page
       setSuccessMsg('Login successful! Redirecting...');
-      setTimeout(() => navigate(from, { replace: true }), 1000);
+      setTimeout(() => navigate(from, { replace: true }), 800);
     } catch (err) {
-      console.error('LoginPage: Login error:', err?.response?.data || err.message);
       if (err.code === 'ECONNABORTED') {
         setErrorMsg('Request timed out. Please try again.');
       } else if (err.response?.status === 401) {
@@ -200,248 +180,205 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-white font-PatrickHand">
-      {/* Left Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-8">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-2 font-Manrope" style={{ color: '#1E1E1E' }}>
-              Welcome Back
+    <div className="min-h-[100dvh] flex bg-Secondarycolor">
+      <SEO title="Sign In" description="Log in to your Prechi Clothing account." url="/login" />
+
+      {/* Form side */}
+      <div className="flex-1 flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-10 lg:py-12">
+        {/* Top logo link */}
+        <div>
+          <Link to="/" className="text-xl font-display font-bold tracking-tight text-Primarycolor">
+            PRECHI
+          </Link>
+        </div>
+
+        {/* Center content */}
+        <div className="w-full max-w-sm mx-auto my-auto py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-Primarycolor mb-2">
+              Welcome back
             </h1>
-            <p className="text-base font-PatrickHand" style={{ color: '#6E6E6E' }}>
-              Sign in to your account to continue
+            <p className="text-sm font-display text-text-secondary">
+              Sign in to manage your account and orders.
             </p>
           </div>
-          {/* Messages */}
+
+          {/* Feedback messages */}
           {successMsg && (
-            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{successMsg}</span>
+            <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-sm mb-6">
+              <CheckCircle size={16} className="text-success flex-shrink-0" weight="fill" />
+              <p className="text-xs font-display text-success">{successMsg}</p>
             </div>
           )}
+
           {errorMsg && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{errorMsg}</span>
+            <div className="flex items-center gap-2 p-3 bg-error/10 border border-error/20 rounded-sm mb-6">
+              <WarningCircle size={16} className="text-error flex-shrink-0" weight="fill" />
+              <p className="text-xs font-display text-error">{errorMsg}</p>
             </div>
           )}
-          {/* Login Form */}
-          <div className="space-y-6">
-            {/* Email Field */}
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold mb-2 font-PatrickHand"
-                style={{ color: '#1E1E1E' }}
-              >
-                Email Address
+              <label htmlFor="email" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-2">
+                Email address
               </label>
               <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
-                  style={{ color: '#6E6E6E' }}
-                />
                 <input
                   id="email"
                   name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${formErrors.email
-                      ? 'border-red-300 focus:ring-red-500'
-                      : 'border-gray-300'
-                    }`}
-                  style={{
-                    color: '#1E1E1E',
-                    ...(formErrors.email ? {} : { '--tw-ring-color': '#1E1E1E' }),
-                  }}
-                  placeholder="you@example.com"
+                  placeholder="name@example.com"
                   autoComplete="email"
+                  className={`w-full h-11 px-3.5 text-sm font-display bg-white border ${
+                    formErrors.email ? 'border-error' : 'border-border'
+                  } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
                 />
               </div>
               {formErrors.email && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                  <AlertCircle className="w-4 h-4" />
+                <p className="mt-1.5 text-xs text-error font-display flex items-center gap-1">
+                  <WarningCircle size={12} weight="bold" />
                   {formErrors.email}
                 </p>
               )}
             </div>
-            {/* Password Field */}
+
+            {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold mb-2 font-PatrickHand"
-                style={{ color: '#1E1E1E' }}
-              >
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password', { state: { email: formData.email } })}
+                  className="text-xs font-display text-text-tertiary hover:text-Primarycolor transition-colors duration-200"
+                >
+                  Forgot?
+                </button>
+              </div>
               <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
-                  style={{ color: '#6E6E6E' }}
-                />
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${formErrors.password
-                      ? 'border-red-300 focus:ring-red-500'
-                      : 'border-gray-300'
-                    }`}
-                  style={{
-                    color: '#1E1E1E',
-                    ...(formErrors.password
-                      ? {}
-                      : { '--tw-ring-color': '#1E1E1E' }),
-                  }}
                   placeholder="••••••••"
                   autoComplete="current-password"
+                  className={`w-full h-11 pl-3.5 pr-10 text-sm font-display bg-white border ${
+                    formErrors.password ? 'border-error' : 'border-border'
+                  } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                  style={{ color: '#6E6E6E' }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-Primarycolor transition-colors p-1"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeSlash size={16} weight="light" /> : <Eye size={16} weight="light" />}
                 </button>
               </div>
               {formErrors.password && (
-                <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                  <AlertCircle className="w-4 h-4" />
+                <p className="mt-1.5 text-xs text-error font-display flex items-center gap-1">
+                  <WarningCircle size={12} weight="bold" />
                   {formErrors.password}
                 </p>
               )}
             </div>
-            {/* Remember Me & Forgot Password */}
-            <div className="flex justify-between items-center text-sm font-PatrickHand">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 focus:ring-2"
-                  style={{ accentColor: '#1E1E1E' }}
-                />
-                <span style={{ color: '#1E1E1E' }}>Remember me</span>
+
+            {/* Remember me */}
+            <div className="flex items-center gap-2">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded-sm border-border text-Primarycolor focus:ring-0 cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-xs font-display text-text-secondary cursor-pointer select-none">
+                Remember me on this device
               </label>
-              <button
-                type="button"
-                onClick={() =>
-                  navigate('/forgot-password', { state: { email: formData.email } })
-                }
-                className="font-medium hover:underline transition-all font-Manrope"
-                style={{ color: '#1E1E1E' }}
-              >
-                Forgot password?
-              </button>
             </div>
-            {/* Submit Button */}
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              onClick={handleLogin}
-              className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Manrope"
-              style={{
-                backgroundColor: '#1E1E1E',
-                color: '#ffffff',
-              }}
+              className="btn btn-primary btn-md w-full mt-2"
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin text-Primarycolor" />
+                <span className="flex items-center justify-center gap-2">
+                  <CircleNotch size={16} className="animate-spin" />
                   Signing in...
-                </>
+                </span>
               ) : (
-                'Sign In'
+                'Sign in'
               )}
             </button>
+          </form>
+
+          {/* Footer note */}
+          <div className="mt-8 text-center">
+            <p className="text-xs font-display text-text-tertiary">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-Primarycolor font-medium hover:underline transition-all">
+                Create account
+              </Link>
+            </p>
           </div>
-          {/* Sign Up Link */}
-          <div className="mt-8 text-center text-sm font-PatrickHand">
-            <span style={{ color: '#6E6E6E' }}>Don't have an account? </span>
-            <Link
-              to="/signup"
-              className="font-semibold hover:underline transition-all font-Manrope"
-              style={{ color: '#1E1E1E' }}
-            >
-              Create account
-            </Link>
-          </div>
+        </div>
+
+        {/* Bottom copyright */}
+        <div className="text-xs font-display text-text-tertiary text-center lg:text-left">
+          &copy; {new Date().getFullYear()} Prechi Clothing
         </div>
       </div>
-      {/* Right Side - Image Carousel */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden">
-        {/* Background overlay */}
-        <div
-          className="absolute inset-0 opacity-10 transition-all duration-1000"
-          style={{ backgroundColor: carouselImages[currentImageIndex].placeholder.bg }}
-        />
-        {/* Image carousel container */}
-        <div className="relative w-full h-full">
-          {carouselImages.map((image, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentImageIndex
-                  ? 'opacity-100 transform translate-x-0'
-                  : index < currentImageIndex
-                    ? 'opacity-0 transform -translate-x-full'
-                    : 'opacity-0 transform translate-x-full'
-                }`}
-            >
-              <img src={image.src} alt={image.title} className="w-full h-full object-cover" />
-              {/* Content overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 z-0">
-                <div className="max-w-md">
-                  <h2
-                    className="text-3xl font-bold mb-4 transition-all duration-500 font-Manrope"
-                    style={{ color: '#ffffff' }}
-                  >
-                    {image.title}
-                  </h2>
-                  <p
-                    className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-PatrickHand"
-                    style={{ color: '#F5F5DC' }}
-                  >
-                    {image.description}
-                  </p>
-                </div>
-              </div>
+
+      {/* Right editorial photo panel */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-Primarycolor overflow-hidden">
+        {carouselImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img
+              src={image.src}
+              alt={image.title}
+              className="w-full h-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/20 to-transparent" />
+            <div className="absolute bottom-16 left-12 right-12 text-white">
+              <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-white/50 mb-3 block">
+                Prechi Sportswear
+              </span>
+              <h2 className="text-2xl lg:text-3xl font-display font-semibold tracking-tight mb-2">
+                {image.title}
+              </h2>
+              <p className="text-sm font-display text-white/60 max-w-md font-light">
+                {image.description}
+              </p>
             </div>
-          ))}
-        </div>
-        {/* Navigation dots */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+          </div>
+        ))}
+
+        {/* Slide indicators */}
+        <div className="absolute top-12 right-12 flex gap-2 z-10">
           {carouselImages.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${index === currentImageIndex ? 'scale-125' : ''
-                }`}
-              style={{
-                backgroundColor: index === currentImageIndex ? '#1E1E1E' : '#ffffff',
-                opacity: index === currentImageIndex ? 1 : 0.6,
-              }}
-              aria-label={`Go to slide ${index + 1}`}
+              className={`h-0.5 rounded-full transition-all duration-500 ${
+                index === currentImageIndex ? 'w-6 bg-white' : 'w-2 bg-white/30'
+              }`}
+              aria-label={`Slide ${index + 1}`}
             />
           ))}
-        </div>
-        {/* Progress bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 bg-opacity-30">
-          <div
-            className="h-full transition-all duration-5000 ease-linear"
-            style={{
-              backgroundColor: '#1E1E1E',
-              width: `${((currentImageIndex + 1) / carouselImages.length) * 100}%`,
-            }}
-          />
         </div>
       </div>
     </div>

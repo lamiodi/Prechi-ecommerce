@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { LogOut, Search, User, Package } from 'lucide-react';
+import { MagnifyingGlass, User, ShoppingBag, ArrowLeft, SignOut, Package, List, X } from '@phosphor-icons/react';
 import { useAuth } from '../context/AuthContext';
+import { useCartDrawer } from '../context/CartDrawerContext';
 import { toastSuccess } from '../utils/toastConfig';
 import LogoWhite from '../assets/icons/Preachilogowhite.png';
 import LogoBlack from '../assets/icons/prechilogoblack.png';
@@ -12,38 +11,67 @@ export default function Navbar2() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, logout } = useAuth();
+  const { openCart, cart } = useCartDrawer();
+  const totalCartCount = (cart?.items || []).reduce((acc, curr) => acc + (curr.quantity || 1), 0);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
+  const menuRef = useRef(null);
 
-  // Determine if current page has white background
-  const isWhiteBackgroundPage = () => {
-    const whiteBackgroundPages = [
-      '/shop',
-      '/shopall',
-      '/search',
-      '/product/',
-      '/bundle/',
-      '/cart',
-      '/checkout',
-      '/orders',
-      '/profile',
-      '/signup',
-      '/forgot-password',
-      '/help',
-      '/more',
-      '/thank-you'
-    ];
+  const whiteBackgroundPages = [
+    '/shop', '/shopall', '/search', '/product/', '/bundle/',
+    '/cart', '/checkout', '/orders', '/profile', '/signup',
+    '/forgot-password', '/help', '/more', '/thank-you'
+  ];
 
-    return whiteBackgroundPages.some(path => location.pathname.includes(path));
-  };
+  const isWhiteBg = whiteBackgroundPages.some(path => location.pathname.includes(path));
+  const isDark = !isWhiteBg;
+
+  // Scroll listener
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+  }, [location.pathname]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (loading) {
-        console.warn('Navbar2: Loading stuck, continuing render.');
-        setLoadingTimeout(true);
-      }
+      if (loading) setLoadingTimeout(true);
     }, 1000);
     return () => clearTimeout(timer);
   }, [loading]);
@@ -54,6 +82,7 @@ export default function Navbar2() {
     toastSuccess('Logged out successfully');
     navigate('/login');
     setIsMenuOpen(false);
+    setIsMobileMenuOpen(false);
   };
 
   const handleSearch = (e) => {
@@ -61,313 +90,321 @@ export default function Navbar2() {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
+      setIsSearchOpen(false);
     }
   };
 
-  const handleMenuNavigation = (path) => {
-    navigate(path);
-    setIsMenuOpen(false);
-  };
+  // Colors based on context
+  const textColor = isDark ? 'text-white' : 'text-Primarycolor';
+  const hoverColor = isDark ? 'hover:text-white/70' : 'hover:text-Primarycolor/70';
+  const iconSize = 20;
 
   if (loading && !loadingTimeout) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="mx-auto max-w-full container-padding flex h-[3.75rem] items-center justify-center">
-          <div className="flex items-center gap-2 text-white">
-            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>Loading...</span>
-          </div>
+      <nav className="fixed top-0 left-0 right-0 z-50 h-16">
+        <div className="h-full flex items-center justify-center">
+          <div className="w-5 h-5 border border-current border-t-transparent rounded-full animate-spin opacity-40" />
         </div>
       </nav>
     );
   }
 
   return (
-    <Disclosure as="nav" className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-sm">
-      {({ open }) => (
-        <>
-          <div className="mx-auto max-w-full container-padding py-1">
-            <div className="relative flex h-[3.75rem] items-center justify-between">
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+          isScrolled
+            ? isDark
+              ? 'bg-Primarycolor/90 backdrop-blur-xl border-b border-white/5'
+              : 'bg-white/90 backdrop-blur-xl border-b border-Primarycolor/5'
+            : 'bg-transparent'
+        }`}
+        style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="section-container">
+          <div className="flex h-16 items-center justify-between">
 
-              {/* Mobile menu button - show below lg */}
-              <div className="absolute inset-y-0 left-0 flex items-center lg:hidden">
-                <DisclosureButton className={`inline-flex items-center justify-center rounded-md p-2 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                  }`}>
-                  <span className="sr-only">Open menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                  )}
-                </DisclosureButton>
-              </div>
+            {/* Left: Mobile menu + Desktop nav links */}
+            <div className="flex items-center gap-1">
+              {/* Mobile menu button */}
+              <button
+                className={`lg:hidden p-2 -ml-2 ${textColor} ${hoverColor} transition-colors duration-300`}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen ? <X size={22} weight="light" /> : <List size={22} weight="light" />}
+              </button>
 
-
-
-              {/* Center: Logo */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 sm:transform-none">
-                <Link to="/home" className="flex items-center">
-                  <img
-                    src={isWhiteBackgroundPage() ? LogoBlack : LogoWhite}
-                    alt="Logo"
-                    className="h-6 w-8 object-contain sm:h-8 sm:w-10 md:h-10 md:w-12"
-                  />
-                </Link>
-              </div>
-
-              {/* Left-side Navigation Links for large screens - SHOP, CONTACT, MORE */}
-              <div className="hidden lg:flex items-center gap-6 ml-6">
-                <Link
-                  to="/shop"
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`}
-                >
-                  SHOP
-                </Link>
-                <Link
-                  to="/help"
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`}
-                >
-                  CONTACT
-                </Link>
-                <Link
-                  to="/more"
-                  className={`text-sm font-medium hover:opacity-80 transition-opacity font-Manrope ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                    }`}
-                >
-                  MORE
-                </Link>
-              </div>
-
-
-
-              {/* Right: Auth and navigation */}
-              <div className="flex items-center gap-4 ml-auto">
-                {/* Search (desktop only - show from lg and above) */}
-                <div className="relative hidden lg:flex items-center">
-                  <input
-                    type="text"
-                    placeholder="Search products or categories..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                    className={`w-40 lg:w-60 xl:w-70 2xl:w-70 pl-2 pr-8 py-1 text-sm border-b bg-transparent focus:border-b-2 focus:outline-none font-PatrickHand ${isWhiteBackgroundPage()
-                        ? 'text-Primarycolor border-Primarycolor focus:border-Primarycolor placeholder-Primarycolor/70'
-                        : 'text-Secondarycolor border-Secondarycolor focus:border-Secondarycolor placeholder-white/70'
-                      }`}
-                  />
-                  <button
-                    onClick={handleSearch}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    aria-label="Search"
+              {/* Desktop navigation links */}
+              <div className="hidden lg:flex items-center gap-8 ml-2">
+                {[
+                  { to: '/shop', label: 'Shop' },
+                  { to: '/shop?category=new', label: 'New' },
+                  { to: '/help', label: 'Contact' },
+                  { to: '/more', label: 'About' },
+                ].map(({ to, label }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className={`text-[0.8125rem] font-medium tracking-[0.04em] uppercase ${textColor} ${hoverColor} transition-colors duration-300 relative group`}
                   >
-                    <Search className={`h-3 w-3 sm:h-4 sm:w-4 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`} />
-                  </button>
-                </div>
-
-                {/* Hamburger menu for desktop - show from lg and above, only when user is logged in */}
-                {user && (
-                  <div className="hidden lg:flex relative group">
-                    <button
-                      onClick={() => setIsMenuOpen(!isMenuOpen)}
-                      className="flex items-center p-1 hover:opacity-80 transition-opacity relative"
-                      aria-label="User menu"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                        }`}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                      </svg>
-                    </button>
-
-                    {/* Tooltip for Order History */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                      Order History
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-800"></div>
-                    </div>
-
-                    {/* Desktop dropdown menu */}
-                    {isMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleMenuNavigation('/profile')}
-                        >
-                          <User className="h-4 w-4 mr-3 text-gray-500" />
-                          Profile
-                        </Link>
-                        <Link
-                          to="/orders"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleMenuNavigation('/orders')}
-                        >
-                          <Package className="h-4 w-4 mr-3 text-gray-500" />
-                          Order History
-                        </Link>
-                        <div className="border-t border-gray-100 my-1"></div>
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          <LogOut className="h-4 w-4 mr-3 text-gray-500" />
-                          Logout
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Auth button */}
-                {user ? (
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-1 text-sm font-medium hover:opacity-80 transition-opacity"
-                    aria-label="Logout"
-                  >
-                    <LogOut size={14} className={`sm:w-4 sm:h-4 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`} />
-                  </button>
-                ) : (
-                  <Link to="/login">
-                    <button
-                      className="flex items-center gap-1 text-sm font-medium hover:opacity-80 transition-opacity"
-                      aria-label="Login"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                        }`}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                      </svg>
-                    </button>
+                    {label}
+                    <span className={`absolute -bottom-1 left-0 h-px w-0 group-hover:w-full transition-all duration-500 ${isDark ? 'bg-white' : 'bg-Primarycolor'}`}
+                      style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+                    />
                   </Link>
-                )}
-
-                {/* Cart or Back */}
-                {location.pathname === '/cart' ? (
-                  <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center p-1 hover:opacity-80 transition-opacity"
-                    aria-label="Go back"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                      }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                    </svg>
-                  </button>
-                ) : (
-                  <Link to="/cart">
-                    <button className="flex items-center p-1 hover:opacity-80 transition-opacity" aria-label="Shopping cart">
-                      <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 sm:h-6 sm:w-6 ${isWhiteBackgroundPage() ? 'text-Primarycolor' : 'text-Secondarycolor'
-                        }`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                      </svg>
-                    </button>
-                  </Link>
-                )}
+                ))}
               </div>
             </div>
-          </div>
 
-          {/* Enhanced Mobile Menu */}
-          <DisclosurePanel className="lg:hidden bg-black/70 backdrop-blur-md border-t border-white/10">
-            <div className="space-y-1 px-4 pb-4 pt-3">
+            {/* Center: Logo */}
+            <Link
+              to="/home"
+              className="absolute left-1/2 -translate-x-1/2 flex items-center"
+              aria-label="Prechi - Home"
+            >
+              <img
+                src={isDark ? LogoWhite : LogoBlack}
+                alt="Prechi"
+                className="h-7 w-auto object-contain sm:h-8 transition-opacity duration-300 hover:opacity-80"
+              />
+            </Link>
 
-              {/* Enhanced Search input (mobile only - show below lg) */}
-              <div className="mb-6">
-                <form onSubmit={handleSearch} className="flex">
-                  <input
-                    type="text"
-                    placeholder="Search products or categories..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 px-4 py-3 text-sm border rounded-l bg-white/10 backdrop-blur-sm text-white border-white/20 placeholder-white/70 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-200 font-PatrickHand"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-white/20 backdrop-blur-sm text-white px-4 py-3 rounded-r border border-l-0 border-white/20 hover:bg-white/30 transition-all duration-200"
-                  >
-                    <Search className="h-4 w-4" />
-                  </button>
-                </form>
-              </div>
-
-              {/* Enhanced Quick Navigation Links */}
-              <nav
-                className="container quicknav flex flex-col space-y-3 lg:max-w-[800px] mb-[40dvh] sm:mb-38 md:mb-50 lg:mb-[50dvh] z-25 lg:absolute lg:left-0 lg:bg-black/70"
-                role="navigation"
-                aria-label="Product categories"
+            {/* Right: Actions */}
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Search toggle */}
+              <button
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300`}
+                aria-label="Search"
               >
-                <Link
-                  to="/shop"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  SHOP ALL
-                </Link>
-                <Link
-                  to="/shop?category=new"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  NEW ARRIVALS
-                </Link>
+                <MagnifyingGlass size={iconSize} weight="light" />
+              </button>
 
-                {/* Additional Navigation Links */}
-                <Link
-                  to="/shop?category=Sets"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  SETS
-                </Link>
-                <Link
-                  to="/shop?category=Tracksuits"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  TRACKSUITS
-                </Link>
-                <Link
-                  to="/help"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  CONTACT
-                </Link>
-                <Link
-                  to="/more"
-                  className="text-white hover:text-white/80 hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30 rounded-lg px-4 py-3 font-medium backdrop-blur-sm border border-white/10 hover:border-white/20 font-Manrope"
-                >
-                  MORE
-                </Link>
-              </nav>
+              {/* User menu */}
+              {user ? (
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300`}
+                    aria-label="Account menu"
+                    aria-expanded={isMenuOpen}
+                  >
+                    <User size={iconSize} weight="light" />
+                  </button>
 
-              {/* Enhanced Profile and Orders links (mobile only) */}
-              {user && (
-                <>
-                  <div className="border-t border-white/10 pt-4 mt-4">
-                    <Link to="/profile">
-                      <button className="flex items-center w-full text-left px-4 py-3 text-sm rounded-lg transition-all duration-200 text-white hover:text-white/80 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-white/20 mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white mr-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                  {/* Dropdown */}
+                  {isMenuOpen && (
+                    <div
+                      className="absolute right-0 mt-2 w-52 bg-white border border-border rounded-lg shadow-[0_8px_30px_rgba(0,0,0,0.08)] py-1.5 z-50"
+                      role="menu"
+                    >
+                      <div className="px-4 py-2.5 border-b border-border-subtle">
+                        <p className="text-xs text-text-tertiary font-display">Signed in as</p>
+                        <p className="text-sm font-medium text-text-primary font-display truncate mt-0.5">
+                          {user.first_name} {user.last_name}
+                        </p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface transition-colors font-display"
+                        role="menuitem"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User size={16} weight="light" />
                         Profile
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface transition-colors font-display"
+                        role="menuitem"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <Package size={16} weight="light" />
+                        Orders
+                      </Link>
+                      <div className="border-t border-border-subtle my-1" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface transition-colors font-display"
+                        role="menuitem"
+                      >
+                        <SignOut size={16} weight="light" />
+                        Sign out
                       </button>
-                    </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300`}
+                  aria-label="Sign in"
+                >
+                  <User size={iconSize} weight="light" />
+                </Link>
+              )}
 
-                    {/* Orders link (mobile only) */}
-                    <Link to="/orders">
-                      <button className="flex items-center w-full text-left px-4 py-3 text-sm rounded-lg transition-all duration-200 text-white hover:text-white/80 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-white/20">
-                        <Package className="h-4 w-4 text-white mr-3" />
-                        Order History
-                      </button>
-                    </Link>
-                  </div>
-                </>
+              {/* Cart */}
+              {location.pathname === '/cart' ? (
+                <button
+                  onClick={() => navigate(-1)}
+                  className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300`}
+                  aria-label="Go back"
+                >
+                  <ArrowLeft size={iconSize} weight="light" />
+                </button>
+              ) : (
+                <button
+                  onClick={openCart}
+                  className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300 relative`}
+                  aria-label="Open Shopping Bag"
+                >
+                  <ShoppingBag size={iconSize} weight="light" />
+                  {totalCartCount > 0 && (
+                    <span className="absolute top-1 right-1 h-4 w-4 bg-Primarycolor text-white text-[0.6rem] font-bold rounded-full flex items-center justify-center border border-white">
+                      {totalCartCount > 9 ? '9+' : totalCartCount}
+                    </span>
+                  )}
+                </button>
               )}
             </div>
-          </DisclosurePanel>
-        </>
-      )}
-    </Disclosure>
+          </div>
+        </div>
+
+        {/* Search bar - slides down */}
+        <div
+          className={`overflow-hidden transition-all duration-500 ${
+            isSearchOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+          } ${isDark ? 'bg-Primarycolor/95 backdrop-blur-xl' : 'bg-white/95 backdrop-blur-xl'}`}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        >
+          <div className="section-container py-3">
+            <form onSubmit={handleSearch} className="flex items-center gap-3">
+              <MagnifyingGlass size={18} weight="light" className={`flex-shrink-0 ${isDark ? 'text-white/50' : 'text-Primarycolor/40'}`} />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`flex-1 bg-transparent text-sm font-display placeholder:font-display focus:outline-none ${
+                  isDark ? 'text-white placeholder:text-white/40' : 'text-Primarycolor placeholder:text-Primarycolor/40'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setIsSearchOpen(false)}
+                className={`text-xs font-medium tracking-[0.04em] uppercase ${isDark ? 'text-white/50 hover:text-white' : 'text-Primarycolor/40 hover:text-Primarycolor'} transition-colors`}
+              >
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile menu overlay */}
+      <div
+        className={`fixed inset-0 z-40 transition-all duration-500 ${
+          isMobileMenuOpen ? 'visible' : 'invisible'
+        }`}
+        style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-Primarycolor/60 backdrop-blur-sm transition-opacity duration-500 ${
+            isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+
+        {/* Panel */}
+        <div
+          className={`absolute top-0 left-0 h-full w-[85%] max-w-sm bg-Primarycolor transition-transform duration-500 ${
+            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        >
+          <div className="flex flex-col h-full pt-20 pb-8 px-6">
+            {/* User greeting */}
+            {user && (
+              <div className="mb-8 pb-6 border-b border-white/10">
+                <p className="text-white/50 text-xs font-display tracking-[0.06em] uppercase mb-1">Welcome back</p>
+                <p className="text-white text-lg font-display font-medium">{user.first_name}</p>
+              </div>
+            )}
+
+            {/* Nav links */}
+            <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
+              {[
+                { to: '/shop', label: 'Shop All' },
+                { to: '/shop?category=new', label: 'New Arrivals' },
+                { to: '/shop?category=Sets', label: 'Sets' },
+                { to: '/shop?category=Tracksuits', label: 'Tracksuits' },
+                { to: '/help', label: 'Contact' },
+                { to: '/more', label: 'About' },
+              ].map(({ to, label }, i) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className="text-white/80 hover:text-white text-2xl font-display font-light py-2 transition-colors duration-300"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{
+                    transitionDelay: isMobileMenuOpen ? `${i * 50}ms` : '0ms',
+                  }}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Bottom actions */}
+            <div className="mt-auto pt-6 border-t border-white/10 flex flex-col gap-1">
+              {user ? (
+                <>
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-3 text-white/60 hover:text-white py-2.5 text-sm font-display transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User size={18} weight="light" />
+                    Profile
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="flex items-center gap-3 text-white/60 hover:text-white py-2.5 text-sm font-display transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Package size={18} weight="light" />
+                    Orders
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 text-white/60 hover:text-white py-2.5 text-sm font-display transition-colors w-full text-left"
+                  >
+                    <SignOut size={18} weight="light" />
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="flex items-center gap-3 text-white/60 hover:text-white py-2.5 text-sm font-display transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <User size={18} weight="light" />
+                  Sign in
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

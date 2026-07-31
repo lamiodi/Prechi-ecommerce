@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Mail, Lock, Phone, User, ArrowRight, Eye, EyeOff, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeSlash, WarningCircle, CheckCircle, CircleNotch } from '@phosphor-icons/react';
 import axios from 'axios';
-import Navbar2 from '../components/Navbar2';
-import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import Pic1 from '../assets/images/IMG_4558.JPG';
 import Pic2 from '../assets/images/IMG_4571.JPG';
 import Pic3 from '../assets/images/IMG_4566 (1).png';
@@ -12,31 +11,32 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r
 
 const SignupPage = () => {
   const navigate = useNavigate();
-  // Image carousel data
+
   const carouselImages = [
     {
       src: Pic1,
       title: 'Step Into Your Power',
       description: 'Create your account and join a growing tribe of bold individuals redefining comfort and performance.',
-      placeholder: { bg: '#1E1E1E', pattern: 'waves' }
     },
     {
       src: Pic2,
       title: 'Perks Just for You',
       description: 'Get early access to drops, member-only discounts, and gear that fits your lifestyle.',
-      placeholder: { bg: '#6E6E6E', pattern: 'dots' }
     },
     {
       src: Pic3,
       title: 'Shop with Confidence',
       description: 'Your privacy matters. Enjoy a seamless, secure experience every time you suit up.',
-      placeholder: { bg: '#1E1E1E', pattern: 'grid' }
     },
   ];
-  
+
   const [formData, setFormData] = useState({
-    first_name: '', last_name: '',
-    email: '', password: '', confirm_password: '', phone_number: ''
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    confirm_password: '',
+    phone_number: '',
   });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -44,15 +44,14 @@ const SignupPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  // Auto-rotate carousel images
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 4500);
+    }, 6000);
     return () => clearInterval(interval);
   }, [carouselImages.length]);
-  
+
   const validateField = useCallback((name, value) => {
     const errors = {};
     if (name === 'first_name' && !value.trim()) errors.first_name = 'First name is required';
@@ -74,21 +73,21 @@ const SignupPage = () => {
     }
     return errors;
   }, [formData.password]);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setFormErrors(prev => ({ ...prev, [name]: undefined }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
     const fieldErrors = validateField(name, value);
     if (Object.keys(fieldErrors).length > 0) {
       setTimeout(() => {
-        setFormErrors(prev => ({ ...prev, ...fieldErrors }));
+        setFormErrors((prev) => ({ ...prev, ...fieldErrors }));
       }, 300);
     }
     if (error) setError('');
     if (successMsg) setSuccessMsg('');
   };
-  
+
   const validateForm = () => {
     const allErrors = {
       ...validateField('first_name', formData.first_name),
@@ -100,381 +99,284 @@ const SignupPage = () => {
     setFormErrors(allErrors);
     return Object.keys(allErrors).length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    setLoading(true); setError(''); setSuccessMsg('');
+    setLoading(true);
+    setError('');
+    setSuccessMsg('');
     try {
-      // Remove confirm_password before sending to backend
       const { confirm_password, ...signupData } = formData;
       const res = await axios.post(`${API_BASE_URL}/api/auth/signup`, signupData);
-      setSuccessMsg(res.data.message);
+      setSuccessMsg(res.data.message || 'Account created successfully!');
       setFormData({
-        first_name: '', last_name: '',
-        email: '', password: '', confirm_password: '', phone_number: ''
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        phone_number: '',
       });
-      setTimeout(() => navigate('/login'), 1500);
+      setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
-      setError(err.response?.data?.error || 'Signup failed');
+      setError(err.response?.data?.error || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-50 relative overflow-hidden font-PatrickHand">
-      {/* Subtle background patterns */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-black/5 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-        <div className="absolute top-0 -right-4 w-72 h-72 bg-gray-500/5 rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-slate-500/5 rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '4s'}}></div>
-      </div>
-      <Navbar2 />
-      <div className="flex flex-col lg:flex-row min-h-screen pt-16 relative z-10">
-        {/* Left Side - Image Carousel */}
-        <div className="hidden lg:flex flex-1 relative overflow-hidden">
-          {/* Background overlay */}
-          <div 
-            className="absolute inset-0 opacity-10 transition-all duration-1000"
-            style={{ backgroundColor: carouselImages[currentImageIndex].placeholder.bg }}
-          />
-          {/* Image carousel container */}
-          <div className="relative w-full h-full">
-            {carouselImages.map((image, index) => (
-              <div
-                key={index}
-                className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-                  index === currentImageIndex 
-                    ? 'opacity-100 transform translate-x-0' 
-                    : index < currentImageIndex 
-                      ? 'opacity-0 transform -translate-x-full'
-                      : 'opacity-0 transform translate-x-full'
-                }`}
-              >
-                <img 
-                  src={image.src}
-                  alt={image.title}
-                  className="w-full h-full object-cover"
-                />
-                {/* Content overlay */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12 bg-opacity-10">
-                  <div className="max-w-md">
-                    <h2 
-                      className="text-3xl font-bold mb-4 transition-all duration-500 font-Manrope"
-                      style={{ color: '#ffffff' }}
-                    >
-                      {image.title}
-                    </h2>
-                    <p 
-                      className="text-lg leading-relaxed mb-8 transition-all duration-500 delay-100 font-PatrickHand"
-                      style={{ color: '#6E6E6E' }}
-                    >
-                      {image.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Navigation dots */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
-            {carouselImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-110 ${
-                  index === currentImageIndex ? 'scale-125' : ''
-                }`}
-                style={{ 
-                  backgroundColor: index === currentImageIndex ? '#1E1E1E' : '#6E6E6E',
-                  opacity: index === currentImageIndex ? 1 : 0.6
-                }}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 bg-opacity-30">
-            <div 
-              className="h-full transition-all duration-4500 ease-linear"
-              style={{ 
-                backgroundColor: '#1E1E1E',
-                width: `${((currentImageIndex + 1) / carouselImages.length) * 100}%`
-              }}
-            />
-          </div>
+    <div className="min-h-[100dvh] flex bg-Secondarycolor">
+      <SEO title="Create Account" description="Join Prechi Clothing to enjoy exclusive access and member deals." url="/signup" />
+
+      {/* Form side */}
+      <div className="flex-1 flex flex-col justify-between px-6 sm:px-12 lg:px-16 py-10 lg:py-12 overflow-y-auto">
+        <div>
+          <Link to="/" className="text-xl font-display font-bold tracking-tight text-Primarycolor">
+            PRECHI
+          </Link>
         </div>
-        {/* Right Side - Signup Form */}
-        <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-8">
-          <div className="w-full max-w-md">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold mb-2 font-Manrope" style={{ color: '#1E1E1E' }}>
-                Create Your Account
-              </h1>
-              <p className="text-base font-PatrickHand" style={{ color: '#6E6E6E' }}>
-                Sign up to unlock exclusive access
-              </p>
+
+        <div className="w-full max-w-sm mx-auto my-auto py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold tracking-tight text-Primarycolor mb-2">
+              Create account
+            </h1>
+            <p className="text-sm font-display text-text-secondary">
+              Unlock member benefits and early access to drops.
+            </p>
+          </div>
+
+          {successMsg && (
+            <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-sm mb-6">
+              <CheckCircle size={16} className="text-success flex-shrink-0" weight="fill" />
+              <p className="text-xs font-display text-success">{successMsg}</p>
             </div>
-            {/* Messages */}
-            {successMsg && (
-              <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
-                <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{successMsg}</span>
-              </div>
-            )}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-center gap-3 font-PatrickHand">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </div>
-            )}
-            {/* Signup Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* First Name */}
+          )}
+
+          {error && (
+            <div className="flex items-center gap-2 p-3 bg-error/10 border border-error/20 rounded-sm mb-6">
+              <WarningCircle size={16} className="text-error flex-shrink-0" weight="fill" />
+              <p className="text-xs font-display text-error">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name row */}
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="first_name" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  First Name
+                <label htmlFor="first_name" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                  First name
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="first_name"
-                    name="first_name"
-                    type="text"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                      formErrors.first_name 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      color: '#1E1E1E',
-                      ...(formErrors.first_name ? {} : { '--tw-ring-color': '#1E1E1E' })
-                    }}
-                    placeholder="First Name"
-                    autoComplete="given-name"
-                  />
-                </div>
+                <input
+                  id="first_name"
+                  name="first_name"
+                  type="text"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  placeholder="John"
+                  autoComplete="given-name"
+                  className={`w-full h-11 px-3.5 text-sm font-display bg-white border ${
+                    formErrors.first_name ? 'border-error' : 'border-border'
+                  } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
+                />
                 {formErrors.first_name && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.first_name}
-                  </p>
-                )}
-              </div>
-              {/* Last Name */}
-              <div>
-                <label htmlFor="last_name" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  Last Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="last_name"
-                    name="last_name"
-                    type="text"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                      formErrors.last_name 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      color: '#1E1E1E',
-                      ...(formErrors.last_name ? {} : { '--tw-ring-color': '#1E1E1E' })
-                    }}
-                    placeholder="Last Name"
-                    autoComplete="family-name"
-                  />
-                </div>
-                {formErrors.last_name && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.last_name}
-                  </p>
+                  <p className="mt-1 text-xs text-error font-display">{formErrors.first_name}</p>
                 )}
               </div>
 
-              {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  Email Address
+                <label htmlFor="last_name" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                  Last name
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-4 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                      formErrors.email 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      color: '#1E1E1E',
-                      ...(formErrors.email ? {} : { '--tw-ring-color': '#1E1E1E' })
-                    }}
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                  />
-                </div>
-                {formErrors.email && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.email}
-                  </p>
+                <input
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  placeholder="Doe"
+                  autoComplete="family-name"
+                  className={`w-full h-11 px-3.5 text-sm font-display bg-white border ${
+                    formErrors.last_name ? 'border-error' : 'border-border'
+                  } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
+                />
+                {formErrors.last_name && (
+                  <p className="mt-1 text-xs text-error font-display">{formErrors.last_name}</p>
                 )}
               </div>
-              {/* Password */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                      formErrors.password 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      color: '#1E1E1E',
-                      ...(formErrors.password ? {} : { '--tw-ring-color': '#1E1E1E' })
-                    }}
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                    style={{ color: '#6E6E6E' }}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {formErrors.password && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.password}
-                  </p>
-                )}
-              </div>
-              {/* Confirm Password */}
-              <div>
-                <label htmlFor="confirm_password" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="confirm_password"
-                    name="confirm_password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.confirm_password}
-                    onChange={handleChange}
-                    className={`w-full pl-10 pr-10 py-3 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 font-PatrickHand ${
-                      formErrors.confirm_password 
-                        ? 'border-red-300 focus:ring-red-500' 
-                        : 'border-gray-300'
-                    }`}
-                    style={{ 
-                      color: '#1E1E1E',
-                      ...(formErrors.confirm_password ? {} : { '--tw-ring-color': '#1E1E1E' })
-                    }}
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-                    style={{ color: '#6E6E6E' }}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {formErrors.confirm_password && (
-                  <p className="mt-2 text-xs text-red-600 flex items-center gap-1 font-PatrickHand">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.confirm_password}
-                  </p>
-                )}
-              </div>
-              {/* Phone */}
-              <div>
-                <label htmlFor="phone_number" className="block text-sm font-semibold mb-2 font-PatrickHand" style={{ color: '#1E1E1E' }}>
-                  Phone Number (Optional)
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#6E6E6E' }} />
-                  <input
-                    id="phone_number"
-                    name="phone_number"
-                    type="tel"
-                    value={formData.phone_number}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl border border-gray-300 transition-all focus:outline-none focus:ring-2 font-PatrickHand"
-                    style={{ 
-                      color: '#1E1E1E',
-                      '--tw-ring-color': '#1E1E1E'
-                    }}
-                    placeholder="Phone Number"
-                    autoComplete="tel"
-                  />
-                </div>
-              </div>
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full font-semibold py-3 rounded-xl focus:outline-none focus:ring-2 transition-all flex justify-center items-center gap-2 hover:opacity-90 font-Manrope"
-                style={{ 
-                  backgroundColor: '#1E1E1E', 
-                  color: '#ffffff'
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin text-Primarycolor" />
-                    Creating Account...
-                  </>
-                ) : (
-                  'Create Account'
-                )}
-              </button>
-              {/* Login Link */}
-              <div className="mt-8 text-center text-sm font-PatrickHand">
-                <span style={{ color: '#6E6E6E' }}>Already have an account? </span>
-                <Link 
-                  to="/login"
-                  className="font-semibold hover:underline transition-all font-Manrope"
-                  style={{ color: '#1E1E1E' }}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="name@example.com"
+                autoComplete="email"
+                className={`w-full h-11 px-3.5 text-sm font-display bg-white border ${
+                  formErrors.email ? 'border-error' : 'border-border'
+                } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
+              />
+              {formErrors.email && (
+                <p className="mt-1 text-xs text-error font-display">{formErrors.email}</p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label htmlFor="phone_number" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                Phone <span className="text-text-tertiary font-normal">(optional)</span>
+              </label>
+              <input
+                id="phone_number"
+                name="phone_number"
+                type="tel"
+                value={formData.phone_number}
+                onChange={handleChange}
+                placeholder="+234..."
+                autoComplete="tel"
+                className="w-full h-11 px-3.5 text-sm font-display bg-white border border-border text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  className={`w-full h-11 pl-3.5 pr-10 text-sm font-display bg-white border ${
+                    formErrors.password ? 'border-error' : 'border-border'
+                  } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-Primarycolor transition-colors p-1"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  Log in here
-                </Link>
+                  {showPassword ? <EyeSlash size={16} weight="light" /> : <Eye size={16} weight="light" />}
+                </button>
               </div>
-            </form>
+              {formErrors.password && (
+                <p className="mt-1 text-xs text-error font-display">{formErrors.password}</p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label htmlFor="confirm_password" className="block text-xs font-display font-medium uppercase tracking-[0.08em] text-text-secondary mb-1.5">
+                Confirm password
+              </label>
+              <input
+                id="confirm_password"
+                name="confirm_password"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.confirm_password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                className={`w-full h-11 px-3.5 text-sm font-display bg-white border ${
+                  formErrors.confirm_password ? 'border-error' : 'border-border'
+                } text-Primarycolor placeholder:text-text-tertiary rounded-sm focus:outline-none focus:border-Primarycolor transition-colors duration-200`}
+              />
+              {formErrors.confirm_password && (
+                <p className="mt-1 text-xs text-error font-display">{formErrors.confirm_password}</p>
+              )}
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary btn-md w-full mt-4"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <CircleNotch size={16} className="animate-spin" />
+                  Creating account...
+                </span>
+              ) : (
+                'Create account'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-xs font-display text-text-tertiary">
+              Already have an account?{' '}
+              <Link to="/login" className="text-Primarycolor font-medium hover:underline transition-all">
+                Sign in
+              </Link>
+            </p>
           </div>
         </div>
+
+        <div className="text-xs font-display text-text-tertiary text-center lg:text-left">
+          &copy; {new Date().getFullYear()} Prechi Clothing
+        </div>
       </div>
-      <Footer />
+
+      {/* Editorial right photo panel */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-Primarycolor overflow-hidden">
+        {carouselImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img
+              src={image.src}
+              alt={image.title}
+              className="w-full h-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/20 to-transparent" />
+            <div className="absolute bottom-16 left-12 right-12 text-white">
+              <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-white/50 mb-3 block">
+                Prechi Community
+              </span>
+              <h2 className="text-2xl lg:text-3xl font-display font-semibold tracking-tight mb-2">
+                {image.title}
+              </h2>
+              <p className="text-sm font-display text-white/60 max-w-md font-light">
+                {image.description}
+              </p>
+            </div>
+          </div>
+        ))}
+
+        <div className="absolute top-12 right-12 flex gap-2 z-10">
+          {carouselImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentImageIndex(index)}
+              className={`h-0.5 rounded-full transition-all duration-500 ${
+                index === currentImageIndex ? 'w-6 bg-white' : 'w-2 bg-white/30'
+              }`}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
 export default SignupPage;
-

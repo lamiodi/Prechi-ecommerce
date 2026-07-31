@@ -63,11 +63,16 @@ const LocationPopup = React.memo(() => {
   }, [])
 
   const fetchExchangeRate = useCallback(async (currency) => {
-    const cacheKey = `${currency}_NGN`
-    const cached = exchangeRateCache.get(cacheKey)
+    const cacheKey = `exrate_${currency}_NGN`
+    const cachedItem = localStorage.getItem(cacheKey)
 
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.rate
+    if (cachedItem) {
+      try {
+        const { rate, timestamp } = JSON.parse(cachedItem)
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          return rate
+        }
+      } catch (e) {}
     }
 
     try {
@@ -80,7 +85,7 @@ const LocationPopup = React.memo(() => {
       const data = await response.json()
       const rate = currency === "NGN" ? 1 : data.conversion_rates.USD || 0.00065311
 
-      exchangeRateCache.set(cacheKey, { rate, timestamp: Date.now() })
+      localStorage.setItem(cacheKey, JSON.stringify({ rate, timestamp: Date.now() }))
       return rate
     } catch (err) {
       console.error("Exchange rate fetch failed:", err.message)

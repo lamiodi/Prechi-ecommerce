@@ -1,58 +1,59 @@
-import React, { useState, useEffect, useRef, useContext, useMemo, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, AlertCircle, CheckCircle, Trash2, Bitcoin, MessageCircle, Smartphone, Truck, Clock, MapPin, Gift, X, Copy, User, RefreshCw, Edit, Plus, CreditCard } from 'lucide-react';
+import {
+  CaretLeft,
+  WarningCircle,
+  CheckCircle,
+  Trash,
+  CurrencyBtc,
+  WhatsappLogo,
+  Truck,
+  MapPin,
+  PencilSimple,
+  Plus,
+  CreditCard,
+  CircleNotch,
+  ShieldCheck,
+  Check
+} from '@phosphor-icons/react';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
-import CouponCode from '../components/CouponCode';
 import GuestCheckoutModal from '../components/checkout/GuestCheckoutModal';
 import OrderSummary from '../components/checkout/OrderSummary';
 const BillingAddressForm = React.lazy(() => import('../components/BillingAddressForm'));
 const ShippingAddressForm = React.lazy(() => import('../components/ShippingAddressForm'));
-const WhatsAppChatWidget = React.lazy(() => import('../components/WhatsAppChatWidget'));
 import { useAuth } from '../context/AuthContext';
 import { useUserManager } from '../hooks/useUserManager';
 import { CurrencyContext } from './CurrencyContext';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
+import SEO from '../components/SEO';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
+  : 'https://prechi-ecommerce.onrender.com';
 const WHATSAPP_NUMBER = '2349016420903';
 
 const CheckoutPage = () => {
-  // Get user data from both AuthContext and our custom hook
-  const { user: authUser, loading: authLoading, login } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   const { user: hookUser, refreshUser, refreshCount } = useUserManager();
-
-  // Use the user from our custom hook, fall back to AuthContext if needed
   const user = hookUser || authUser;
 
   let currencyContext;
   try {
     currencyContext = useContext(CurrencyContext);
   } catch (error) {
-    console.error('Error accessing CurrencyContext:', error);
-    currencyContext = {
-      currency: 'NGN',
-      exchangeRate: 1,
-      country: 'Nigeria',
-      contextLoading: false
-    };
+    currencyContext = { currency: 'NGN', exchangeRate: 1, country: 'Nigeria', contextLoading: false };
   }
 
-  const {
-    currency = 'NGN',
-    exchangeRate = 1,
-    country = 'Nigeria',
-    contextLoading = false
-  } = currencyContext || {};
-
+  const { currency = 'NGN', exchangeRate = 1, country = 'Nigeria', contextLoading = false } = currencyContext || {};
   const navigate = useNavigate();
+
   const [cart, setCart] = useState({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [] });
   const [shippingAddresses, setShippingAddresses] = useState([]);
   const [billingAddresses, setBillingAddresses] = useState([]);
-  // always keep IDs as strings to avoid number/string mismatch bugs
   const [shippingAddressId, setShippingAddressId] = useState(null);
   const [billingAddressId, setBillingAddressId] = useState(null);
   const [shippingMethod, setShippingMethod] = useState(null);
@@ -69,120 +70,92 @@ const CheckoutPage = () => {
   const [editingShippingAddress, setEditingShippingAddress] = useState(null);
   const [editingBillingAddress, setEditingBillingAddress] = useState(null);
   const [showBitcoinInstructions, setShowBitcoinInstructions] = useState(false);
+
   const [shippingForm, setShippingForm] = useState({
     title: '',
     address_line_1: '',
-    // address_line_2 removed - using landmark instead
     landmark: '',
     city: '',
     state: '',
     zip_code: '',
     country: 'Nigeria',
-    phone_number: '', // Will be removed for guest users
+    phone_number: '',
   });
+
   const [billingForm, setBillingForm] = useState({
     full_name: '',
     email: '',
     phone_number: '',
     address_line_1: '',
-    // address_line_2 removed
     city: '',
     state: '',
     zip_code: '',
     country: 'Nigeria',
   });
 
-  // New state for billing address option
-  const [billingAddressOption, setBillingAddressOption] = useState('same'); // 'same' or 'different'
-
-  // Discount states
+  const [billingAddressOption, setBillingAddressOption] = useState('same');
   const [firstOrderDiscount, setFirstOrderDiscount] = useState(0);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState('');
-  const [couponSuccess, setCouponSuccess] = useState('');
 
-  // Add state to track if user data has been refreshed
   const [userDataRefreshed, setUserDataRefreshed] = useState(false);
-
-  // Guest user states
-  const [isGuest, setIsGuest] = useState(false);
-  const [guestForm, setGuestForm] = useState({
-    name: '',
-    email: '',
-    phone_number: ''
+  const [isGuest, setIsGuest] = useState(() => !localStorage.getItem('token'));
+  const [guestForm, setGuestForm] = useState(() => {
+    try {
+      const saved = localStorage.getItem('prechi_guest_info');
+      return saved ? JSON.parse(saved) : { name: '', email: '', phone_number: '' };
+    } catch (e) {
+      return { name: '', email: '', phone_number: '' };
+    }
   });
-  const [showGuestModal, setShowGuestModal] = useState(true); // Changed to showGuestModal
+  const [createdUserId, setCreatedUserId] = useState(() => localStorage.getItem('prechi_guest_id') || null);
+  const [guestFormSubmitted, setGuestFormSubmitted] = useState(() => !!localStorage.getItem('prechi_guest_id'));
+  const [showGuestModal, setShowGuestModal] = useState(() => !localStorage.getItem('token') && !localStorage.getItem('prechi_guest_id'));
   const [guestFormErrors, setGuestFormErrors] = useState({});
-  const [createdUserId, setCreatedUserId] = useState(null);
-  const [existingUserType, setExistingUserType] = useState(null); // 'temporary', 'permanent', or null
-
-  // State to track which form needs to be filled
-  const [requiredForm, setRequiredForm] = useState(null); // 'guest', 'shipping', 'billing'
-
-  // State to track if guest form has been submitted
-  const [guestFormSubmitted, setGuestFormSubmitted] = useState(false);
-
-  // NEW: State to prevent duplicate submissions
+  const [existingUserType, setExistingUserType] = useState(null);
+  const [requiredForm, setRequiredForm] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // NEW: State for step-by-step checkout and validation
   const [currentStep, setCurrentStep] = useState(1);
   const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
+  const [idempotencyKey] = useState(() => uuidv4());
 
-
-  // Validation for Step 1
   const validateStep1 = () => {
     const missing = [];
-    if (isGuest && !guestFormSubmitted) {
-      missing.push("Guest contact information is required");
-    }
-    
+    if (isGuest && !guestFormSubmitted) missing.push("Guest contact information is required");
     const hasShipping = isAuthenticated()
       ? (shippingAddressId && shippingAddresses.length > 0) || shippingForm.address_line_1
       : shippingForm.address_line_1;
-      
     if (!hasShipping) {
       missing.push("Shipping address is missing");
       setRequiredForm('shipping');
     }
-    
     const addressCountry = shippingForm.country || country;
     const isNigeria = addressCountry.toLowerCase() === 'nigeria';
-    
-    if (isNigeria && !shippingMethod) {
-      missing.push("Delivery method is required");
-    }
-    
+    if (isNigeria && !shippingMethod) missing.push("Delivery method is required");
+
     if (missing.length > 0) {
       setMissingFieldsSummary(missing);
       return false;
     }
-    
     setMissingFieldsSummary([]);
     return true;
   };
 
-  // Validation for Step 2
   const validateStep2 = () => {
     const missing = [];
-    
     const hasBilling = isAuthenticated()
       ? (billingAddressOption === 'same' && (shippingAddressId || shippingForm.address_line_1)) || (billingAddressId && billingAddresses.length > 0)
       : (billingAddressOption === 'same' ? shippingForm.address_line_1 : billingForm.address_line_1);
-      
+
     if (!hasBilling) {
       missing.push("Billing address is missing");
       setRequiredForm('billing');
     }
-    
     if (missing.length > 0) {
       setMissingFieldsSummary(missing);
       return false;
     }
-    
     setMissingFieldsSummary([]);
     return true;
   };
@@ -197,23 +170,13 @@ const CheckoutPage = () => {
     }
   };
 
-  // NEW: Generate idempotency key once per session
-  const [idempotencyKey] = useState(() => uuidv4());
-
-  // Memoize functions to prevent unnecessary re-renders
   const handleGuestFormChange = useCallback((field, value) => {
     setGuestForm(prev => ({ ...prev, [field]: value }));
-    if (field === 'name' || field === 'email') {
-      setExistingUserType(null);
-    }
+    if (field === 'name' || field === 'email') setExistingUserType(null);
   }, []);
 
   const handleOrderNoteChange = useCallback((e) => {
     setOrderNote(e.target.value);
-  }, []);
-
-  const handleCouponCodeChange = useCallback((e) => {
-    setCouponCode(e.target.value.toUpperCase());
   }, []);
 
   const handleLoginRedirect = useCallback(() => {
@@ -224,12 +187,9 @@ const CheckoutPage = () => {
     try {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
       return JSON.parse(jsonPayload);
     } catch (err) {
-      console.error('CheckoutPage: Error decoding token:', err);
       return null;
     }
   };
@@ -246,126 +206,38 @@ const CheckoutPage = () => {
     return tokenData?.id;
   };
 
-  const isAuthenticated = () => {
-    return !!getToken();
-  };
+  const isAuthenticated = () => !!getToken();
 
-  // Replace your refreshUserData function with this
   const refreshUserData = async () => {
     try {
-      console.log('Refreshing user data...');
-
-      // Use the refreshUser function from our custom hook
       const updatedUser = await refreshUser();
-
       if (updatedUser) {
-        console.log('User data refreshed successfully');
         setUserDataRefreshed(true);
         return updatedUser;
-      } else {
-        console.warn('Failed to refresh user data');
-        return null;
       }
-    } catch (err) {
-      console.error('Failed to refresh user data:', err);
-      return null;
-    }
+    } catch (err) {}
+    return null;
   };
 
-  // Force refresh user data on component mount
   useEffect(() => {
     const refreshUserDataOnMount = async () => {
       if (user && isAuthenticated() && !userDataRefreshed) {
-        try {
-          await refreshUserData();
-          console.log('User data refreshed on component mount');
-        } catch (err) {
-          console.error('Failed to refresh user data on mount:', err);
-        }
+        try { await refreshUserData(); } catch (err) {}
       }
     };
     refreshUserDataOnMount();
   }, [user, userDataRefreshed]);
 
-  // Update the useEffect that calculates the first order discount
   useEffect(() => {
-    const currentSubtotal = cart.subtotal; // Always in NGN
-
-    // Guest users (temporary) don't get first order discount
+    const currentSubtotal = cart.subtotal;
     if (isGuest) {
       setFirstOrderDiscount(0);
-    }
-    // For authenticated users, check if it's their first order
-    else if (user && (user.first_order === true || user.first_order === 1) && currentSubtotal > 0) {
-      const discountAmount = Number((currentSubtotal * 0.05).toFixed(2));
-      setFirstOrderDiscount(discountAmount);
+    } else if (user && (user.first_order === true || user.first_order === 1) && currentSubtotal > 0) {
+      setFirstOrderDiscount(Number((currentSubtotal * 0.05).toFixed(2)));
     } else {
       setFirstOrderDiscount(0);
     }
-  }, [user?.first_order, cart.subtotal, userDataRefreshed, refreshCount, isGuest]); // Added isGuest to dependencies
-
-  // Apply coupon code
-  const handleApplyCoupon = async (e) => {
-    e.preventDefault();
-
-    if (!couponCode.trim()) {
-      setCouponError('Please enter a coupon code');
-      return;
-    }
-
-    setCouponLoading(true);
-    setCouponError('');
-    setCouponSuccess('');
-
-    try {
-      const token = getToken();
-      const response = await axios.post(
-        `${API_BASE_URL}/api/admin/discounts/validate`, // Updated to use /api/admin/discounts/validate
-        { code: couponCode },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.valid) {
-        const discount = response.data.discount;
-
-        // Calculate discount amount
-        let discountAmount = 0;
-        if (discount.type === 'percentage') {
-          discountAmount = (cart.subtotal * discount.value) / 100;
-        } else if (discount.type === 'fixed') {
-          discountAmount = discount.value;
-        }
-
-        // Ensure discount doesn't exceed subtotal
-        discountAmount = Math.min(discountAmount, cart.subtotal);
-
-        setAppliedCoupon({
-          code: discount.code,
-          type: discount.type,
-          value: discount.value,
-          amount: discountAmount
-        });
-
-        setCouponDiscount(discountAmount);
-        setCouponSuccess(`Coupon applied! You saved ${discount.type === 'percentage' ? `${discount.value}%` : `₦${discount.value}`}`);
-      } else {
-        setCouponError(response.data.message || 'Invalid coupon code');
-      }
-    } catch (err) {
-      console.error('Error validating coupon:', err);
-      setCouponError(err.response?.data?.message || 'Failed to validate coupon');
-    } finally {
-      setCouponLoading(false);
-    }
-  };
-
-  // Remove coupon
-  const handleRemoveCoupon = () => {
-    setAppliedCoupon(null);
-    setCouponCode('');
-    setCouponDiscount(0);
-    setCouponSuccess('');
-  };
+  }, [user?.first_order, cart.subtotal, userDataRefreshed, refreshCount, isGuest]);
 
   const shippingOptions = [
     {
@@ -394,51 +266,23 @@ const CheckoutPage = () => {
     },
   ];
 
-  const getShippingIcon = (iconType) => {
-    switch (iconType) {
-      case 'truck':
-        return <Truck className="h-5 w-5" />;
-      case 'package':
-        return <MapPin className="h-5 w-5" />;
-      case 'home':
-        return <MapPin className="h-5 w-5" />;
-      default:
-        return <Truck className="h-5 w-5" />;
-    }
-  };
-
-  // Memoized guest form validation to prevent unnecessary recalculations
   const validateGuestForm = useCallback(() => {
     const errors = {};
-    if (!guestForm.name.trim()) {
-      errors.name = 'Please enter your full name';
-    } else if (guestForm.name.trim().length < 2) {
-      errors.name = 'Name must be at least 2 characters';
-    }
-    if (!guestForm.email.trim()) {
-      errors.email = 'Please enter your email address';
-    } else if (!/\S+@\S+\.\S+/.test(guestForm.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-    if (!guestForm.phone_number.trim()) {
-      errors.phone_number = 'Please enter your phone number';
-    } else if (guestForm.phone_number.trim().length < 10) {
-      errors.phone_number = 'Phone number must be at least 10 digits';
-    }
+    if (!guestForm.name.trim()) errors.name = 'Please enter your full name';
+    if (!guestForm.email.trim()) errors.email = 'Please enter your email address';
+    else if (!/\S+@\S+\.\S+/.test(guestForm.email)) errors.email = 'Please enter a valid email';
+    if (!guestForm.phone_number.trim()) errors.phone_number = 'Please enter your phone number';
 
     if (Object.keys(errors).length > 0) {
       setGuestFormErrors(errors);
       return false;
     }
-
     setGuestFormErrors({});
     return true;
-  }, [guestForm.name, guestForm.email, guestForm.phone_number]);
+  }, [guestForm]);
 
-  // Handle guest form submission
   const handleGuestFormSubmit = useCallback(async (e) => {
     if (e) e.preventDefault();
-
     if (!validateGuestForm()) {
       setRequiredForm('guest');
       return;
@@ -448,7 +292,6 @@ const CheckoutPage = () => {
     setError('');
 
     try {
-      // Call the createTemporaryUser API endpoint
       const response = await axios.post(`${API_BASE_URL}/api/auth/create-temp-user`, {
         name: guestForm.name,
         email: guestForm.email,
@@ -458,31 +301,23 @@ const CheckoutPage = () => {
       const { user, isExisting } = response.data;
       const userId = user.id;
 
-      // Update all state at once
       setCreatedUserId(userId);
-      // Keep isGuest as true for both new and existing temporary users
-      setShowGuestModal(false); // Close the modal instead of setting showGuestForm
+      setShowGuestModal(false);
       setGuestFormSubmitted(true);
+      localStorage.setItem('prechi_guest_info', JSON.stringify(guestForm));
+      localStorage.setItem('prechi_guest_id', userId);
 
       if (isExisting) {
         setExistingUserType('temporary');
-        toast.success('Welcome back! We found your temporary account.');
+        toast.success('Welcome back!');
       } else {
         setExistingUserType(null);
         toast.success('Account created successfully!');
       }
 
-      // Update shipping and billing forms with guest information
       setShippingForm(prev => ({
         ...prev,
-        title: 'Home', // Add default title
-        address_line_1: '',
-        // address_line_2 removed
-        landmark: '',
-        city: '',
-        state: '',
-        zip_code: '',
-        country: 'Nigeria',
+        title: 'Home',
         phone_number: guestForm.phone_number
       }));
 
@@ -491,109 +326,31 @@ const CheckoutPage = () => {
         full_name: guestForm.name,
         email: guestForm.email,
         phone_number: guestForm.phone_number,
-        address_line_1: '',
-        // address_line_2 removed
-        city: '',
-        state: '',
-        zip_code: '',
-        country: 'Nigeria',
       }));
 
-      // Set the billing address option to 'same' by default
       setBillingAddressOption('same');
-
-      // Return the user ID to use in processOrder
       return userId;
     } catch (err) {
-      console.error('Error in guest submission:', err);
-
-      // Check if the error is because the user already exists
-      if (err.response?.status === 400 &&
-        (err.response?.data?.error?.includes('already exists') ||
-          err.response?.data?.message?.includes('already registered'))) {
-
-        // Check if the error response includes existingUser data
-        if (err.response?.data?.existingUser) {
-          const { existingUser } = err.response.data;
-
-          if (existingUser.is_temporary === false) {
-            // It's a permanent user
-            setExistingUserType('permanent');
-            setError('An account with this email and phone number already exists. Please log in to continue.');
-            toast.error('An account with this email and phone number already exists. Please log in to continue.');
-          } else {
-            // It's a temporary user
-            setExistingUserType('temporary');
-            setError('A temporary account with this email and phone number already exists. Please use a different email or phone number or log in if you have a password.');
-            toast.error('A temporary account with this email and phone number already exists. Please use a different email or phone number or log in if you have a password.');
-          }
-        } else {
-          // Fallback if existingUser is not included in the response
-          setExistingUserType('permanent');
-          setError('An account with this email and phone number already exists. Please log in to continue.');
-          toast.error('An account with this email and phone number already exists. Please log in to continue.');
-        }
-      } else if (err.response?.status === 500) {
-        // Handle server error specifically
-        setError('Server error occurred while creating your account. Please try again later.');
-        toast.error('Server error occurred while creating your account. Please try again later.');
-      } else {
-        // Some other error occurred
-        const errorMessage = err.response?.data?.error ||
-          err.response?.data?.message ||
-          err.message ||
-          'Failed to create account';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      }
-
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to create guest account';
+      setError(errorMessage);
+      toast.error(errorMessage);
       return false;
     } finally {
       setShippingAddressLoading(false);
     }
   }, [guestForm, validateGuestForm]);
 
-  // Validate shipping address
-  const validateShippingAddress = () => {
-    if (!shippingForm.address_line_1) {
-      setError('Please add a shipping address');
-      setRequiredForm('shipping');
-      return false;
-    }
-    return true;
-  };
+  const generateOrderReference = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
-  // Validate billing address
-  const validateBillingAddress = () => {
-    if (!billingForm.address_line_1) {
-      setError('Please add a billing address');
-      setRequiredForm('billing');
-      return false;
-    }
-    return true;
-  };
-
-  // NEW: Generate a unique order reference
-  const generateOrderReference = () => {
-    const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 10000);
-    return `ORD-${timestamp}-${random}`;
-  };
-
-  // Modified processOrder function with better error handling and loading state management
   const processOrder = useCallback(async (guestUserId = null) => {
-    // Use the provided guestUserId if available, otherwise fall back to state
     const userId = guestUserId || createdUserId || getUserId();
-
-    // Skip guest form check if we have a guestUserId
     if (!guestUserId && isGuest && !guestFormSubmitted) {
       setError('Please complete the guest form to continue');
       setRequiredForm('guest');
-      setLoading(false); // Reset loading state
+      setLoading(false);
       return;
     }
 
-    // Check if user has provided shipping address (either form data or selected address ID)
     const hasShippingAddress = isAuthenticated()
       ? (shippingAddressId && shippingAddresses.length > 0) || shippingForm.address_line_1
       : shippingForm.address_line_1;
@@ -601,11 +358,10 @@ const CheckoutPage = () => {
     if (!hasShippingAddress) {
       setError('Please add a shipping address');
       setRequiredForm('shipping');
-      setLoading(false); // Reset loading state
+      setLoading(false);
       return;
     }
 
-    // Check if user has provided billing address (either form data, selected address ID, or same as shipping)
     const hasBillingAddress = isAuthenticated()
       ? (billingAddressOption === 'same' && hasShippingAddress) || (billingAddressId && billingAddresses.length > 0)
       : billingForm.address_line_1;
@@ -613,7 +369,7 @@ const CheckoutPage = () => {
     if (!hasBillingAddress) {
       setError('Please add a billing address');
       setRequiredForm('billing');
-      setLoading(false); // Reset loading state
+      setLoading(false);
       return;
     }
 
@@ -622,23 +378,20 @@ const CheckoutPage = () => {
 
     if (isNigeria && !shippingMethod) {
       setError('Please select a shipping method');
-      setLoading(false); // Reset loading state
+      setLoading(false);
       return;
     }
 
     if (!cart?.items?.length) {
       setError('Cart is empty');
       toast.error('Cart is empty');
-      setLoading(false); // Reset loading state
+      setLoading(false);
       return;
     }
 
     try {
-      const orderCurrency = 'NGN'; // Force NGN due to Paystack limitation
-
-      // Calculate amounts in NGN
       const baseSubtotal = Number(cart?.subtotal) || 0;
-      const baseFirstOrderDiscount = firstOrderDiscount; // Use the calculated discount
+      const baseFirstOrderDiscount = firstOrderDiscount;
       const baseCouponDiscount = couponDiscount;
       const baseTotalDiscount = Number((baseFirstOrderDiscount + baseCouponDiscount).toFixed(2));
       const baseFinalDiscount = Math.min(baseTotalDiscount, baseSubtotal);
@@ -647,13 +400,8 @@ const CheckoutPage = () => {
       const baseDiscountedSubtotal = Number((baseSubtotal - baseFinalDiscount).toFixed(2));
       const baseTotal = Number((baseDiscountedSubtotal + baseTax + baseShippingCost).toFixed(2));
 
-      // Format payment method as a string to match backend expectations
-      const formattedPaymentMethod = paymentMethod;
-
       const orderData = {
         user_id: userId,
-        // For guests, we send shipping_data and billing_data
-        // For authenticated users, we send address_id and billing_address_id
         shipping_data: !isAuthenticated() ? shippingForm : null,
         billing_data: !isAuthenticated()
           ? (billingAddressOption === 'same'
@@ -676,25 +424,15 @@ const CheckoutPage = () => {
         shipping_method_id: isNigeria ? shippingMethod?.id : null,
         shipping_cost: baseShippingCost,
         shipping_country: addressCountry,
-        payment_method: formattedPaymentMethod, // Use formatted payment method as string
-        currency: orderCurrency,
-        // NEW: Use the new reference generator
+        payment_method: paymentMethod,
+        currency: 'NGN',
         reference: generateOrderReference(),
         items: cart.items.map(item => {
           const basePrice = Number(item.item?.price || 0);
-
-          // Resolve variant_id correctly:
-          // - Auth users (DB cart): item.variant_id is now exposed at top level by cartController,
-          //   OR it's in item.item.variant.variant_id
-          // - Guest users: item.variant_id stored directly (top level) OR item.item.id was set to variant_id
           const resolvedVariantId = item.item?.is_product
             ? (item.variant_id ?? item.item?.variant?.variant_id ?? null)
             : null;
-
-          // Resolve bundle id
           const resolvedBundleId = item.item?.is_product ? null : (item.bundle_id ?? item.item?.id ?? null);
-
-          // Resolve size_id: now exposed at top level by cartController for auth users; guest items also have it top level
           const resolvedSizeId = item.size_id ?? item.item?.size_id ?? null;
 
           const resolveImgUrl = (raw) => {
@@ -721,9 +459,6 @@ const CheckoutPage = () => {
             size_name: item.item?.size || item.size_name || null,
           };
 
-          // Add bundle_items for bundle orders
-          // For auth users: comes as item.item.items (from cart_bundle_items via get_cart_items_optimized)
-          // For guest users: comes as item.item.items (manually constructed in addToGuestCart)
           const bundleItems = item.item?.items;
           if (!item.item?.is_product && Array.isArray(bundleItems) && bundleItems.length > 0) {
             orderItem.bundle_items = bundleItems.map(bundleItem => ({
@@ -731,148 +466,63 @@ const CheckoutPage = () => {
               size_id: bundleItem.size_id
             }));
           }
-
           return orderItem;
         }),
         note: orderNote,
-        exchange_rate: 1, // No conversion needed
+        exchange_rate: 1,
         base_currency_total: baseTotal,
         converted_total: baseTotal,
         tax: baseTax,
       };
 
-
-
       let orderResponse;
       try {
-        // NEW: Include idempotency key in headers
         orderResponse = await axios.post(`${API_BASE_URL}/api/orders`, orderData, {
-          headers: {
-            'X-Idempotency-Key': idempotencyKey
-          }
+          headers: { 'X-Idempotency-Key': idempotencyKey }
         });
-
-        // Handle case where backend returns 200 with 'Order already exists with pending payment'
         if (orderResponse.data.message === 'Order already exists with pending payment') {
-          const existingOrderId = orderResponse.data.order.id;
-
-          // Continue with payment initialization using existing order
-          orderResponse = { data: { order: { id: existingOrderId, reference: orderResponse.data.order.reference } } };
+          orderResponse = { data: { order: { id: orderResponse.data.order.id, reference: orderResponse.data.order.reference } } };
         }
       } catch (err) {
-        // Handle case where order with same reference already exists
         if (err.response?.status === 409 && err.response?.data?.order_id) {
           const existingOrderId = err.response.data.order_id;
-
-          // If payment is already completed, redirect to thank you page
           if (err.response.data.payment_status === 'completed') {
             toast.success('Order already exists with completed payment');
             navigate(`/thank-you?reference=${err.response.data.reference || orderData.reference}&orderId=${existingOrderId}`);
             return;
           }
-
-          // If payment is pending, continue with payment initialization
-          orderResponse = {
-            data: {
-              order: {
-                id: existingOrderId,
-                reference: err.response.data.reference || orderData.reference
-              }
-            }
-          };
+          orderResponse = { data: { order: { id: existingOrderId, reference: err.response.data.reference || orderData.reference } } };
         } else {
           throw err;
         }
       }
 
-
-
       const orderId = orderResponse.data.order?.id || orderResponse.data.id || orderResponse.data.data?.id;
-      if (!orderId) {
-        console.error('Order ID not found in response:', orderResponse.data);
-        throw new Error('Order ID not found in response');
-      }
-
-      const paymentCurrency = 'NGN';
-      const paymentAmount = baseTotal;
-
-      const callbackUrl = `${window.location.origin}/thank-you?reference=${orderResponse.data.order?.reference || orderData.reference}&orderId=${orderId}`;
+      if (!orderId) throw new Error('Order ID not found');
 
       const paymentData = {
         order_id: orderId,
         reference: orderResponse.data.order?.reference || orderData.reference,
-        // Resolve email from all available sources with clear priority
-        email: billingForm.email ||
-          guestForm.email ||
-          user?.email ||
-          user?.login ||
-          JSON.parse(localStorage.getItem('user') || '{}')?.email ||
-          null,
-        amount: Math.round(paymentAmount * 100), // Convert to kobo
-        currency: paymentCurrency,
-        callback_url: callbackUrl,
+        email: billingForm.email || guestForm.email || user?.email || user?.login || JSON.parse(localStorage.getItem('user') || '{}')?.email || null,
+        amount: Math.round(baseTotal * 100),
+        currency: 'NGN',
+        callback_url: `${window.location.origin}/thank-you?reference=${orderResponse.data.order?.reference || orderData.reference}&orderId=${orderId}`,
       };
 
-      // Guard: if no email found, show a clear message instead of a 500
       if (!paymentData.email || !paymentData.email.includes('@')) {
-        throw new Error('No email address found for payment. Please add an email to your billing details and try again.');
+        throw new Error('No valid email address found for payment.');
       }
 
+      let paymentResponse = await axios.post(`${API_BASE_URL}/api/paystack/initialize`, paymentData);
+      let paymentInfo = paymentResponse.data.data || paymentResponse.data;
 
-
-
-      let paymentResponse;
-      let retryCount = 0;
-      const maxRetries = 3;
-
-      while (retryCount < maxRetries) {
-        try {
-          // Increase timeout for each retry
-          const timeout = 15000 * (retryCount + 1); // 15s, 30s, 45s
-
-          paymentResponse = await Promise.race([
-            axios.post(`${API_BASE_URL}/api/paystack/initialize`, paymentData),
-            new Promise((_, reject) =>
-              setTimeout(() => reject(new Error('Payment initialization timeout')), timeout)
-            )
-          ]);
-
-          // If we get here, the request was successful
-          break;
-        } catch (err) {
-          retryCount++;
-          console.error(`Payment initialization attempt ${retryCount} failed:`, err);
-
-          if (retryCount >= maxRetries) {
-            throw new Error('Payment initialization failed after multiple attempts. Please try again later.');
-          }
-
-          // Wait before retrying (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
-        }
-      }
-
-      // Add null checks for paymentResponse
-      if (!paymentResponse || !paymentResponse.data) {
-        throw new Error('No response from payment server');
-      }
-
-      let paymentInfo = paymentResponse.data;
-      if (paymentResponse.data.data) {
-        paymentInfo = paymentResponse.data.data;
-      }
+      if (isGuest) localStorage.removeItem('guestCart');
+      toast.success('Order placed!');
+      localStorage.setItem('lastOrderReference', orderResponse.data.order?.reference || orderData.reference);
+      localStorage.setItem('pendingOrderId', orderId);
 
       const accessCode = paymentInfo.access_code;
       const authorizationUrl = paymentInfo.authorization_url;
-
-      // Clear guest cart from localStorage
-      if (isGuest) {
-        localStorage.removeItem('guestCart');
-      }
-
-      toast.success('Order placed successfully!');
-      localStorage.setItem('lastOrderReference', orderResponse.data.order?.reference || orderData.reference);
-      localStorage.setItem('pendingOrderId', orderId); // Store the order ID
 
       if (accessCode) {
         const paystack = new PaystackPop();
@@ -882,63 +532,34 @@ const CheckoutPage = () => {
           amount: paymentData.amount,
           currency: paymentData.currency,
           reference: paymentData.reference,
-          callback: (response) => {
+          callback: () => {
             toast.success('Payment successful!');
             navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
           },
           onClose: () => {
-            toast.info('Payment window closed. You can complete payment later from your orders page.');
-            // For guest users, go to thank you page with reference instead of orders page
-            if (isGuest) {
-              navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
-            } else {
-              navigate(`/orders/${orderId}`);
-            }
+            if (isGuest) navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
+            else navigate(`/orders/${orderId}`);
           }
         });
       } else if (authorizationUrl) {
         window.location.href = authorizationUrl;
-      } else {
-        throw new Error('Failed to get payment information');
       }
     } catch (err) {
-      // Handle specific error cases
-      let errorMessage = 'Failed to process order';
-
-      if (err.message === 'Payment initialization timeout' ||
-        err.message.includes('Payment initialization failed after multiple attempts')) {
-        errorMessage = 'Payment service is currently experiencing high traffic. Please try again later.';
-      } else if (err.response?.data?.error) {
-        errorMessage = err.response.data.error;
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-
-      setError(`Failed to process order: ${errorMessage}`);
-      toast.error(`Failed to process order: ${errorMessage}`);
-      setLoading(false); // Reset loading state
-
-      // If order was created but payment failed, redirect to order page
-      if (err.orderId) {
-        navigate(`/orders/${err.orderId}`);
-      }
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to process order';
+      setError(`Order processing error: ${errorMessage}`);
+      toast.error(`Order processing error: ${errorMessage}`);
+      setLoading(false);
     }
   }, [createdUserId, getUserId, isGuest, guestFormSubmitted, isAuthenticated, shippingAddressId, shippingAddresses.length, shippingForm, billingAddressOption, billingAddressId, billingAddresses.length, billingForm, country, shippingMethod, cart, firstOrderDiscount, couponDiscount, paymentMethod, guestForm, appliedCoupon, orderNote, idempotencyKey, user, navigate]);
 
-  // Updated handlePlaceOrder to ensure loading state is reset and prevent duplicate submissions
   const handlePlaceOrder = useCallback(async () => {
-    // Prevent multiple submissions
     if (isProcessing) return;
-
     setIsProcessing(true);
     setLoading(true);
     setError('');
     setRequiredForm(null);
 
     try {
-      // For guest users, first process the guest form to get the user ID
       if (isGuest && !guestFormSubmitted) {
         const guestUserId = await handleGuestFormSubmit();
         if (!guestUserId) {
@@ -946,11 +567,8 @@ const CheckoutPage = () => {
           setIsProcessing(false);
           return;
         }
-
-        // Now process the order with the returned user ID
         await processOrder(guestUserId);
       } else {
-        // For logged-in users or already submitted guest forms, process directly
         await processOrder();
       }
     } catch (err) {
@@ -960,157 +578,77 @@ const CheckoutPage = () => {
     }
   }, [isProcessing, isGuest, guestFormSubmitted, handleGuestFormSubmit, processOrder]);
 
-  // Optimize form updates with useCallback
   const handleShippingSubmit = useCallback(async (data) => {
     try {
       setShippingAddressLoading(true);
-
-      // For authenticated users, save address to backend
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
         const userId = getUserId();
-
-        const addressData = {
-          user_id: userId,
-          title: data.title || 'Home',
-          address_line_1: data.address_line_1,
-          address_line_2: data.address_line_2,
-          city: data.city,
-          state: data.state,
-          zip_code: data.zip_code,
-          country: data.country
-        };
-
+        const addressData = { user_id: userId, title: data.title || 'Home', ...data };
         let response;
         if (editingShippingAddress) {
-          // Update existing address
           response = await axios.put(`${API_BASE_URL}/api/addresses/${editingShippingAddress.id}`, addressData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-
-          // Update the address in the list
-          const updatedAddress = response.data;
-          setShippingAddresses(prev =>
-            prev.map(addr => addr.id === editingShippingAddress.id ? updatedAddress : addr)
-          );
-          setShippingAddressId(String(updatedAddress.id));
+          setShippingAddresses(prev => prev.map(addr => addr.id === editingShippingAddress.id ? response.data : addr));
+          setShippingAddressId(String(response.data.id));
         } else {
-          // Create new address
           response = await axios.post(`${API_BASE_URL}/api/addresses/`, addressData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-
-          // Add the new address to the list and set it as selected
-          const newAddress = response.data;
-          setShippingAddresses(prev => [newAddress, ...prev]);
-          setShippingAddressId(String(newAddress.id));
+          setShippingAddresses(prev => [response.data, ...prev]);
+          setShippingAddressId(String(response.data.id));
         }
       }
-
-      // Update shipping form state
       setShippingForm(data);
-      setShowShippingForm(false); // This ensures the form closes after saving
-      setEditingShippingAddress(null); // Clear editing state
-
-      // If billing address option is 'same', update billing address to match
-      if (billingAddressOption === 'same') {
-        // Create a billing address object from the shipping address
-        const billingAddress = {
-          full_name: guestForm.name || billingForm.full_name,
-          email: guestForm.email || billingForm.email,
-          // For guest users, use the phone number from guest form instead of shipping form
-          phone_number: isGuest ? guestForm.phone_number : data.phone_number,
-          address_line_1: data.address_line_1,
-          // address_line_2 removed
-          city: data.city,
-          state: data.state,
-          zip_code: data.zip_code,
-          country: data.country,
-        };
-
-        // Update billing form state
-        setBillingForm(billingAddress);
-      }
-
-      const successMessage = editingShippingAddress ? 'Shipping address updated successfully.' : 'Shipping address added successfully.';
-      setSuccess(successMessage);
-      toast.success(editingShippingAddress ? 'Shipping address updated' : 'Shipping address added');
-    } catch (err) {
-      const errorMessage = err.response?.data?.details || err.response?.data?.error || err.message;
-      const action = editingShippingAddress ? 'update' : 'add';
-      setError(`Failed to ${action} shipping address: ${errorMessage}`);
-      toast.error(`Failed to ${action} shipping address: ${errorMessage}`);
-      // Ensure form closes even if there's an error
       setShowShippingForm(false);
       setEditingShippingAddress(null);
+      if (billingAddressOption === 'same') {
+        setBillingForm({
+          full_name: guestForm.name || billingForm.full_name,
+          email: guestForm.email || billingForm.email,
+          phone_number: isGuest ? guestForm.phone_number : data.phone_number,
+          ...data
+        });
+      }
+      toast.success(editingShippingAddress ? 'Shipping address updated' : 'Shipping address added');
+    } catch (err) {
+      toast.error('Failed to save address');
+      setShowShippingForm(false);
     } finally {
       setShippingAddressLoading(false);
     }
-  }, [isAuthenticated, editingShippingAddress, billingAddressOption, guestForm.name, guestForm.email, guestForm.phone_number, billingForm.full_name, billingForm.email, isGuest]);
+  }, [isAuthenticated, editingShippingAddress, billingAddressOption, guestForm, billingForm, isGuest]);
 
   const handleBillingSubmit = useCallback(async (data) => {
     try {
       setBillingAddressLoading(true);
-
-      // For authenticated users, save billing address to backend
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
         const userId = getUserId();
-
-        const billingData = {
-          user_id: userId,
-          full_name: data.full_name,
-          email: data.email,
-          phone_number: data.phone_number,
-          address_line_1: data.address_line_1,
-          city: data.city,
-          state: data.state,
-          zip_code: data.zip_code,
-          country: data.country
-        };
-
+        const billingData = { user_id: userId, ...data };
         let response;
         if (editingBillingAddress) {
-          // Update existing billing address
           response = await axios.put(`${API_BASE_URL}/api/billing-addresses/${editingBillingAddress.id}`, billingData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-
-          // Update the billing address in the list
-          const updatedBillingAddress = response.data;
-          setBillingAddresses(prev =>
-            prev.map(addr => addr.id === editingBillingAddress.id ? updatedBillingAddress : addr)
-          );
-          setBillingAddressId(String(updatedBillingAddress.id));
+          setBillingAddresses(prev => prev.map(addr => addr.id === editingBillingAddress.id ? response.data : addr));
+          setBillingAddressId(String(response.data.id));
         } else {
-          // Create new billing address
           response = await axios.post(`${API_BASE_URL}/api/billing-addresses/`, billingData, {
             headers: { Authorization: `Bearer ${token}` }
           });
-
-          // Add the new billing address to the list and set it as selected
-          const newBillingAddress = response.data;
-          setBillingAddresses(prev => [newBillingAddress, ...prev]);
-          setBillingAddressId(String(newBillingAddress.id));
+          setBillingAddresses(prev => [response.data, ...prev]);
+          setBillingAddressId(String(response.data.id));
         }
       }
-
-      // Update billing form state
       setBillingForm(data);
       setShowBillingForm(false);
-      setEditingBillingAddress(null); // Clear editing state
-
-      const successMessage = editingBillingAddress ? 'Billing address updated successfully.' : 'Billing address added successfully.';
-      setSuccess(successMessage);
-      toast.success(editingBillingAddress ? 'Billing address updated' : 'Billing address added');
-    } catch (err) {
-      const errorMessage = err.response?.data?.details || err.response?.data?.error || err.message;
-      const action = editingBillingAddress ? 'update' : 'add';
-      setError(`Failed to ${action} billing address: ${errorMessage}`);
-      toast.error(`Failed to ${action} billing address: ${errorMessage}`);
-      // Ensure form closes even if there's an error
-      setShowBillingForm(false);
       setEditingBillingAddress(null);
+      toast.success('Billing address saved');
+    } catch (err) {
+      toast.error('Failed to save billing address');
+      setShowBillingForm(false);
     } finally {
       setBillingAddressLoading(false);
     }
@@ -1128,142 +666,37 @@ const CheckoutPage = () => {
     }
   }, []);
 
-  const handleAddNewShippingAddress = useCallback(() => {
-    setEditingShippingAddress(null);
-    setShippingForm({
-      title: '',
-      address_line_1: '',
-      address_line_2: '',
-      city: '',
-      state: '',
-      zip_code: '',
-      country: 'Nigeria',
-      phone_number: ''
-    });
-    setShowShippingForm(true);
-  }, []);
-
-  const handleAddNewBillingAddress = useCallback(() => {
-    setEditingBillingAddress(null);
-    setBillingForm({
-      full_name: user?.name || '',
-      email: user?.email || '',
-      phone_number: '',
-      address_line_1: '',
-      city: '',
-      state: '',
-      zip_code: '',
-      country: 'Nigeria'
-    });
-    setShowBillingForm(true);
-  }, [user]);
-
   const handleDeleteAddress = useCallback(async (type, addressId) => {
-    if (!isAuthenticated() && !createdUserId) {
-      console.error('CheckoutPage: No user ID available');
-      toast.error('Please create an account to delete address');
-      return;
-    }
-
-    // Show confirmation dialog
-    const addressType = type === 'addresses' ? 'shipping' : 'billing';
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete this ${addressType} address?\n\nThis action cannot be undone.`
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
+    if (!window.confirm('Delete address?')) return;
     try {
       setLoading(true);
-
-      // 1. Delete address from backend
       const token = localStorage.getItem('token');
       await axios.delete(`${API_BASE_URL}/api/${type}/${addressId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       if (type === 'addresses') {
-        // Remove from local state
         const remaining = shippingAddresses.filter(addr => String(addr.id) !== String(addressId));
         setShippingAddresses(remaining);
-
-        // If deleted address was selected, pick first remaining or null
         if (String(shippingAddressId) === String(addressId)) {
-          const newShippingId = remaining.length ? String(remaining[0].id) : null;
-          setShippingAddressId(newShippingId);
-
-          // If no addresses remain, automatically show the shipping form
-          if (remaining.length === 0) {
-            setShowShippingForm(true);
-          }
+          setShippingAddressId(remaining.length ? String(remaining[0].id) : null);
         }
       } else {
-        // Type = 'billing-addresses'
         const remaining = billingAddresses.filter(addr => String(addr.id) !== String(addressId));
         setBillingAddresses(remaining);
         if (String(billingAddressId) === String(addressId)) {
-          const newBillingId = remaining.length ? String(remaining[0].id) : null;
-          setBillingAddressId(newBillingId);
-
-          // If no addresses remain, automatically show the billing form
-          if (remaining.length === 0) {
-            setShowBillingForm(true);
-          }
+          setBillingAddressId(remaining.length ? String(remaining[0].id) : null);
         }
       }
-
-      setSuccess(`Successfully deleted ${addressType} address.`);
-      toast.success(`Deleted ${addressType} address`);
+      toast.success('Address deleted');
     } catch (err) {
-      const errorMessage = err.response?.data?.details || err.response?.data?.error || err.message;
-      setError(`Failed to delete address: ${errorMessage}`);
-      toast.error(`Failed to delete address: ${errorMessage}`);
+      toast.error('Failed to delete address');
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, createdUserId, shippingAddresses, billingAddresses, shippingAddressId, billingAddressId]);
+  }, [shippingAddresses, billingAddresses, shippingAddressId, billingAddressId]);
 
-  // Optimized copyShippingToBilling to not copy phone number for guest users
-  const copyShippingToBilling = useCallback(() => {
-    if (!shippingForm.address_line_1) {
-      toast.error('Please add a shipping address first');
-      return;
-    }
-
-    // Create a billing address object from the shipping address
-    const billingAddress = {
-      full_name: guestForm.name || billingForm.full_name,
-      email: guestForm.email || billingForm.email,
-      // For guest users, use the phone number from guest form instead of shipping form
-      phone_number: isGuest ? guestForm.phone_number : shippingForm.phone_number,
-      address_line_1: shippingForm.address_line_1,
-      // address_line_2 removed
-      city: shippingForm.city,
-      state: shippingForm.state,
-      zip_code: shippingForm.zip_code,
-      country: shippingForm.country,
-    };
-
-    // Update billing form state
-    setBillingForm(billingAddress);
-    toast.success('Billing address updated to match shipping address');
-  }, [shippingForm, guestForm.name, guestForm.email, guestForm.phone_number, billingForm.full_name, billingForm.email, isGuest]);
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.async = true;
-    document.body.appendChild(script);
-    return () => document.body.removeChild(script);
-  }, []);
-
-  // Memoized fetch function to prevent unnecessary re-creation
   const fetchCartAndAddresses = useCallback(async () => {
-    // Check if user is authenticated
     if (!isAuthenticated() && !createdUserId) {
-      // Load guest cart from localStorage
       const guestCartData = localStorage.getItem('guestCart');
       if (guestCartData) {
         try {
@@ -1273,9 +706,7 @@ const CheckoutPage = () => {
           setShowGuestModal(true);
           setLoading(false);
           return;
-        } catch (err) {
-          console.error('Error parsing guest cart:', err);
-        }
+        } catch (err) {}
       }
       setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [] });
       setIsGuest(true);
@@ -1287,773 +718,241 @@ const CheckoutPage = () => {
     setLoading(true);
     try {
       const userId = createdUserId || getUserId();
-
-      // If we have a createdUserId but no token, we don't need to fetch addresses
       if (createdUserId && !isAuthenticated()) {
         setIsGuest(true);
         setLoading(false);
         return;
       }
-
       const token = getToken();
 
-      // Use Promise.allSettled for parallel API calls with better error handling
       const [cartResult, shippingResult, billingResult] = await Promise.allSettled([
-        axios.get(`${API_BASE_URL}/api/cart/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`${API_BASE_URL}/api/addresses/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`${API_BASE_URL}/api/billing-addresses/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        axios.get(`${API_BASE_URL}/api/cart/${userId}`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_BASE_URL}/api/addresses/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_BASE_URL}/api/billing-addresses/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
-      // Handle cart data
       if (cartResult.status === 'fulfilled') {
         const cartData = cartResult.value.data?.data || cartResult.value.data;
-
         if (!cartData.cartId || !cartData.items?.length) {
-          setError('Your cart is empty. Please add items to proceed.');
-          toast.error('Your cart is empty. Please add items to proceed.');
           navigate('/cart');
           return;
         }
-
         setCart(cartData);
         setIsGuest(false);
-      } else {
-        throw new Error('Failed to fetch cart data');
       }
 
-      // Handle shipping addresses
       if (shippingResult.status === 'fulfilled') {
-        let shippingData = shippingResult.value.data;
-        if (shippingData && !Array.isArray(shippingData)) {
-          shippingData = [shippingData];
-        } else if (shippingData && Array.isArray(shippingData.data)) {
-          shippingData = shippingData.data;
-        } else if (!shippingData) {
-          shippingData = [];
-        }
-
+        let shippingData = shippingResult.value.data || [];
+        if (!Array.isArray(shippingData)) shippingData = [shippingData];
         setShippingAddresses(shippingData);
-        if (shippingData.length > 0) {
-          setShippingAddressId(String(shippingData[0].id));
-        } else {
-          setShowShippingForm(true);
-        }
-      } else {
-        console.error('Error fetching shipping addresses:', shippingResult.reason);
-        setShippingAddresses([]);
+        if (shippingData.length > 0) setShippingAddressId(String(shippingData[0].id));
       }
 
-      // Handle billing addresses
       if (billingResult.status === 'fulfilled') {
-        let billingData = billingResult.value.data;
-        if (billingData && !Array.isArray(billingData)) {
-          billingData = [billingData];
-        } else if (billingData && Array.isArray(billingData.data)) {
-          billingData = billingData.data;
-        } else if (!billingData) {
-          billingData = [];
-        }
-
+        let billingData = billingResult.value.data || [];
+        if (!Array.isArray(billingData)) billingData = [billingData];
         setBillingAddresses(billingData);
-        if (billingData.length > 0) {
-          setBillingAddressId(String(billingData[0].id));
-        } else {
-          setShowBillingForm(true);
-        }
-      } else {
-        console.error('Error fetching billing addresses:', billingResult.reason);
-        setBillingAddresses([]);
+        if (billingData.length > 0) setBillingAddressId(String(billingData[0].id));
       }
-
-      toast.success('Checkout data loaded successfully');
     } catch (err) {
-      const errorMessage = err.message || 'Unknown error';
-      setError(`Failed to load checkout data: ${errorMessage}`);
-      toast.error(`Failed to load checkout data: ${errorMessage}`);
+      toast.error('Failed to load checkout details');
     } finally {
       setLoading(false);
     }
   }, [createdUserId, navigate]);
 
   useEffect(() => {
-    if (!authLoading && !contextLoading) {
-      fetchCartAndAddresses();
-    }
+    if (!authLoading && !contextLoading) fetchCartAndAddresses();
   }, [authLoading, contextLoading, fetchCartAndAddresses]);
-
-  // Update billing address when shipping address changes if option is 'same'
-  useEffect(() => {
-    if (billingAddressOption === 'same' && shippingForm.address_line_1) {
-      // Update billing form to match shipping form
-      const billingAddress = {
-        full_name: guestForm.name || billingForm.full_name,
-        email: guestForm.email || billingForm.email,
-        // For guest users, use the phone number from guest form instead of shipping form
-        phone_number: isGuest ? guestForm.phone_number : shippingForm.phone_number,
-        address_line_1: shippingForm.address_line_1,
-        // address_line_2 removed
-        city: shippingForm.city,
-        state: shippingForm.state,
-        zip_code: shippingForm.zip_code,
-        country: shippingForm.country,
-      };
-
-      setBillingForm(billingAddress);
-    }
-  }, [shippingForm, billingAddressOption, guestForm.name, guestForm.email, guestForm.phone_number, isGuest, billingForm.full_name, billingForm.email]);
-
-  useEffect(() => {
-    if (shippingAddresses.length > 0 && !shippingAddressId) {
-      setShippingAddressId(String(shippingAddresses[0].id));
-    }
-    if (billingAddresses.length > 0 && !billingAddressId) {
-      setBillingAddressId(String(billingAddresses[0].id));
-    }
-  }, [shippingAddresses, billingAddresses, shippingAddressId, billingAddressId]);
-
-  // Initialize billing form with user data for logged-in users
-  useEffect(() => {
-    if (user && isAuthenticated() && billingAddresses.length === 0 && !billingForm.full_name && !billingForm.email) {
-      setBillingForm(prev => ({
-        ...prev,
-        full_name: user.name || '',
-        email: user.email || ''
-      }));
-    }
-  }, [user, billingAddresses.length, billingForm.full_name, billingForm.email]);
-
-  useEffect(() => {
-    const addressCountry = shippingForm.country || country;
-    const isNigeria = addressCountry.toLowerCase() === 'nigeria';
-
-    if (isNigeria && !shippingMethod) {
-      const defaultMethod = shippingOptions[0];
-      setShippingMethod(defaultMethod);
-    }
-
-    if (!isNigeria && shippingMethod) {
-      setShippingMethod(null);
-    }
-  }, [shippingForm, country]);
-
-  // Add this useEffect to check for pending orders
-  useEffect(() => {
-    const checkPendingOrder = async () => {
-      const pendingOrderId = localStorage.getItem('pendingOrderId');
-      if (pendingOrderId) {
-        try {
-          const token = getToken();
-          const response = await axios.get(`${API_BASE_URL}/api/orders/${pendingOrderId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-
-          const order = response.data;
-          if (order.payment_status === 'pending') {
-            toast.info('You have a pending order. Please complete the payment.');
-            navigate(`/orders/${pendingOrderId}`);
-            return;
-          } else if (order.payment_status === 'completed') { // NEW: Check for completed orders
-            toast.success('Your payment has been completed. Thank you for your order!');
-            navigate(`/thank-you?reference=${order.reference}&orderId=${pendingOrderId}`);
-            return;
-          }
-        } catch (err) {
-          console.error('Error checking pending order:', err);
-        } finally {
-          localStorage.removeItem('pendingOrderId');
-        }
-      }
-    };
-
-    if (user && !authLoading && !contextLoading) {
-      checkPendingOrder();
-    }
-  }, [user, authLoading, contextLoading, navigate]);
 
   const addressCountry = shippingForm.country || country;
   const isNigeria = addressCountry.toLowerCase() === 'nigeria';
 
-  // Memoize expensive calculations to prevent unnecessary recalculations
   const calculatedValues = useMemo(() => {
     const subtotal = Number(cart?.subtotal) || 0;
     const tax = isNigeria ? 0 : Number((subtotal * 0.05).toFixed(2));
     const shippingCost = isNigeria ? shippingMethod?.total_cost || 0 : 0;
-
-    // Calculate total discount (first order + coupon)
     const totalDiscount = Number((firstOrderDiscount + couponDiscount).toFixed(2));
-    // Ensure total discount doesn't exceed subtotal
     const finalDiscount = Math.min(totalDiscount, subtotal);
     const discountedSubtotal = Number((subtotal - finalDiscount).toFixed(2));
     const total = Number((discountedSubtotal + tax + shippingCost).toFixed(2));
 
     return {
-      subtotal,
-      tax,
-      shippingCost,
-      finalDiscount,
-      total,
       displaySubtotal: subtotal,
       displayFirstOrderDiscount: firstOrderDiscount,
       displayCouponDiscount: couponDiscount,
-      displayTotalDiscount: finalDiscount,
       displayTax: tax,
       displayTotal: total
     };
   }, [cart?.subtotal, isNigeria, shippingMethod?.total_cost, firstOrderDiscount, couponDiscount]);
 
-  const {
-    subtotal,
-    tax,
-    shippingCost,
-    finalDiscount,
-    total,
-    displaySubtotal,
-    displayFirstOrderDiscount,
-    displayCouponDiscount,
-    displayTotalDiscount,
-    displayTax,
-    displayTotal
-  } = calculatedValues;
+  const { displaySubtotal, displayFirstOrderDiscount, displayCouponDiscount, displayTax, displayTotal } = calculatedValues;
 
   const handleWhatsAppPayment = () => {
-    const message = `Hello, I would like to pay for my order with Bitcoin.\n\nOrder Details:\n- Subtotal: ${displaySubtotal.toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}\n${displayFirstOrderDiscount > 0 ? `- First Order Discount (5%): -${displayFirstOrderDiscount.toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}\n` : ''}${displayCouponDiscount > 0 ? `- Coupon Discount: -${displayCouponDiscount.toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}\n` : ''}- Total Amount: ${displayTotal.toLocaleString('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}\n- Currency: NGN\n- Order Reference: order_${createdUserId || getUserId()}_${Date.now()}\n\nI have attached a screenshot of my checkout for your reference.`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, '')}?text=${encodedMessage}`, '_blank');
-    toast.success('Opening WhatsApp to complete your Bitcoin payment...');
+    const message = `Hello, I would like to pay for my order with Bitcoin.\nOrder Total: ₦${displayTotal.toLocaleString()}\nRef: ORD-${createdUserId || getUserId()}-${Date.now()}`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
-  if (authLoading || contextLoading) {
+  if (authLoading || contextLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center text-Accent">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-Primarycolor"></div>
-          <p className="mt-2 text-sm font-PatrickHand">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor font-display">
         <Navbar2 />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Checkout Form Skeleton */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="animate-pulse">
-                  <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-                  <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="animate-pulse">
-                  <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="h-10 bg-gray-200 rounded"></div>
-                    <div className="h-10 bg-gray-200 rounded"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Right Column - Order Summary Skeleton */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-1/3 mb-6"></div>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                  </div>
-                  <div className="flex justify-between">
-                    <div className="h-4 bg-gray-200 rounded w-1/5"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/6"></div>
-                  </div>
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between">
-                      <div className="h-5 bg-gray-200 rounded w-1/4"></div>
-                      <div className="h-5 bg-gray-200 rounded w-1/5"></div>
-                    </div>
-                  </div>
-                  <div className="h-12 bg-gray-200 rounded mt-6"></div>
-                </div>
-              </div>
-            </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <CircleNotch size={28} className="animate-spin text-Primarycolor mx-auto mb-3" />
+            <p className="text-xs font-display uppercase tracking-[0.08em] text-text-tertiary">Preparing checkout...</p>
           </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Updated empty cart handling to check for pending orders
-  if (!cart?.items?.length) {
-    // Check if there's a pending order
-    const pendingOrderId = localStorage.getItem('pendingOrderId');
-    if (pendingOrderId) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center text-Accent py-8 font-PatrickHand">
-            <p>Your order is pending payment.</p>
-            <Link to={`/orders/${pendingOrderId}`} className="mt-4 inline-flex items-center text-Accent hover:text-Primarycolor">
-              View Order
-            </Link>
-          </div>
-        </div>
-      );
-    }
-
-    // Original empty cart message
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-Accent py-8 font-PatrickHand">
-          Your cart is empty. Please add items to proceed.
-          <Link to="/cart" className="mt-4 inline-flex items-center text-Accent hover:text-Primarycolor">
-            <ArrowLeft className="h-5 w-5 mr-2" /> Go to Cart
-          </Link>
         </div>
       </div>
     );
   }
-
-
 
   return (
-    <div
-      className="min-h-screen bg-gray-100 typography"
-      style={{
-        '--color-Primarycolor': '#1E1E1E',
-        '--color-Secondarycolor': '#ffffff',
-        '--color-Accent': '#6E6E6E',
-        '--font-Manrope': '"Manrope", sans-serif',
-        '--font-PatrickHand': '"Jost", "sans-serif"'
-      }}
-    >
+    <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor font-display">
+      <SEO title="Checkout | Prechi" description="Complete your purchase securely on Prechi." />
       <Navbar2 />
-      <div className="max-w-7xl mx-auto px-[0.4em] md:px-4 sm:px-6 lg:px-8 py-7 pt-20">
-        <Link to="/cart" className="inline-flex items-center text-Accent hover:text-Primarycolor mb-6 font-PatrickHand">
-          <ArrowLeft className="h-5 w-5 mr-1" /> Back to Cart
-        </Link>
-        <h2 className="text-3xl font-bold text-Primarycolor mb-8 font-Manrope">Checkout</h2>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-            <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
-            <span className="text-sm text-red-700 font-PatrickHand">{error}</span>
-          </div>
-        )}
+      <main className="flex-1 pt-24 pb-20">
+        <div className="section-container">
+          <Link to="/cart" className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-Primarycolor transition-colors uppercase tracking-[0.08em] mb-8 font-medium">
+            <CaretLeft size={14} weight="bold" /> Return to shopping bag
+          </Link>
 
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-            <span className="text-sm text-green-600 font-PatrickHand">{success}</span>
-          </div>
-        )}
-
-        {showBitcoinInstructions && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-Primarycolor flex items-center font-Manrope">
-                  <Bitcoin className="h-5 w-5 mr-2 text-orange-500" />
-                  Bitcoin Payment Instructions
-                </h3>
-                <button
-                  onClick={() => setShowBitcoinInstructions(false)}
-                  className="text-Accent hover:text-Primarycolor"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <p className="text-sm text-orange-800 font-PatrickHand">
-                    To complete your purchase with Bitcoin, please follow these steps:
-                  </p>
-                </div>
-
-                <ol className="list-decimal pl-5 space-y-2 text-sm text-Accent font-PatrickHand">
-                  <li>Take a screenshot of your checkout page showing the order total and items</li>
-                  <li>Click the button below to open WhatsApp</li>
-                  <li>Send the screenshot along with your order details</li>
-                  <li>Our team will provide you with Bitcoin payment instructions</li>
-                  <li>Once payment is confirmed, we'll process your order immediately</li>
-                </ol>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                  <p className="text-sm text-blue-800 font-PatrickHand">
-                    <strong>Note:</strong> Your order will be reserved for 2 hours to allow time for Bitcoin payment completion.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                  <button
-                    onClick={handleWhatsAppPayment}
-                    className="flex-1 flex items-center justify-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-PatrickHand"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Open WhatsApp
-                  </button>
-                  <button
-                    onClick={() => setShowBitcoinInstructions(false)}
-                    className="flex-1 bg-gray-200 text-Primarycolor py-2 px-4 rounded-md hover:bg-gray-300 transition-colors font-PatrickHand"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-border">
+            <h1 className="text-2xl sm:text-3xl font-display font-semibold text-Primarycolor tracking-tight">Checkout</h1>
+            <div className="flex items-center gap-2 text-xs text-text-secondary">
+              <ShieldCheck size={16} className="text-emerald-600" />
+              <span>256-bit Encrypted SSL Payment</span>
             </div>
           </div>
-        )}
 
-        {/* Guest Modal */}
-        {isGuest && showGuestModal && (
-          <GuestCheckoutModal
-            guestForm={guestForm}
-            guestFormErrors={guestFormErrors}
-            existingUserType={existingUserType}
-            requiredForm={requiredForm}
-            onGuestFormChange={handleGuestFormChange}
-            onLoginRedirect={handleLoginRedirect}
-            onSubmitGuestForm={handleGuestFormSubmit}
-            loading={loading}
-            navigate={navigate}
-          />
-        )}
+          {error && (
+            <div className="mb-6 p-4 bg-rose-50 border border-rose-200 rounded-sm flex items-start gap-3 text-rose-800 text-xs font-medium">
+              <WarningCircle size={18} className="text-rose-600 flex-shrink-0 mt-0.5" />
+              <div>{error}</div>
+            </div>
+          )}
 
-        {/* Only show the checkout content if the guest form has been submitted or user is authenticated */}
-        {(!isGuest || guestFormSubmitted) && (
-          <>
-            {/* Updated to two-column layout */}
+          {/* Guest Checkout Modal overlay */}
+          {isGuest && showGuestModal && (
+            <GuestCheckoutModal
+              guestForm={guestForm}
+              guestFormErrors={guestFormErrors}
+              existingUserType={existingUserType}
+              requiredForm={requiredForm}
+              onGuestFormChange={handleGuestFormChange}
+              onLoginRedirect={handleLoginRedirect}
+              onSubmitGuestForm={handleGuestFormSubmit}
+              loading={loading}
+              navigate={navigate}
+            />
+          )}
 
-            {/* Step Progress Bar */}
-            <div className="lg:col-span-12 mb-6">
-              <div className="flex items-center justify-between w-full">
-                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 1 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>1. Shipping & Delivery</div>
-                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 2 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>2. Payment & Billing</div>
-                <div className={`flex-1 text-center py-3 border-b-4 ${currentStep >= 3 ? 'border-Primarycolor text-Primarycolor font-bold' : 'border-gray-200 text-gray-400'}`}>3. Review Order</div>
+          {(!isGuest || guestFormSubmitted) && (
+            <>
+              {/* Step indicator */}
+              <div className="grid grid-cols-3 gap-2 mb-8 border-b border-border pb-4">
+                {[
+                  { step: 1, label: "1. Shipping & Delivery" },
+                  { step: 2, label: "2. Payment & Billing" },
+                  { step: 3, label: "3. Order Review" },
+                ].map((s) => (
+                  <button
+                    key={s.step}
+                    onClick={() => handleNextStep(s.step)}
+                    className={`py-2 text-left text-xs uppercase tracking-[0.08em] font-semibold transition-all border-b-2 ${
+                      currentStep >= s.step
+                        ? 'border-Primarycolor text-Primarycolor'
+                        : 'border-transparent text-text-tertiary hover:text-text-secondary'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
               </div>
-              
+
               {missingFieldsSummary.length > 0 && (
-                <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
-                  <div className="flex items-start">
-                    <AlertCircle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
-                    <div>
-                      <h4 className="text-red-800 font-bold mb-1">Please complete the following:</h4>
-                      <ul className="list-disc pl-5 text-red-700 text-sm">
-                        {missingFieldsSummary.map((err, i) => (
-                          <li key={i}>{err}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-sm text-amber-800 text-xs">
+                  <p className="font-semibold uppercase tracking-wider mb-1">Required Information Missing:</p>
+                  <ul className="list-disc pl-4 space-y-0.5">
+                    {missingFieldsSummary.map((m, idx) => (
+                      <li key={idx}>{m}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
-            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-              {/* Left Column - Forms */}
-              <div className="lg:col-span-7 space-y-8">
-                {/* Address Forms - Different for guests and logged-in users */}
-                {isGuest ? (
-                  // Guest Address Forms
-                  <>
-                    <div className={currentStep === 1 ? "block" : "hidden"}>
-                    {/* Shipping Address Form for Guests */}
-                    <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
-
-                      {requiredForm === 'shipping' && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-start">
-                            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
-                            <div>
-                              <p className="text-sm font-medium text-red-800 font-PatrickHand">
-                                Please add a shipping address
-                              </p>
-                              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
-                                This information is required to deliver your order
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {!showShippingForm ? (
-                        shippingForm.address_line_1 ? (
-                          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                            <div className="flex items-start">
-                              <div className="flex-1">
-                                <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Shipping Address</h4>
-                                <div className="text-sm text-black font-PatrickHand">
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
-                                  {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => setShowShippingForm(true)}
-                                className="ml-4 p-2 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors"
-                                title="Edit shipping address"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-8">
-                            <button
-                              onClick={() => setShowShippingForm(true)}
-                              className="px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
-                            >
-                              <MapPin className="h-5 w-5 inline mr-2" />
-                              Add Shipping Address
-                            </button>
-                          </div>
-                        )
-                      ) : (
-                        <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
-                          <ShippingAddressForm
-                            address={{ state: shippingForm, setState: setShippingForm }}
-                            onSubmit={handleShippingSubmit}
-                            onCancel={() => setShowShippingForm(false)}
-                            formErrors={formErrors}
-                            setFormErrors={setFormErrors}
-                            actionLoading={loading}
-                            isGuest={true}
-                            guestData={guestForm}
-                          />
-                        </React.Suspense>
-                      )}
-                    </div>
-
-                    </div>
-                    <div className={currentStep === 2 ? "block" : "hidden"}>
-                    {/* Billing Address Form for Guests */}
-                    <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
-
-                      {/* Billing Address Option Selector */}
-                      <div className="mb-6">
-                        <div className="flex items-center space-x-6">
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="billingAddressOption"
-                              value="same"
-                              checked={billingAddressOption === 'same'}
-                              onChange={() => setBillingAddressOption('same')}
-                              className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
-                            />
-                            <span className="text-sm font-medium text-Accent font-PatrickHand">Use my shipping address for billing</span>
-                          </label>
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="billingAddressOption"
-                              value="different"
-                              checked={billingAddressOption === 'different'}
-                              onChange={() => setBillingAddressOption('different')}
-                              className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
-                            />
-                            <span className="text-sm font-medium text-Accent font-PatrickHand">Enter a different billing address</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      {requiredForm === 'billing' && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-start">
-                            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" />
-                            <div>
-                              <p className="text-sm font-medium text-red-800 font-PatrickHand">
-                                Please add a billing address
-                              </p>
-                              <p className="text-xs mt-1 text-red-700 font-PatrickHand">
-                                This information is required to process your payment
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {billingAddressOption === 'same' ? (
-                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                          <div className="flex items-start">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
-                              {shippingForm.address_line_1 ? (
-                                <div className="text-sm text-black font-PatrickHand">
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.address_line_1}</p>
-                                  {shippingForm.landmark && <p>{shippingForm.landmark}</p>}
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.city}, {shippingForm.state} {shippingForm.zip_code}</p>
-                                  <p className="text-sm text-Primarycolor font-Manrope">{shippingForm.country}</p>
-                                </div>
-                              ) : (
-                                <p className="text-sm text-gray-500 font-PatrickHand">Please enter a shipping address first</p>
-                              )}
-                            </div>
-                            <button
-                              onClick={copyShippingToBilling}
-                              className="ml-4 p-2 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors"
-                              title="Copy shipping address to billing address"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
-                          <BillingAddressForm
-                            address={{ state: billingForm, setState: setBillingForm }}
-                            onSubmit={handleBillingSubmit}
-                            onCancel={() => setShowBillingForm(false)}
-                            formErrors={formErrors}
-                            setFormErrors={setFormErrors}
-                            actionLoading={loading}
-                            isGuest={true}
-                            guestData={guestForm}
-                            userData={null}
-                          />
-                        </React.Suspense>
-                      )}
-                    </div>
-                    </div>
-                  </>
-                ) : (
-                  // Logged-in User Address Management
-                  <>
-                    <div className={currentStep === 1 ? "block" : "hidden"}>
-                    {/* Shipping Address Section */}
-                    <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Shipping Address</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+                {/* Form Steps Column */}
+                <div className="lg:col-span-7 space-y-8">
+                  {/* Step 1: Shipping */}
+                  <div className={currentStep === 1 ? "block space-y-6" : "hidden"}>
+                    <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
+                      <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-3 border-b border-border">
+                        Shipping Address
+                      </h2>
 
                       {shippingAddresses.length > 0 ? (
-                        <>
-                          {/* Address Selection Dropdown */}
-                          {shippingAddresses.length > 1 && (
-                            <div className="mb-4">
-                              <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
-                                Select Shipping Address
-                              </label>
-                              <select
-                                value={shippingAddressId || ''}
-                                onChange={(e) => setShippingAddressId(e.target.value)}
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
-                              >
-                                {shippingAddresses.map(address => (
-                                  <option key={address.id} value={String(address.id)}>
-                                    {address.title} - {address.city}, {address.state}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          )}
-
-                          {/* Selected Address Display */}
-                          <div className="border rounded-lg p-4 bg-gray-50">
-                            {shippingAddresses
-                              .filter(addr => String(addr.id) === String(shippingAddressId))
-                              .map(address => (
-                                <div key={address.id}>
-                                  <div className="flex justify-between items-start mb-2">
-                                    <p className="font-medium text-Primarycolor">{address.title}</p>
-                                    <div className="flex gap-2">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-3">
+                            {shippingAddresses.map((addr) => {
+                              const isSelected = String(addr.id) === String(shippingAddressId);
+                              return (
+                                <div
+                                  key={addr.id}
+                                  onClick={() => setShippingAddressId(String(addr.id))}
+                                  className={`p-4 border rounded-sm cursor-pointer transition-all duration-200 ${
+                                    isSelected
+                                      ? 'border-Primarycolor bg-surface ring-1 ring-Primarycolor'
+                                      : 'border-border hover:border-text-tertiary'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between">
+                                    <div>
+                                      <p className="font-semibold text-xs text-Primarycolor uppercase tracking-wider mb-1">
+                                        {addr.title || 'Address'}
+                                      </p>
+                                      <p className="text-xs text-text-secondary">{addr.address_line_1}</p>
+                                      <p className="text-xs text-text-tertiary">{addr.city}, {addr.state} {addr.zip_code}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                       <button
-                                        onClick={() => handleEditAddress('addresses', address)}
-                                        className="p-1 text-Primarycolor hover:text-gray-800 transition-colors"
-                                        title="Edit address"
+                                        onClick={(e) => { e.stopPropagation(); handleEditAddress('addresses', addr); }}
+                                        className="p-1 hover:text-Primarycolor text-text-tertiary transition-colors"
                                       >
-                                        <Edit className="h-4 w-4" />
+                                        <PencilSimple size={16} />
                                       </button>
                                       <button
-                                        onClick={() => handleDeleteAddress('addresses', address.id)}
-                                        className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                                        title="Delete address"
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteAddress('addresses', addr.id); }}
+                                        className="p-1 hover:text-rose-600 text-text-tertiary transition-colors"
                                       >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash size={16} />
                                       </button>
                                     </div>
                                   </div>
-                                  <p className="text-sm text-Accent">{address.address_line_1}</p>
-                                  {address.landmark && <p className="text-sm text-Accent">{address.landmark}</p>}
-                                  <p className="text-sm text-Accent">{address.city}, {address.state} {address.zip_code}</p>
-                                  <p className="text-sm text-Accent">{address.country}</p>
-                                  {address.phone_number && <p className="text-sm text-Accent">{address.phone_number}</p>}
                                 </div>
-                              ))
-                            }
-                            <div className="mt-4 pt-4 border-t border-gray-200">
-                              <button
-                                onClick={handleAddNewShippingAddress}
-                                className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
-                              >
-                                <Plus className="h-4 w-4 mr-1" />
-                                Add Another Address
-                              </button>
-                            </div>
+                              );
+                            })}
                           </div>
-                        </>
+                        </div>
                       ) : (
-                        <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                          <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No shipping address found</p>
-                          <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your shipping address to continue with checkout</p>
-                          <button
-                            onClick={handleAddNewShippingAddress}
-                            className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
-                          >
-                            <MapPin className="h-5 w-5 mr-2" />
-                            Add Shipping Address
-                          </button>
+                        <div className="py-6 text-center">
+                          <p className="text-xs text-text-tertiary mb-4">No shipping address recorded yet.</p>
                         </div>
                       )}
-                    </div>
 
+                      {!showShippingForm && (
+                        <button
+                          onClick={() => { setEditingShippingAddress(null); setShowShippingForm(true); }}
+                          className="btn btn-secondary btn-sm w-full flex items-center justify-center gap-2"
+                        >
+                          <Plus size={14} />
+                          Add new shipping address
+                        </button>
+                      )}
 
-
-                    {/* Shipping Address Form for Logged-in Users */}
-                    {showShippingForm && (
-                      <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                        <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">
-                          {editingShippingAddress ? 'Edit Shipping Address' : 'Add Shipping Address'}
-                        </h3>
-                        <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
+                      {showShippingForm && (
+                        <React.Suspense fallback={<div className="animate-spin w-5 h-5 border-2 border-Primarycolor border-t-transparent rounded-full mx-auto" />}>
                           <ShippingAddressForm
                             address={{ state: shippingForm, setState: setShippingForm }}
                             onSubmit={handleShippingSubmit}
@@ -2061,352 +960,170 @@ const CheckoutPage = () => {
                             formErrors={formErrors}
                             setFormErrors={setFormErrors}
                             actionLoading={shippingAddressLoading}
-                            isGuest={false}
+                            isGuest={isGuest}
                           />
                         </React.Suspense>
-                      </div>
-                    )}
-
-                    </div>
-                    <div className={currentStep === 2 ? "block" : "hidden"}>
-                    {/* Billing Address Section */}
-                    <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                      <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Billing Address</h3>
-
-                      {/* Billing Address Option Selector for Logged-in Users */}
-                      <div className="mb-6">
-                        <div className="flex items-center space-x-6">
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="billingAddressOption"
-                              value="same"
-                              checked={billingAddressOption === 'same'}
-                              onChange={() => setBillingAddressOption('same')}
-                              className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
-                            />
-                            <span className="text-sm font-medium text-Accent font-PatrickHand">Same as shipping address</span>
-                          </label>
-                          <label className="flex items-center cursor-pointer">
-                            <input
-                              type="radio"
-                              name="billingAddressOption"
-                              value="different"
-                              checked={billingAddressOption === 'different'}
-                              onChange={() => setBillingAddressOption('different')}
-                              className="h-4 w-4 text-Primarycolor focus:ring-Primarycolor mr-2"
-                            />
-                            <span className="text-sm font-medium text-Accent font-PatrickHand">Use a different billing address</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      {billingAddressOption === 'same' ? (
-                        /* Same as Shipping Address Display */
-                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                          <div className="flex items-start">
-                            <div className="flex-1">
-                              <h4 className="font-medium text-Primarycolor font-Manrope mb-2">Billing Address (Same as Shipping)</h4>
-                              {shippingAddresses.length > 0 && shippingAddressId ? (
-                                <div className="text-sm text-black font-PatrickHand">
-                                  {shippingAddresses
-                                    .filter(addr => String(addr.id) === String(shippingAddressId))
-                                    .map(address => (
-                                      <div key={address.id}>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.title}</p>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.address_line_1}</p>
-                                        {address.landmark && <p>{address.landmark}</p>}
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.city}, {address.state} {address.zip_code}</p>
-                                        <p className="text-sm text-Primarycolor font-Manrope">{address.country}</p>
-                                        {address.phone_number && <p className="text-sm text-Primarycolor font-Manrope">{address.phone_number}</p>}
-                                      </div>
-                                    ))
-                                  }
-                                </div>
-                              ) : (
-                                <p className="text-sm text-gray-500 font-PatrickHand">Please select a shipping address first</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Different Billing Address Selection */
-                        billingAddresses.length > 0 ? (
-                          <>
-                            {/* Address Selection Dropdown */}
-                            {billingAddresses.length > 1 && (
-                              <div className="mb-4">
-                                <label className="block text-sm font-medium text-Primarycolor mb-2 font-PatrickHand">
-                                  Select Billing Address
-                                </label>
-                                <select
-                                  value={billingAddressId || ''}
-                                  onChange={(e) => setBillingAddressId(e.target.value)}
-                                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-Primarycolor focus:border-transparent font-PatrickHand"
-                                >
-                                  {billingAddresses.map(address => (
-                                    <option key={address.id} value={String(address.id)}>
-                                      {address.full_name} - {address.city}, {address.state}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            )}
-
-                            {/* Selected Address Display */}
-                            <div className="border rounded-lg p-4 bg-gray-50">
-                              {billingAddresses
-                                .filter(addr => String(addr.id) === String(billingAddressId))
-                                .map(address => (
-                                  <div key={address.id}>
-                                    <div className="flex justify-between items-start mb-2">
-                                      <p className="font-medium text-Primarycolor">{address.full_name}</p>
-                                      <div className="flex gap-2">
-                                        <button
-                                          onClick={() => handleEditAddress('billing-addresses', address)}
-                                          className="p-1 text-Primarycolor hover:text-gray-800 transition-colors"
-                                          title="Edit address"
-                                        >
-                                          <Edit className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                          onClick={() => handleDeleteAddress('billing-addresses', address.id)}
-                                          className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                                          title="Delete address"
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <p className="text-sm text-Accent">{address.email}</p>
-                                    {address.phone_number && <p className="text-sm text-Accent">{address.phone_number}</p>}
-                                    <p className="text-sm text-Accent">{address.address_line_1}</p>
-                                    <p className="text-sm text-Accent">{address.city}, {address.state} {address.zip_code}</p>
-                                    <p className="text-sm text-Accent">{address.country}</p>
-                                  </div>
-                                ))
-                              }
-                              <div className="mt-4 pt-4 border-t border-gray-200">
-                                <button
-                                  onClick={handleAddNewBillingAddress}
-                                  className="flex items-center text-Primarycolor hover:text-gray-800 transition-colors text-sm font-PatrickHand"
-                                >
-                                  <Plus className="h-4 w-4 mr-1" />
-                                  Add Another Address
-                                </button>
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-lg font-medium text-Primarycolor mb-2 font-Manrope">No billing address found</p>
-                            <p className="text-sm text-gray-600 mb-6 font-PatrickHand">Add your billing address for payment processing</p>
-                            <button
-                              onClick={handleAddNewBillingAddress}
-                              className="inline-flex items-center px-6 py-3 bg-Primarycolor text-white rounded-lg hover:bg-gray-800 transition-colors font-medium font-PatrickHand"
-                            >
-                              <CreditCard className="h-5 w-5 mr-2" />
-                              Add Billing Address
-                            </button>
-                          </div>
-                        )
                       )}
                     </div>
-                  </div>
-                  </>
-                )}
 
-                {/* Billing Address Form for Logged-in Users */}
-                <div className={currentStep === 2 ? "block" : "hidden"}>
-                {showBillingForm && (
-                  <div className="p-5 md:p-6 bg-white rounded-lg shadow-md mb-6">
-                    <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Add Billing Address</h3>
-                    <React.Suspense fallback={<div className="animate-pulse h-64 bg-gray-200 rounded"></div>}>
-                      <BillingAddressForm
-                        address={{ state: billingForm, setState: setBillingForm }}
-                        onSubmit={handleBillingSubmit}
-                        onCancel={() => setShowBillingForm(false)}
-                        formErrors={formErrors}
-                        setFormErrors={setFormErrors}
-                        actionLoading={billingAddressLoading}
-                        isGuest={false}
-                        userData={user}
-                      />
-                    </React.Suspense>
-                  </div>
-                )}
-
-                </div>
-                <div className={currentStep === 1 ? "block" : "hidden"}>
-                {/* Order Note */}
-                <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-4 font-Manrope">Special Instructions (optional)</h3>
-                  <textarea
-                    value={orderNote}
-                    onChange={handleOrderNoteChange}
-                    maxLength={500}
-                    placeholder="Add special delivery instructions, gift message, or other notes for your order"
-                    className="w-full p-2 border border-gray-300 rounded-md font-PatrickHand"
-                  />
-                  <p className="text-sm text-Accent font-PatrickHand">Characters left: {500 - orderNote.length}/500</p>
-                </div>
-
-                {/* Shipping Method */}
-                <div className="p-5 md:p-6 bg-white rounded-lg shadow-md">
-                  <h3 className="text-xl font-semibold text-Primarycolor mb-6 font-Manrope">
-                    <Truck className="h-5 w-5 inline mr-2" />
-                    Choose Delivery Method
-                  </h3>
-                  {isNigeria ? (
-                    <div className="grid gap-4">
-                      {shippingOptions.map((option) => (
-                        <label
-                          key={option.id}
-                          className={`
-                            relative cursor-pointer rounded-xl border-2 transition-all duration-200
-                            ${shippingMethod?.id === option.id
-                              ? 'border-Primarycolor bg-gradient-to-r from-gray-50 to-blue-50 shadow-md'
-                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                            }
-                          `}
-                        >
-                          <div className="p-4 sm:p-5">
-                            <div className="flex items-start gap-4">
+                    {/* Delivery Methods */}
+                    <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
+                      <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-3 border-b border-border">
+                        Delivery Method
+                      </h2>
+                      {isNigeria ? (
+                        <div className="space-y-3">
+                          {shippingOptions.map((option) => (
+                            <label
+                              key={option.id}
+                              className={`flex items-start gap-4 p-4 border rounded-sm cursor-pointer transition-all ${
+                                shippingMethod?.id === option.id
+                                  ? 'border-Primarycolor bg-surface ring-1 ring-Primarycolor'
+                                  : 'border-border hover:border-text-tertiary'
+                              }`}
+                            >
                               <input
                                 type="radio"
                                 name="shippingMethod"
-                                value={option.id}
                                 checked={shippingMethod?.id === option.id}
                                 onChange={() => setShippingMethod(option)}
-                                className="mt-1 h-4 w-4 text-Primarycolor focus:ring-2 focus:ring-Primarycolor"
+                                className="mt-1 accent-Primarycolor"
                               />
+                              <div className="flex-1 flex justify-between items-start text-xs">
+                                <div>
+                                  <p className="font-semibold text-Primarycolor">{option.method}</p>
+                                  <p className="text-text-tertiary mt-0.5">{option.estimated_delivery}</p>
+                                </div>
+                                <span className="font-semibold text-Primarycolor tabular-nums">
+                                  ₦{option.total_cost.toLocaleString()}
+                                </span>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-text-secondary">International delivery quotes calculated post-order.</p>
+                      )}
+                    </div>
 
-                              <div className="flex-1">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                                  <div className="flex items-center gap-3">
-                                    <div className={`
-                                      p-2 rounded-lg
-                                      ${shippingMethod?.id === option.id
-                                        ? 'bg-Primarycolor text-white'
-                                        : 'bg-gray-100 text-Accent'
-                                      }
-                                    `}>
-                                      {getShippingIcon(option.icon)}
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-Primarycolor text-sm sm:text-base font-Manrope">
-                                        {option.method}
-                                      </h4>
-                                      <p className="text-xs sm:text-sm text-Accent font-PatrickHand">
-                                        {option.description}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <div className="font-bold text-Primarycolor text-lg font-Manrope">
-                                      {option.total_cost.toLocaleString('en-NG', {
-                                        style: 'currency',
-                                        currency: 'NGN',
-                                        minimumFractionDigits: 0,
-                                        maximumFractionDigits: 0,
-                                      })}
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm text-Accent font-PatrickHand">
-                                  <Clock className="h-4 w-4" />
-                                  <span>{option.estimated_delivery}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          {shippingMethod?.id === option.id && (
-                            <div className="absolute top-3 right-3">
-                              <div className="bg-Primarycolor text-white rounded-full p-1">
-                                <CheckCircle className="h-4 w-4" />
-                              </div>
-                            </div>
-                          )}
+                    {/* Special Instructions */}
+                    <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-3">
+                      <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-2">
+                        Special Instructions (Optional)
+                      </h2>
+                      <textarea
+                        value={orderNote}
+                        onChange={handleOrderNoteChange}
+                        maxLength={500}
+                        rows={3}
+                        placeholder="Add delivery instructions or packaging notes..."
+                        className="input-field text-xs resize-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Step 2: Payment & Billing */}
+                  <div className={currentStep === 2 ? "block space-y-6" : "hidden"}>
+                    <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
+                      <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-3 border-b border-border">
+                        Billing Address
+                      </h2>
+                      <div className="flex items-center gap-6 text-xs text-text-secondary py-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billingOption"
+                            value="same"
+                            checked={billingAddressOption === 'same'}
+                            onChange={() => setBillingAddressOption('same')}
+                            className="accent-Primarycolor"
+                          />
+                          <span>Same as shipping address</span>
                         </label>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                          <MapPin className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-Primarycolor font-Manrope">
-                            International Shipping to {addressCountry}
-                          </h4>
-                        </div>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billingOption"
+                            value="different"
+                            checked={billingAddressOption === 'different'}
+                            onChange={() => setBillingAddressOption('different')}
+                            className="accent-Primarycolor"
+                          />
+                          <span>Use a different billing address</span>
+                        </label>
                       </div>
-                      <p className="text-sm text-Accent font-PatrickHand mb-2">
-                        You will receive a separate email with payment instructions for international shipping fees.
-                        Note: Payments are processed in NGN due to current system limitations.
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-blue-600 font-PatrickHand">
-                        <Clock className="h-3 w-3" />
-                        <span>Estimated delivery: 10-21 business days</span>
-                      </div>
-                    </div>
-                  )}
-                  {formErrors.shippingMethod && (
-                    <p className="text-sm text-red-600 mt-2 font-PatrickHand">{formErrors.shippingMethod}</p>
-                  )}
-                </div>
-                </div>
-                {/* Navigation Buttons */}
-                <div className="flex justify-between mt-6">
-                  {currentStep > 1 && (
-                    <button onClick={() => setCurrentStep(currentStep - 1)} className="px-6 py-2 bg-gray-200 text-Primarycolor rounded-md font-Manrope hover:bg-gray-300">Back</button>
-                  )}
-                  {currentStep === 1 && (
-                    <button onClick={() => handleNextStep(2)} className="px-6 py-2 bg-Primarycolor text-white rounded-md font-Manrope hover:bg-gray-800 ml-auto">Continue to Billing</button>
-                  )}
-                  {currentStep === 2 && (
-                    <button onClick={() => handleNextStep(3)} className="px-6 py-2 bg-Primarycolor text-white rounded-md font-Manrope hover:bg-gray-800 ml-auto">Continue to Review</button>
-                  )}
-                </div>
-              </div>
 
-              {/* Right Column - Order Summary */}
-              <div className="lg:col-span-5 ">
-                <OrderSummary
-                  cart={cart}
-                  displaySubtotal={displaySubtotal}
-                  displayFirstOrderDiscount={displayFirstOrderDiscount}
-                  displayCouponDiscount={displayCouponDiscount}
-                  displayTax={displayTax}
-                  displayTotal={displayTotal}
-                  shippingMethod={shippingMethod}
-                  isNigeria={isNigeria}
-                  setCouponDiscount={setCouponDiscount}
-                  appliedCoupon={appliedCoupon}
-                  paymentMethod={paymentMethod}
-                  handlePlaceOrder={handlePlaceOrder}
-                  isProcessing={isProcessing}
-                  loading={loading}
-                  shippingForm={shippingForm}
-                  shippingAddressId={shippingAddressId}
-                  billingForm={billingForm}
-                  billingAddressId={billingAddressId}
-                  isGuest={isGuest}
-                  createdUserId={createdUserId}
-                  guestFormSubmitted={guestFormSubmitted}
-                  requiredForm={requiredForm}
-                  billingAddressOption={billingAddressOption}
-                />
+                      {billingAddressOption === 'different' && showBillingForm && (
+                        <React.Suspense fallback={<div className="animate-spin w-5 h-5 border-2 border-Primarycolor border-t-transparent rounded-full mx-auto" />}>
+                          <BillingAddressForm
+                            address={{ state: billingForm, setState: setBillingForm }}
+                            onSubmit={handleBillingSubmit}
+                            onCancel={() => setShowBillingForm(false)}
+                            formErrors={formErrors}
+                            setFormErrors={setFormErrors}
+                            actionLoading={billingAddressLoading}
+                            isGuest={isGuest}
+                          />
+                        </React.Suspense>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Step Buttons */}
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    {currentStep > 1 && (
+                      <button
+                        onClick={() => setCurrentStep(currentStep - 1)}
+                        className="btn btn-secondary btn-sm"
+                      >
+                        Previous Step
+                      </button>
+                    )}
+                    {currentStep < 2 && (
+                      <button
+                        onClick={() => handleNextStep(currentStep + 1)}
+                        className="btn btn-primary btn-sm ml-auto"
+                      >
+                        Continue to Next Step
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Order Summary Column */}
+                <div className="lg:col-span-5">
+                  <OrderSummary
+                    cart={cart}
+                    displaySubtotal={displaySubtotal}
+                    displayFirstOrderDiscount={displayFirstOrderDiscount}
+                    displayCouponDiscount={displayCouponDiscount}
+                    displayTax={displayTax}
+                    displayTotal={displayTotal}
+                    shippingMethod={shippingMethod}
+                    isNigeria={isNigeria}
+                    setCouponDiscount={setCouponDiscount}
+                    appliedCoupon={appliedCoupon}
+                    paymentMethod={paymentMethod}
+                    handlePlaceOrder={handlePlaceOrder}
+                    isProcessing={isProcessing}
+                    loading={loading}
+                    shippingForm={shippingForm}
+                    shippingAddressId={shippingAddressId}
+                    billingForm={billingForm}
+                    billingAddressId={billingAddressId}
+                    isGuest={isGuest}
+                    createdUserId={createdUserId}
+                    guestFormSubmitted={guestFormSubmitted}
+                    requiredForm={requiredForm}
+                    billingAddressOption={billingAddressOption}
+                  />
+                </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
-      <React.Suspense fallback={<div></div>}>
-        <WhatsAppChatWidget />
-      </React.Suspense>
+            </>
+          )}
+        </div>
+      </main>
+
       <Footer />
     </div>
   );
