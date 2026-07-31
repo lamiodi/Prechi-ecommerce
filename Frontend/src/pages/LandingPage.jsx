@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { Button } from '../components/ui/button';
 import Navbar2 from '../components/Navbar2';
@@ -18,13 +18,13 @@ const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget')
 // Parallax Product Card Component
 const ParallaxProductCard = ({ product, index, formatPrice }) => {
   const ref = useRef(null);
-  const { scrollYProgress } = motion.useScroll({
+  const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   });
   
   // Create a subtle parallax effect for the image
-  const imageY = motion.useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   const productUrl = product.is_product
     ? `/product/${product.id}${product.variantId ? `?variant=${product.variantId}` : ''}`
