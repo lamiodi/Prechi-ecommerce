@@ -1,25 +1,26 @@
- // Backend/routes/products.js
-   import express from 'express';
-   import { getProductById, uploadProduct } from '../controllers/productController.js';
-   import upload from '../utils/multer.js';
+// Backend/routes/products.js
+import express from 'express';
+import { getProductById, uploadProduct } from '../controllers/productController.js';
+import { getShopAll } from '../controllers/shop/getShopAll.js';
+import upload from '../utils/multer.js';
 
-   const router = express.Router();
+const router = express.Router();
 
-   const multiFieldUpload = upload.fields([
-     { name: 'images_0', maxCount: 5 },
-     { name: 'images_1', maxCount: 5 },
-     { name: 'images_2', maxCount: 5 },
-     { name: 'images_3', maxCount: 5 },
-     { name: 'images_4', maxCount: 5 },
-     { name: 'videos_0', maxCount: 3 },
-     { name: 'videos_1', maxCount: 3 },
-     { name: 'videos_2', maxCount: 3 },
-     { name: 'videos_3', maxCount: 3 },
-     { name: 'videos_4', maxCount: 3 },
-   ]);
+const multiFieldUpload = upload.fields([
+  { name: 'images_0', maxCount: 5 },
+  { name: 'images_1', maxCount: 5 },
+  { name: 'images_2', maxCount: 5 },
+  { name: 'images_3', maxCount: 5 },
+  { name: 'images_4', maxCount: 5 },
+  { name: 'videos_0', maxCount: 3 },
+  { name: 'videos_1', maxCount: 3 },
+  { name: 'videos_2', maxCount: 3 },
+  { name: 'videos_3', maxCount: 3 },
+  { name: 'videos_4', maxCount: 3 },
+]);
 
-   router.get('/:id', getProductById);
-   router.post('/', multiFieldUpload, uploadProduct);
+router.get('/', getShopAll);
+router.get('/:id', getProductById);
+router.post('/', multiFieldUpload, uploadProduct);
 
-   export default router;
-   
+export default router;

@@ -28,14 +28,12 @@ const SideCartDrawer = () => {
   // Fetch quick recommendation suggestions
   useEffect(() => {
     if (isCartOpen && recommendations.length === 0) {
-      axios.get(`${API_BASE_URL}/api/products?limit=4`)
-        ? axios.get(`${API_BASE_URL}/api/products?limit=4`)
-            .then(res => {
-              const prods = res.data?.products || res.data || [];
-              if (Array.isArray(prods)) setRecommendations(prods.slice(0, 4));
-            })
-            .catch(() => {})
-        : null;
+      axios.get(`${API_BASE_URL}/api/shopall?limit=4`)
+        .then(res => {
+          const prods = res.data?.products || res.data || [];
+          if (Array.isArray(prods)) setRecommendations(prods.slice(0, 4));
+        })
+        .catch(() => {});
     }
   }, [isCartOpen, recommendations.length]);
 

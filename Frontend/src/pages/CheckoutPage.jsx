@@ -121,6 +121,118 @@ const CheckoutPage = () => {
   const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
   const [idempotencyKey] = useState(() => uuidv4());
 
+  const decodeToken = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const getToken = () => {
+    if (user && user.token) return user.token;
+    return localStorage.getItem('token');
+  };
+
+  const getUserId = () => {
+    const token = getToken();
+    if (!token) return null;
+    const tokenData = decodeToken(token);
+    return tokenData?.id;
+  };
+
+  const isAuthenticated = () => !!getToken();
+
+  const handleLoginRedirect = useCallback(() => {
+    navigate('/login', { state: { from: '/checkout' } });
+  }, [navigate]);
+
+  const handleGuestFormChange = useCallback((field, value) => {
+    setGuestForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'name' || field === 'email') setExistingUserType(null);
+  }, []);
+
+  const handleOrderNoteChange = useCallback((e) => {
+    setOrderNote(e.target.value);
+  }, []);
+
+  const validateGuestForm = useCallback(() => {
+    const errors = {};
+    if (!guestForm.name.trim()) errors.name = 'Please enter your full name';
+    if (!guestForm.email.trim()) errors.email = 'Please enter your email address';
+    else if (!/\S+@\S+\.\S+/.test(guestForm.email)) errors.email = 'Please enter a valid email';
+    if (!guestForm.phone_number.trim()) errors.phone_number = 'Please enter your phone number';
+
+    if (Object.keys(errors).length > 0) {
+      setGuestFormErrors(errors);
+      return false;
+    }
+    setGuestFormErrors({});
+    return true;
+  }, [guestForm]);
+
+  const handleGuestFormSubmit = useCallback(async (e) => {
+    if (e) e.preventDefault();
+    if (!validateGuestForm()) {
+      setRequiredForm('guest');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/create-temp-user`, {
+        name: guestForm.name,
+        email: guestForm.email,
+        phone_number: guestForm.phone_number
+      });
+
+      const { user, isExisting } = response.data;
+      const userId = user.id;
+
+      setCreatedUserId(userId);
+      setShowGuestModal(false);
+      setGuestFormSubmitted(true);
+      localStorage.setItem('prechi_guest_info', JSON.stringify(guestForm));
+      localStorage.setItem('prechi_guest_id', userId);
+
+      if (isExisting) {
+        setExistingUserType('temporary');
+        toast.success('Welcome back!');
+      } else {
+        setExistingUserType(null);
+        toast.success('Account created successfully!');
+      }
+
+      setShippingForm(prev => ({
+        ...prev,
+        title: 'Home',
+        phone_number: guestForm.phone_number
+      }));
+
+      setBillingForm(prev => ({
+        ...prev,
+        full_name: guestForm.name,
+        email: guestForm.email,
+        phone_number: guestForm.phone_number,
+      }));
+
+      setBillingAddressOption('same');
+      return userId;
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to create guest account';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return false;
+    } finally {
+      setShippingAddressLoading(false);
+    }
+  }, [guestForm, validateGuestForm]);
+
   const validateStep1 = useCallback(() => {
     const missing = [];
     if (isGuest) {
@@ -197,176 +309,6 @@ const CheckoutPage = () => {
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [validateStep1, isGuest, createdUserId, guestFormSubmitted, handleGuestFormSubmit, validateStep2]);
-
-  const handleGuestFormChange = useCallback((field, value) => {
-    setGuestForm(prev => ({ ...prev, [field]: value }));
-    if (field === 'name' || field === 'email') setExistingUserType(null);
-  }, []);
-
-  const handleOrderNoteChange = useCallback((e) => {
-    setOrderNote(e.target.value);
-  }, []);
-
-  const handleLoginRedirect = useCallback(() => {
-    navigate('/login', { state: { from: '/checkout' } });
-  }, [navigate]);
-
-  const decodeToken = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-      return JSON.parse(jsonPayload);
-    } catch (err) {
-      return null;
-    }
-  };
-
-  const getToken = () => {
-    if (user && user.token) return user.token;
-    return localStorage.getItem('token');
-  };
-
-  const getUserId = () => {
-    const token = getToken();
-    if (!token) return null;
-    const tokenData = decodeToken(token);
-    return tokenData?.id;
-  };
-
-  const isAuthenticated = () => !!getToken();
-
-  const refreshUserData = async () => {
-    try {
-      const updatedUser = await refreshUser();
-      if (updatedUser) {
-        setUserDataRefreshed(true);
-        return updatedUser;
-      }
-    } catch (err) {}
-    return null;
-  };
-
-  useEffect(() => {
-    const refreshUserDataOnMount = async () => {
-      if (user && isAuthenticated() && !userDataRefreshed) {
-        try { await refreshUserData(); } catch (err) {}
-      }
-    };
-    refreshUserDataOnMount();
-  }, [user, userDataRefreshed]);
-
-  useEffect(() => {
-    const currentSubtotal = cart.subtotal;
-    if (isGuest) {
-      setFirstOrderDiscount(0);
-    } else if (user && (user.first_order === true || user.first_order === 1) && currentSubtotal > 0) {
-      setFirstOrderDiscount(Number((currentSubtotal * 0.05).toFixed(2)));
-    } else {
-      setFirstOrderDiscount(0);
-    }
-  }, [user?.first_order, cart.subtotal, userDataRefreshed, refreshCount, isGuest]);
-
-  const shippingOptions = [
-    {
-      id: 2,
-      method: 'Delivery within Lagos Mainland',
-      total_cost: 4000,
-      estimated_delivery: '5–7 business days',
-      icon: 'package',
-      description: 'Reliable delivery within Lagos Mainland'
-    },
-    {
-      id: 1,
-      method: 'Delivery within Lagos Island',
-      total_cost: 6000,
-      estimated_delivery: '3–5 business days',
-      icon: 'truck',
-      description: 'Fast delivery within Lagos Island'
-    },
-    {
-      id: 3,
-      method: 'Outside Lagos',
-      total_cost: 7000,
-      estimated_delivery: '7–10 business days',
-      icon: 'home',
-      description: 'Delivery outside Lagos state'
-    },
-  ];
-
-  const validateGuestForm = useCallback(() => {
-    const errors = {};
-    if (!guestForm.name.trim()) errors.name = 'Please enter your full name';
-    if (!guestForm.email.trim()) errors.email = 'Please enter your email address';
-    else if (!/\S+@\S+\.\S+/.test(guestForm.email)) errors.email = 'Please enter a valid email';
-    if (!guestForm.phone_number.trim()) errors.phone_number = 'Please enter your phone number';
-
-    if (Object.keys(errors).length > 0) {
-      setGuestFormErrors(errors);
-      return false;
-    }
-    setGuestFormErrors({});
-    return true;
-  }, [guestForm]);
-
-  const handleGuestFormSubmit = useCallback(async (e) => {
-    if (e) e.preventDefault();
-    if (!validateGuestForm()) {
-      setRequiredForm('guest');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/create-temp-user`, {
-        name: guestForm.name,
-        email: guestForm.email,
-        phone_number: guestForm.phone_number
-      });
-
-      const { user, isExisting } = response.data;
-      const userId = user.id;
-
-      setCreatedUserId(userId);
-      setShowGuestModal(false);
-      setGuestFormSubmitted(true);
-      localStorage.setItem('prechi_guest_info', JSON.stringify(guestForm));
-      localStorage.setItem('prechi_guest_id', userId);
-
-      if (isExisting) {
-        setExistingUserType('temporary');
-        toast.success('Welcome back!');
-      } else {
-        setExistingUserType(null);
-        toast.success('Account created successfully!');
-      }
-
-      setShippingForm(prev => ({
-        ...prev,
-        title: 'Home',
-        phone_number: guestForm.phone_number
-      }));
-
-      setBillingForm(prev => ({
-        ...prev,
-        full_name: guestForm.name,
-        email: guestForm.email,
-        phone_number: guestForm.phone_number,
-      }));
-
-      setBillingAddressOption('same');
-      return userId;
-    } catch (err) {
-      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Failed to create guest account';
-      setError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    } finally {
-      setShippingAddressLoading(false);
-    }
-  }, [guestForm, validateGuestForm]);
 
   const generateOrderReference = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
