@@ -1,11 +1,24 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from '@phosphor-icons/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 
 const HeroSection = () => {
   const videoRef = useRef(null);
   const sectionRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Parallax setup
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"]
+  });
+
+  // Background moves slightly slower than scroll (parallax)
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  // Content moves slightly faster and fades out
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const desktopVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867614/Prechi_Clothing_-_Made_for_You._1_hj54pu.mp4";
   const mobileVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867619/Prechi_Clothing_-_Made_for_You._2_j9h7aw.mp4";
@@ -30,8 +43,11 @@ const HeroSection = () => {
       ref={sectionRef}
       className="relative min-h-[100dvh] flex items-end overflow-hidden bg-Primarycolor"
     >
-      {/* Video background */}
-      <div className="absolute inset-0">
+      {/* Parallax Video background */}
+      <motion.div 
+        className="absolute inset-0"
+        style={{ y: backgroundY }}
+      >
         <video
           ref={videoRef}
           autoPlay
@@ -48,10 +64,13 @@ const HeroSection = () => {
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-Primarycolor/40 to-transparent" />
-      </div>
+      </motion.div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full section-container pb-16 sm:pb-20 md:pb-24 lg:pb-28 pt-32">
+      {/* Parallax Content */}
+      <motion.div 
+        className="relative z-10 w-full section-container pb-16 sm:pb-20 md:pb-24 lg:pb-28 pt-32"
+        style={{ y: contentY, opacity: contentOpacity }}
+      >
         <div className="max-w-2xl">
           {/* Eyebrow */}
           <div
@@ -115,16 +134,17 @@ const HeroSection = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
-      <div
+      <motion.div
         className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 transition-all duration-700 delay-[1100ms] ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
+        style={{ opacity: contentOpacity }}
       >
         <div className="w-px h-8 bg-gradient-to-b from-transparent to-white/30" />
-      </div>
+      </motion.div>
     </section>
   );
 };

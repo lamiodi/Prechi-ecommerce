@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'motion/react';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import Navbar2 from '../components/Navbar2';
 import { CurrencyContext } from '../pages/CurrencyContext';
@@ -127,34 +128,45 @@ const LandingPage = () => {
                   if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
 
                   return (
-                    <Link
+                    <motion.div
                       key={product.id || index}
-                      to={productUrl}
-                      className="group relative block overflow-hidden bg-surface"
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ 
+                        duration: 0.7, 
+                        delay: index * 0.1,
+                        ease: [0.16, 1, 0.3, 1] 
+                      }}
                     >
-                      <div className="aspect-[3/4] overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={displayName}
-                          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03]"
-                          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-                          onError={(e) => { e.target.style.opacity = '0'; }}
-                          loading="lazy"
-                        />
+                      <Link
+                        to={productUrl}
+                        className="group relative block overflow-hidden bg-surface"
+                      >
+                        <div className="aspect-[3/4] overflow-hidden">
+                          <img
+                            src={product.image}
+                            alt={displayName}
+                            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03]"
+                            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+                            onError={(e) => { e.target.style.opacity = '0'; }}
+                            loading="lazy"
+                          />
 
-                        {/* Hover overlay with info */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/70 via-Primarycolor/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-6">
-                          <div>
-                            <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
-                              {displayName}
-                            </h3>
-                            <p className="text-sm font-display text-white/70 tabular-nums">
-                              {formatPrice(product.price)}
-                            </p>
+                          {/* Hover overlay with info */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/70 via-Primarycolor/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-6">
+                            <div>
+                              <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
+                                {displayName}
+                              </h3>
+                              <p className="text-sm font-display text-white/70 tabular-nums">
+                                {formatPrice(product.price)}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </motion.div>
                   );
                 })}
               </div>
