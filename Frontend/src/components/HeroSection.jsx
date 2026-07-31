@@ -7,7 +7,8 @@ import { Button } from './ui/button';
 const HeroSection = () => {
   const videoRef = useRef(null);
   const sectionRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [videoSrc, setVideoSrc] = useState('/IMG_9987.mp4');
 
   // Parallax setup
   const { scrollYProgress } = useScroll({
@@ -23,21 +24,33 @@ const HeroSection = () => {
 
   const desktopVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867614/Prechi_Clothing_-_Made_for_You._1_hj54pu.mp4";
   const mobileVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867619/Prechi_Clothing_-_Made_for_You._2_j9h7aw.mp4";
+  const localVideoUrl = "/IMG_9987.mp4";
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleCanPlay = () => setIsLoaded(true);
-    video.addEventListener('canplay', handleCanPlay);
-
-    // Determine video source based on viewport
     const isMobile = window.innerWidth < 768;
-    video.src = isMobile ? mobileVideoUrl : desktopVideoUrl;
-    video.load();
+    const preferredUrl = isMobile ? mobileVideoUrl : desktopVideoUrl;
 
-    return () => video.removeEventListener('canplay', handleCanPlay);
+    const testPreferredVideo = async () => {
+      try {
+        const res = await fetch(preferredUrl, { method: 'HEAD' });
+        if (res.ok) {
+          setVideoSrc(preferredUrl);
+        } else {
+          setVideoSrc(localVideoUrl);
+        }
+      } catch {
+        setVideoSrc(localVideoUrl);
+      }
+    };
+
+    testPreferredVideo();
   }, []);
+
+  const handleVideoError = () => {
+    if (videoSrc !== localVideoUrl) {
+      setVideoSrc(localVideoUrl);
+    }
+  };
 
   return (
     <section
@@ -51,15 +64,14 @@ const HeroSection = () => {
       >
         <video
           ref={videoRef}
+          src={videoSrc}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1.2s] ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          onError={handleVideoError}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1.2s] opacity-100"
           aria-hidden="true"
         />
         {/* Gradient overlays */}
