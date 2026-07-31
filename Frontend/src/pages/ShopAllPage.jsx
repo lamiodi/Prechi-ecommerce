@@ -226,14 +226,14 @@ const ShopAllPage = () => {
           </div>
 
           {/* Filter + Sort bar */}
-          <div className="flex items-center justify-between gap-4 mb-8 md:mb-10 border-b border-border pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-8 md:mb-10 border-b border-border pb-3 sm:pb-4">
             {/* Filters */}
-            <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1 -mb-[calc(1rem+1px)]">
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1 sm:pb-1 -mb-px sm:-mb-[calc(1rem+1px)] min-w-0 flex-1">
               {filterCategories.map((filter) => (
                 <button
                   key={filter}
                   onClick={() => handleFilterChange(filter)}
-                  className={`px-4 py-2 text-[0.8125rem] font-display font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-300 border-b-2 -mb-px ${
+                  className={`px-3.5 sm:px-4 py-2 text-[0.8125rem] font-display font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-300 border-b-2 -mb-px ${
                     currentFilter === filter
                       ? 'text-Primarycolor border-Primarycolor'
                       : 'text-text-tertiary border-transparent hover:text-text-primary hover:border-border'
@@ -247,9 +247,9 @@ const ShopAllPage = () => {
             </div>
 
             {/* Right controls */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center justify-between sm:justify-end gap-2 flex-shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
               {/* Layout toggle (mobile) */}
-              <div className="flex sm:hidden items-center gap-0.5 border border-border rounded-sm p-0.5">
+              <div className="flex sm:hidden items-center gap-0.5 border border-border rounded-sm p-0.5 bg-surface">
                 <button
                   onClick={() => setMobileLayout('one')}
                   className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'one' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
@@ -279,6 +279,11 @@ const ShopAllPage = () => {
                   <option value="name">Name: A to Z</option>
                   <option value="newest">Newest First</option>
                 </select>
+                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-tertiary">
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>

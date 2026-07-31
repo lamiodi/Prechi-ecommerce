@@ -127,13 +127,13 @@ const ProductGrid = () => {
 
       {/* Filter bar */}
       <div className="section-container mb-6 md:mb-8">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide pb-1 min-w-0 flex-1">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => handleFilterChange(category)}
-                className={`px-4 py-2 text-[0.8125rem] font-display font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-300 ${
+                className={`px-3.5 sm:px-4 py-2 text-[0.8125rem] font-display font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-300 rounded-sm ${
                   filter === category
                     ? 'text-Primarycolor bg-surface'
                     : 'text-text-tertiary hover:text-text-primary'
@@ -147,21 +147,23 @@ const ProductGrid = () => {
           </div>
 
           {/* Layout toggle (mobile only) */}
-          <div className="flex sm:hidden items-center gap-0.5 border border-border rounded-sm p-0.5">
-            <button
-              onClick={() => setMobileLayout('one')}
-              className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'one' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
-              aria-label="Single column"
-            >
-              <Rows size={14} weight="bold" />
-            </button>
-            <button
-              onClick={() => setMobileLayout('two')}
-              className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'two' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
-              aria-label="Two column"
-            >
-              <SquaresFour size={14} weight="bold" />
-            </button>
+          <div className="flex sm:hidden items-center justify-end gap-0.5 border-t border-border/40 pt-2">
+            <div className="flex items-center gap-0.5 border border-border rounded-sm p-0.5 bg-surface">
+              <button
+                onClick={() => setMobileLayout('one')}
+                className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'one' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
+                aria-label="Single column"
+              >
+                <Rows size={14} weight="bold" />
+              </button>
+              <button
+                onClick={() => setMobileLayout('two')}
+                className={`p-1.5 rounded-sm transition-colors ${mobileLayout === 'two' ? 'bg-Primarycolor text-white' : 'text-text-tertiary'}`}
+                aria-label="Two column"
+              >
+                <SquaresFour size={14} weight="bold" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
