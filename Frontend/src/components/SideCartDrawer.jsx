@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Trash, Plus, Minus, ShoppingBag, ArrowRight, Sparkle, Check } from '@phosphor-icons/react';
 import { useCartDrawer } from '../context/CartDrawerContext';
+import { Button } from './ui/button';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -92,13 +93,15 @@ const SideCartDrawer = () => {
               Shopping Bag ({items.reduce((acc, curr) => acc + (curr.quantity || 1), 0)})
             </h2>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={closeCart}
-            className="p-1 text-text-tertiary hover:text-Primarycolor transition-colors"
+            className="h-8 w-8 text-text-tertiary hover:text-Primarycolor rounded-sm"
             aria-label="Close cart drawer"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* Free Shipping Progress Indicator */}
@@ -127,12 +130,14 @@ const SideCartDrawer = () => {
               <p className="text-xs uppercase tracking-wider text-text-tertiary font-medium">
                 Your shopping bag is currently empty
               </p>
-              <button
+              <Button
+                variant="default"
+                size="sm"
                 onClick={() => { closeCart(); navigate('/shop'); }}
-                className="btn btn-primary btn-sm mt-2"
+                className="mt-2"
               >
                 Discover Collection
-              </button>
+              </Button>
             </div>
           ) : (
             items.map((cartItem) => {
@@ -225,13 +230,15 @@ const SideCartDrawer = () => {
                       <p className="text-[0.7rem] font-medium text-Primarycolor truncate">{rec.name}</p>
                       <p className="text-[0.65rem] text-text-tertiary tabular-nums">₦{(rec.price || 0).toLocaleString()}</p>
                     </div>
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => handleQuickAdd(rec)}
                       disabled={addingId === rec.id}
-                      className="btn btn-secondary text-[0.65rem] py-1 w-full flex items-center justify-center gap-1"
+                      className="text-[0.65rem] py-1 h-8 w-full flex items-center justify-center gap-1"
                     >
                       {addingId === rec.id ? 'Adding...' : '+ Add'}
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -248,19 +255,21 @@ const SideCartDrawer = () => {
             </div>
             <p className="text-[0.7rem] text-text-tertiary">Shipping and tax calculated at checkout.</p>
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
+              <Button
+                variant="secondary"
                 onClick={handleViewCartClick}
-                className="btn btn-secondary btn-md w-full text-xs"
+                className="w-full text-xs"
               >
                 View Full Bag
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="default"
                 onClick={handleCheckoutClick}
-                className="btn btn-primary btn-md w-full text-xs flex items-center justify-center gap-1.5"
+                className="w-full text-xs flex items-center justify-center gap-1.5"
               >
                 <span>Checkout</span>
                 <ArrowRight size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         )}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import { ArrowRight } from '@phosphor-icons/react';
+import { Button } from './ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -96,9 +97,9 @@ const NewReleaseGrid = () => {
       <section className="py-12 md:py-16">
         <div className="section-container text-center">
           <p className="text-text-secondary font-display text-sm mb-4">Unable to load new releases.</p>
-          <button onClick={fetchNewReleases} className="btn btn-primary btn-sm">
+          <Button onClick={fetchNewReleases} size="sm">
             Try again
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -141,12 +142,11 @@ const NewReleaseGrid = () => {
 
         {/* Mobile "View all" link */}
         <div className="flex sm:hidden justify-center mt-8">
-          <Link
-            to="/shop?category=new"
-            className="btn btn-outline text-xs"
-          >
-            View all new releases
-          </Link>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/shop?category=new">
+              View all new releases
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

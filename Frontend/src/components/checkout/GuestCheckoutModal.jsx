@@ -1,5 +1,7 @@
 import React from 'react';
 import { User, X, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Smartphone, Mail } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const GuestCheckoutModal = React.memo(({ 
   guestForm, 
@@ -17,13 +19,15 @@ const GuestCheckoutModal = React.memo(({
     <div className="bg-Secondarycolor rounded-sm max-w-md w-full p-6 shadow-2xl border border-border relative animate-slideUp">
       {/* Close button if optional */}
       {onClose && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-text-tertiary hover:text-Primarycolor transition-colors"
+          className="absolute top-4 right-4 h-8 w-8 text-text-tertiary hover:text-Primarycolor rounded-sm"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
-        </button>
+        </Button>
       )}
 
       {/* Header */}
@@ -78,14 +82,12 @@ const GuestCheckoutModal = React.memo(({
             Full Name *
           </label>
           <div className="relative">
-            <input
+            <Input
               type="text"
               name="name"
               value={guestForm.name || ''}
               onChange={(e) => onGuestFormChange('name', e.target.value)}
-              className={`input w-full text-xs font-display ${
-                guestFormErrors.name ? 'border-rose-500 bg-rose-50/20' : ''
-              }`}
+              className={`w-full ${guestFormErrors.name ? 'border-rose-500 focus-visible:border-rose-500' : ''}`}
               placeholder="e.g. Alex Morgan"
               required
             />
@@ -101,14 +103,12 @@ const GuestCheckoutModal = React.memo(({
             Email Address *
           </label>
           <div className="relative">
-            <input
+            <Input
               type="email"
               name="email"
               value={guestForm.email || ''}
               onChange={(e) => onGuestFormChange('email', e.target.value)}
-              className={`input w-full text-xs font-display ${
-                guestFormErrors.email ? 'border-rose-500 bg-rose-50/20' : ''
-              }`}
+              className={`w-full ${guestFormErrors.email ? 'border-rose-500 focus-visible:border-rose-500' : ''}`}
               placeholder="alex@example.com"
               required
             />
@@ -124,14 +124,12 @@ const GuestCheckoutModal = React.memo(({
             Phone Number *
           </label>
           <div className="relative">
-            <input
+            <Input
               type="tel"
               name="phone_number"
               value={guestForm.phone_number || ''}
               onChange={(e) => onGuestFormChange('phone_number', e.target.value)}
-              className={`input w-full text-xs font-display ${
-                guestFormErrors.phone_number ? 'border-rose-500 bg-rose-50/20' : ''
-              }`}
+              className={`w-full ${guestFormErrors.phone_number ? 'border-rose-500 focus-visible:border-rose-500' : ''}`}
               placeholder="+234 800 000 0000"
               required
             />
@@ -144,22 +142,23 @@ const GuestCheckoutModal = React.memo(({
         {/* Existing account option */}
         {existingUserType === 'permanent' && (
           <div className="p-3 bg-surface border border-border rounded-sm text-center">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onLoginRedirect}
-              className="btn btn-secondary btn-sm w-full text-xs"
+              className="w-full text-xs"
             >
               Log in to your account
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Submit Actions */}
         <div className="pt-2 space-y-2">
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="btn btn-primary btn-md w-full text-xs flex items-center justify-center gap-2"
+            className="w-full text-xs flex items-center justify-center gap-2"
           >
             {loading ? (
               <span>Processing...</span>
@@ -169,16 +168,17 @@ const GuestCheckoutModal = React.memo(({
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={() => navigate('/cart')}
-            className="btn btn-tertiary btn-sm w-full text-xs flex items-center justify-center gap-1 text-text-tertiary hover:text-Primarycolor"
+            className="w-full text-xs flex items-center justify-center gap-1 text-text-tertiary hover:text-Primarycolor"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Return to Bag</span>
-          </button>
+          </Button>
         </div>
       </form>
     </div>

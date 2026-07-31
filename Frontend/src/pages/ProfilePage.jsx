@@ -7,6 +7,8 @@ import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import SEO from '../components/SEO';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -275,10 +277,9 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="pt-2 flex justify-end">
-                  <button
+                  <Button
                     type="submit"
                     disabled={loading}
-                    className="btn btn-primary btn-md"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -288,7 +289,7 @@ const ProfilePage = () => {
                     ) : (
                       'Save changes'
                     )}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
@@ -387,10 +388,10 @@ const ProfilePage = () => {
                 </div>
 
                 <div className="pt-2 flex justify-end">
-                  <button
+                  <Button
                     type="submit"
+                    variant="secondary"
                     disabled={loading}
-                    className="btn btn-secondary btn-md"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -400,7 +401,7 @@ const ProfilePage = () => {
                     ) : (
                       'Update password'
                     )}
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>

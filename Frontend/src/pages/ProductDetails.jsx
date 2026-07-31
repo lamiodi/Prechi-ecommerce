@@ -27,6 +27,7 @@ import DescriptionSection from "../components/DescriptionSection";
 import { toastSuccess, toastError } from "../utils/toastConfig";
 import ProductSchema from "../components/ProductSchema";
 import SEO from "../components/SEO";
+import { Button } from "../components/ui/button";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -442,9 +443,9 @@ const ProductDetails = () => {
             <WarningCircle size={40} className="text-text-tertiary mx-auto mb-3" weight="light" />
             <h2 className="text-lg font-display font-semibold text-Primarycolor mb-2">Product unavailable</h2>
             <p className="text-xs font-display text-text-secondary mb-6">{error || "Failed to load product details."}</p>
-            <button onClick={() => navigate('/shop')} className="btn btn-primary btn-sm">
+            <Button onClick={() => navigate('/shop')} size="sm">
               Explore collection
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -756,10 +757,11 @@ const ProductDetails = () => {
                   </div>
 
                   {/* Add to Cart button */}
-                  <button
+                  <Button
                     onClick={handleAddToCart}
                     disabled={isAddingToCart || isVariantSoldOut}
-                    className="btn btn-primary btn-md flex-1 h-12"
+                    className="flex-1 h-12 w-full"
+                    size="lg"
                   >
                     {isAddingToCart ? (
                       <span className="flex items-center justify-center gap-2">
@@ -774,7 +776,7 @@ const ProductDetails = () => {
                         Add to shopping bag
                       </span>
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
 

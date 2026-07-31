@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Save, X, User, Mail, Smartphone } from 'lucide-react';
 import { countries } from '../utils/countries';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const BillingAddressForm = ({ 
   address, 
@@ -171,14 +173,12 @@ const BillingAddressForm = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name *
                 </label>
-                <input
+                <Input
                   type="text"
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleChange}
-                  className={`w-full p-2 border rounded-md ${
-                    errors.full_name ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`${errors.full_name ? 'border-red-500' : ''}`}
                   placeholder="Full name"
                 />
                 {errors.full_name && (
@@ -190,14 +190,12 @@ const BillingAddressForm = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address *
                 </label>
-                <input
+                <Input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full p-2 border rounded-md ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`${errors.email ? 'border-red-500' : ''}`}
                   placeholder="Email address"
                 />
                 {errors.email && (
@@ -228,14 +226,12 @@ const BillingAddressForm = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number *
             </label>
-            <input
+            <Input
               type="tel"
               name="phone_number"
               value={formData.phone_number}
               onChange={handleChange}
-              className={`w-full p-2 border rounded-md ${
-                errors.phone_number ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`${errors.phone_number ? 'border-red-500' : ''}`}
               placeholder="Phone number"
             />
             {errors.phone_number && (
@@ -249,14 +245,12 @@ const BillingAddressForm = ({
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Address Line 1 *
         </label>
-        <input
+        <Input
           type="text"
           name="address_line_1"
           value={formData.address_line_1}
           onChange={handleChange}
-          className={`w-full p-2 border rounded-md ${
-            errors.address_line_1 ? 'border-red-500' : 'border-gray-300'
-          }`}
+          className={`${errors.address_line_1 ? 'border-red-500' : ''}`}
           placeholder="Street address, P.O. box"
         />
         {errors.address_line_1 && (
@@ -271,14 +265,12 @@ const BillingAddressForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             City *
           </label>
-          <input
+          <Input
             type="text"
             name="city"
             value={formData.city}
             onChange={handleChange}
-            className={`w-full p-2 border rounded-md ${
-              errors.city ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`${errors.city ? 'border-red-500' : ''}`}
             placeholder="City"
           />
           {errors.city && (
@@ -290,14 +282,12 @@ const BillingAddressForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             State *
           </label>
-          <input
+          <Input
             type="text"
             name="state"
             value={formData.state}
             onChange={handleChange}
-            className={`w-full p-2 border rounded-md ${
-              errors.state ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`${errors.state ? 'border-red-500' : ''}`}
             placeholder="State"
           />
           {errors.state && (
@@ -311,12 +301,11 @@ const BillingAddressForm = ({
           <label className="block text-sm font-medium text-gray-700 mb-1">
             ZIP/Postal Code
           </label>
-          <input
+          <Input
             type="text"
             name="zip_code"
             value={formData.zip_code}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
             placeholder="ZIP/Postal code"
           />
         </div>
@@ -347,17 +336,19 @@ const BillingAddressForm = ({
       </div>
       
       <div className="flex justify-end space-x-3 pt-2">
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
+          className="flex items-center"
         >
           <X className="h-4 w-4 mr-1" /> Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
+          variant="default"
           disabled={actionLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center disabled:opacity-50"
+          className="flex items-center"
         >
           {actionLoading ? (
             <>
@@ -369,7 +360,7 @@ const BillingAddressForm = ({
               <Save className="h-4 w-4 mr-1" /> Save Address
             </>
           )}
-        </button>
+        </Button>
       </div>
     </form>
   );

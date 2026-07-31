@@ -8,4 +8,16 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-icons': ['@phosphor-icons/react', 'lucide-react'],
+          'utils': ['axios', 'uuid', 'date-fns', 'framer-motion', 'clsx', 'tailwind-merge'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 800
+  }
 });

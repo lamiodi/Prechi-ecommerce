@@ -7,6 +7,7 @@ import Pic2 from '../assets/images/IMG_4554.JPG';
 import Pic3 from '../assets/images/IMG_4559.JPG';
 import axios from 'axios';
 import SEO from '../components/SEO';
+import { Button } from '../components/ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
 const api = axios.create({
@@ -305,10 +306,10 @@ const Login = () => {
             </div>
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="btn btn-primary btn-md w-full mt-2"
+              className="w-full mt-2"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -318,7 +319,7 @@ const Login = () => {
               ) : (
                 'Sign in'
               )}
-            </button>
+            </Button>
           </form>
 
           {/* Footer note */}

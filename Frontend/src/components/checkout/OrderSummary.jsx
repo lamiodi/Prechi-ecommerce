@@ -1,6 +1,7 @@
 import React from 'react';
 import { CurrencyBtc, WarningCircle, ShoppingBag, Check } from '@phosphor-icons/react';
 import CouponCode from '../CouponCode';
+import { Button } from '../ui/button';
 
 const OrderSummary = React.memo(({
   cart,
@@ -162,7 +163,9 @@ const OrderSummary = React.memo(({
       )}
 
       {/* Place Order CTA Button */}
-      <button
+      <Button
+        variant="default"
+        size="lg"
         onClick={handlePlaceOrder}
         disabled={
           isProcessing || loading ||
@@ -171,7 +174,7 @@ const OrderSummary = React.memo(({
           (isNigeria && !shippingMethod) ||
           (isGuest && !createdUserId && !guestFormSubmitted)
         }
-        className="mt-6 btn btn-primary btn-md w-full"
+        className="mt-6 w-full"
       >
         {isProcessing || loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -184,7 +187,7 @@ const OrderSummary = React.memo(({
             Place Order
           </span>
         )}
-      </button>
+      </Button>
 
       {paymentMethod === 'bitcoin' && (
         <div className="mt-4 bg-amber-50 border border-amber-200 rounded-sm p-3 flex items-center gap-2">

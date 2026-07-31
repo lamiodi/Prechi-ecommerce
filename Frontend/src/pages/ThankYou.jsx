@@ -5,6 +5,7 @@ import { Loader2, CheckCircle, AlertCircle, RefreshCw, ArrowLeft, UserPlus, Mail
 import { toast } from 'react-toastify';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
+import { Button } from '../components/ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -268,10 +269,10 @@ const ThankYou = () => {
               <p className="text-sm md:text-base text-red-700 font-PatrickHand">{error}</p>
             </div>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <button
+              <Button
                 onClick={handleManualVerify}
                 disabled={verifying}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-PatrickHand"
+                className="w-full sm:w-auto font-PatrickHand"
               >
                 {verifying ? (
                   <>
@@ -284,24 +285,26 @@ const ThankYou = () => {
                     Verify Payment Manually
                   </>
                 )}
-              </button>
+              </Button>
               
-              <button
+              <Button
                 onClick={handleRefresh}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-PatrickHand"
+                variant="secondary"
+                className="w-full sm:w-auto font-PatrickHand"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Page
-              </button>
+              </Button>
             </div>
             
             <div className="mt-6">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => navigate('/')}
                 className="text-sm md:text-base text-Accent hover:text-Primarycolor font-PatrickHand"
               >
                 Return to Homepage
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -329,10 +332,10 @@ const ThankYou = () => {
             <h2 className="text-xl md:text-2xl font-bold text-Primarycolor mb-4 font-Manrope">Order Not Found</h2>
             <p className="text-sm md:text-base text-Accent mb-6 font-PatrickHand">We couldn't find your order details. Please try verifying your payment manually.</p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <button
+              <Button
                 onClick={handleManualVerify}
                 disabled={verifying}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 font-PatrickHand"
+                className="w-full sm:w-auto font-PatrickHand"
               >
                 {verifying ? (
                   <>
@@ -345,24 +348,26 @@ const ThankYou = () => {
                     Verify Payment Manually
                   </>
                 )}
-              </button>
+              </Button>
               
-              <button
+              <Button
                 onClick={handleRefresh}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm md:text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-PatrickHand"
+                variant="secondary"
+                className="w-full sm:w-auto font-PatrickHand"
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh Page
-              </button>
+              </Button>
             </div>
             
             <div className="mt-6">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => navigate('/')}
                 className="text-sm md:text-base text-Accent hover:text-Primarycolor font-PatrickHand"
               >
                 Return to Homepage
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -435,13 +440,13 @@ const ThankYou = () => {
                     </div>
                   </div>
                   
-                  <button
+                  <Button
                     onClick={handleConvertAccount}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition-all shadow-lg flex items-center justify-center font-Manrope"
+                    className="w-full sm:w-auto shadow-lg flex items-center justify-center font-Manrope"
                   >
                     <Lock className="h-5 w-5 mr-2" />
                     Set Up Password
-                  </button>
+                  </Button>
                   
                   <p className="text-xs md:text-sm text-Accent mt-3 font-PatrickHand">
                     This will convert your temporary account to a permanent one
@@ -509,24 +514,25 @@ const ThankYou = () => {
           
           <div className="flex flex-col justify-center items-center gap-4 w-full max-w-md mx-auto">
             {user && !user.is_temporary && (
-              <button
+              <Button
                 onClick={() => navigate(`/orders?orderId=${order.id}`)}
-                className="w-full bg-Primarycolor text-Secondarycolor py-2 px-4 sm:px-6 rounded-md hover:bg-gray-800 transition-colors font-PatrickHand flex items-center justify-center text-sm md:text-base"
+                className="w-full font-PatrickHand"
               >
                 View Order Details
-              </button>
+              </Button>
             )}
             {user && user.is_temporary && (
               <div className="w-full bg-blue-50 border border-blue-200 rounded-md p-3 sm:p-4 text-center">
                 <p className="text-xs md:text-sm text-blue-800 font-PatrickHand mb-2">
                   To view your order details and track future orders, please convert your guest account to a permanent account.
                 </p>
-                <button
+                <Button
                   onClick={handleConvertAccount}
-                  className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-blue-700 transition-colors text-xs md:text-sm font-PatrickHand"
+                  size="sm"
+                  className="font-PatrickHand"
                 >
                   Convert Account
-                </button>
+                </Button>
               </div>
             )}
             {!user && (
@@ -534,20 +540,21 @@ const ThankYou = () => {
                 <p className="text-sm md:text-base text-blue-800 font-PatrickHand mb-4">
                   Made this order as a guest? Reset your password to convert your temporary account to a permanent one and access order history.
                 </p>
-                <button
+                <Button
                   onClick={() => navigate('/forgot-password')}
-                  className="w-full bg-blue-600 text-white py-2 px-4 sm:px-6 rounded-md hover:bg-blue-700 transition-colors text-sm md:text-base font-PatrickHand mb-3"
+                  className="w-full font-PatrickHand mb-3"
                 >
                   Reset Password
-                </button>
+                </Button>
               </div>
             )}
-            <button
+            <Button
               onClick={() => navigate('/')}
-              className="w-full bg-white text-Primarycolor border border-gray-300 py-2 px-4 sm:px-6 rounded-md hover:bg-gray-50 transition-colors font-PatrickHand flex items-center justify-center text-sm md:text-base"
+              variant="outline"
+              className="w-full font-PatrickHand"
             >
               Continue Shopping
-            </button>
+            </Button>
           </div>
         </div>
       </div>

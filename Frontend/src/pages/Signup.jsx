@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeSlash, WarningCircle, CheckCircle, CircleNotch } from '@phosphor-icons/react';
 import axios from 'axios';
 import SEO from '../components/SEO';
+import { Button } from '../components/ui/button';
 import Pic1 from '../assets/images/IMG_4558.JPG';
 import Pic2 from '../assets/images/IMG_4571.JPG';
 import Pic3 from '../assets/images/IMG_4566 (1).png';
@@ -302,10 +303,10 @@ const SignupPage = () => {
             </div>
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="btn btn-primary btn-md w-full mt-4"
+              className="w-full mt-4"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -315,7 +316,7 @@ const SignupPage = () => {
               ) : (
                 'Create account'
               )}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-8 text-center">

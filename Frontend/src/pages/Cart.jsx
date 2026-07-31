@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Minus, Plus, Trash2, ArrowRight, ShoppingBag, Loader2, Package, Star, X, AlertCircle, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar2 from '../components/Navbar2';
+import { Button } from '../components/ui/button';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from './CurrencyContext';
@@ -858,13 +859,15 @@ const Cart = () => {
                     </div>
 
                     {/* Delete Button - Top Right */}
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => removeItem(item.id)}
-                      className="flex-shrink-0 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                      className="flex-shrink-0 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
                       title="Remove item"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </div>
 
                   {/* Bundle Items Display */}
@@ -927,38 +930,43 @@ const Cart = () => {
                 <div className="flex items-center">
                   <label className="text-sm text-gray-600 font-PatrickHand mr-3">Quantity:</label>
                   <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => debouncedUpdateQuantity(item.id, item.quantity - 1)}
                       disabled={isOutOfStock || isUpdating === item.id || item.quantity <= 1}
-                      className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="h-8 w-8 sm:h-10 sm:w-10 rounded-none disabled:opacity-50"
                     >
                       <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </button>
-                    <div className="px-2 sm:px-4 py-1 sm:py-2 bg-gray-50 border-x border-gray-300 min-w-[2.5rem] sm:min-w-[3rem] text-center">
+                    </Button>
+                    <div className="px-2 sm:px-4 py-1 sm:py-2 bg-gray-50 border-x border-gray-300 min-w-[2.5rem] sm:min-w-[3rem] text-center flex items-center justify-center">
                       {isUpdating === item.id ? (
                         <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin text-Primarycolor mx-auto" />
                       ) : (
                         <span className="text-xs sm:text-sm font-semibold font-PatrickHand">{item.quantity}</span>
                       )}
                     </div>
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => debouncedUpdateQuantity(item.id, item.quantity + 1)}
                       disabled={isOutOfStock || isUpdating === item.id || item.quantity >= item.item.stock_quantity}
-                      className="p-1 sm:p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="h-8 w-8 sm:h-10 sm:w-10 rounded-none disabled:opacity-50"
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {/* Delete Button - Bottom */}
-                <button
+                <Button
+                  variant="link"
                   onClick={() => removeItem(item.id)}
-                  className="flex items-center gap-1 text-sm text-red-600 hover:text-red-800 font-PatrickHand transition-colors"
+                  className="h-auto p-0 text-sm text-red-600 hover:text-red-800 font-PatrickHand transition-colors flex items-center gap-1"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -1026,12 +1034,12 @@ const Cart = () => {
 
               {/* Continue Shopping Button - Better Position */}
               {cart.items.length > 0 && (
-                <Link to="/shop" className="self-start">
-                  <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium font-PatrickHand flex items-center gap-2 transition-colors">
+                <Button asChild variant="secondary" size="sm" className="self-start gap-2">
+                  <Link to="/shop">
                     <ArrowRight className="h-4 w-4 rotate-180" />
                     Continue Shopping
-                  </button>
-                </Link>
+                  </Link>
+                </Button>
               )}
             </div>
           </div>
@@ -1052,13 +1060,15 @@ const Cart = () => {
                 {/* Your Items Header with Clear All Items Button */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
                   <h2 className="text-lg md:text-xl font-semibold font-Manrope text-gray-900">Your Items</h2>
-                  <button
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     onClick={clearCart}
-                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium font-PatrickHand flex items-center justify-center gap-2 transition-colors"
+                    className="flex items-center justify-center gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
                     Clear All Items
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Cart Items List */}
@@ -1080,11 +1090,11 @@ const Cart = () => {
                           </p>
                         </div>
                         <div className="space-y-3">
-                          <Link to="/shop">
-                            <button className="w-full bg-gray-900 text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-medium font-PatrickHand">
+                          <Button asChild variant="default" size="lg" className="w-full">
+                            <Link to="/shop">
                               Continue Shopping
-                            </button>
-                          </Link>
+                            </Link>
+                          </Button>
 
                           {isGuest && (
                             <div className="bg-blue-50 rounded-lg p-4 mt-4">
@@ -1166,32 +1176,32 @@ const Cart = () => {
 
                   {/* Checkout Button */}
                   {cart.warning || cart.items.some((item) => item.item.stock_quantity === 0) ? (
-                    <div className="relative">
-                      <button
-                        className="w-full mt-6 bg-gray-400 text-white py-4 px-6 rounded-lg font-semibold font-Manrope cursor-not-allowed flex items-center justify-center gap-2 opacity-50"
+                    <div className="relative mt-6">
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full flex items-center justify-center gap-2 opacity-50"
                         disabled
                         title={cart.warning || "Remove out of stock items to continue checkout"}
                       >
                         <span>Proceed to Checkout</span>
                         <ArrowRight className="h-5 w-5" />
-                      </button>
+                      </Button>
                       {cart.warning && cart.warning.includes('brief') && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded-md -mt-12">
+                          <div className="bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded-sm -mt-12">
                             Minimum 3 briefs required
                           </div>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <Link to="/checkout">
-                      <button
-                        className="w-full mt-6 bg-gray-900 text-white py-4 px-6 rounded-lg font-semibold font-Manrope hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-                      >
+                    <Button asChild variant="default" size="lg" className="w-full mt-6">
+                      <Link to="/checkout" className="flex items-center justify-center gap-2">
                         <span>Proceed to Checkout</span>
                         <ArrowRight className="h-5 w-5" />
-                      </button>
-                    </Link>
+                      </Link>
+                    </Button>
                   )}
 
                   {/* Enhanced Warning for brief minimum quantity */}

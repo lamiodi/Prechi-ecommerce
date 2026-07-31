@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import SEO from '../components/SEO';
+import { Button } from '../components/ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -103,9 +104,9 @@ const UserOrders = () => {
               <Package size={32} weight="light" className="text-text-tertiary mx-auto mb-3" />
               <p className="text-base font-display font-medium text-Primarycolor mb-1">No orders yet</p>
               <p className="text-xs font-display text-text-tertiary mb-6">When you place an order, it will appear here.</p>
-              <button onClick={() => navigate('/shop')} className="btn btn-primary btn-sm">
+              <Button onClick={() => navigate('/shop')} size="sm">
                 Start shopping
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="bg-surface border border-border overflow-hidden rounded-sm">
@@ -136,16 +137,18 @@ const UserOrders = () => {
                           </span>
                         </td>
                         <td className="py-4 px-6 text-right">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => {
                               setSelectedOrder(order);
                               setSearchParams({ orderId: order.id });
                             }}
-                            className="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.04em] text-Primarycolor hover:text-text-secondary transition-colors"
+                            className="h-8 px-2 text-xs uppercase tracking-[0.04em]"
                           >
                             View
                             <CaretRight size={14} weight="bold" />
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -170,16 +173,18 @@ const UserOrders = () => {
                   #{selectedOrder.id}
                 </h2>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => {
                   setSelectedOrder(null);
                   setSearchParams({});
                 }}
-                className="p-2 text-text-tertiary hover:text-Primarycolor transition-colors"
+                className="h-8 w-8 text-text-tertiary hover:text-Primarycolor"
                 aria-label="Close"
               >
                 <X size={20} weight="light" />
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-6 font-display">

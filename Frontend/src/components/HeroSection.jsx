@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from '@phosphor-icons/react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { Button } from './ui/button';
 
 const HeroSection = () => {
   const videoRef = useRef(null);
@@ -115,11 +116,13 @@ const HeroSection = () => {
             style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
           >
             <Link to="/shop">
-              <button className="h-12 sm:h-[3.25rem] px-8 sm:px-10 bg-white text-Primarycolor text-[0.8125rem] sm:text-sm font-display font-medium tracking-[0.04em] uppercase transition-all duration-500 active:scale-[0.98] hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+              <Button 
+                variant="default" 
+                size="lg"
+                className="bg-white text-Primarycolor hover:bg-white/90"
               >
                 Shop now
-              </button>
+              </Button>
             </Link>
             <Link
               to="/shop?category=new"

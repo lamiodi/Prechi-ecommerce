@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
+import { Button } from '../components/ui/button';
 
 const useMetaTags = (title, description) => {
   useEffect(() => {
@@ -294,9 +295,9 @@ const ShopAllPage = () => {
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-text-secondary font-display text-sm mb-4">Something went wrong loading products.</p>
-              <button onClick={fetchProducts} className="btn btn-primary btn-sm">
+              <Button onClick={fetchProducts} size="sm">
                 Try again
-              </button>
+              </Button>
             </div>
           ) : displayedProducts.length === 0 ? (
             <div className="text-center py-20">
@@ -324,20 +325,18 @@ const ShopAllPage = () => {
               {/* Add shadcn pagination component here later */}
               <div className="flex gap-1">
                 {[...Array(Math.ceil(filteredProducts.length / itemsPerPage))].map((_, i) => (
-                  <button
+                  <Button
                     key={i}
+                    variant={page === i + 1 ? 'default' : 'outline'}
+                    size="icon"
+                    className="w-8 h-8 rounded-sm text-xs font-display flex items-center justify-center transition-colors"
                     onClick={() => {
                       setPage(i + 1);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`w-8 h-8 rounded-sm text-xs font-display flex items-center justify-center transition-colors ${
-                      page === i + 1 
-                        ? 'bg-Primarycolor text-white' 
-                        : 'bg-surface border border-border text-text-secondary hover:bg-border/50'
-                    }`}
                   >
                     {i + 1}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

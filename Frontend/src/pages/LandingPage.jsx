@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from '@phosphor-icons/react';
+import { Button } from '../components/ui/button';
 import Navbar2 from '../components/Navbar2';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
@@ -13,6 +14,67 @@ import PageTransition from '../components/PageTransition';
 
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
+
+// Parallax Product Card Component
+const ParallaxProductCard = ({ product, index, formatPrice }) => {
+  const ref = useRef(null);
+  const { scrollYProgress } = motion.useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  // Create a subtle parallax effect for the image
+  const imageY = motion.useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  const productUrl = product.is_product
+    ? `/product/${product.id}${product.variantId ? `?variant=${product.variantId}` : ''}`
+    : `/bundle/${product.id}`;
+
+  let displayName = product.name || 'Product';
+  if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ 
+        duration: 0.7, 
+        delay: index * 0.1,
+        ease: [0.16, 1, 0.3, 1] 
+      }}
+    >
+      <Link
+        to={productUrl}
+        className="group relative block overflow-hidden bg-surface"
+      >
+        <div className="aspect-[3/4] overflow-hidden relative">
+          <motion.img
+            src={product.image}
+            alt={displayName}
+            className="absolute inset-0 w-full h-[120%] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            style={{ y: imageY, transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+            onError={(e) => { e.target.style.opacity = '0'; }}
+            loading="lazy"
+          />
+
+          {/* Hover overlay with info */}
+          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/70 via-Primarycolor/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-6">
+            <div>
+              <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
+                {displayName}
+              </h3>
+              <p className="text-sm font-display text-white/70 tabular-nums">
+                {formatPrice(product.price)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+};
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '') + '/api'
@@ -119,64 +181,24 @@ const LandingPage = () => {
               </div>
             ) : products.length > 0 ? (
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                {products.map((product, index) => {
-                  const productUrl = product.is_product
-                    ? `/product/${product.id}${product.variantId ? `?variant=${product.variantId}` : ''}`
-                    : `/bundle/${product.id}`;
-
-                  let displayName = product.name || 'Product';
-                  if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
-
-                  return (
-                    <motion.div
-                      key={product.id || index}
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-50px" }}
-                      transition={{ 
-                        duration: 0.7, 
-                        delay: index * 0.1,
-                        ease: [0.16, 1, 0.3, 1] 
-                      }}
-                    >
-                      <Link
-                        to={productUrl}
-                        className="group relative block overflow-hidden bg-surface"
-                      >
-                        <div className="aspect-[3/4] overflow-hidden">
-                          <img
-                            src={product.image}
-                            alt={displayName}
-                            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-[1.03]"
-                            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-                            onError={(e) => { e.target.style.opacity = '0'; }}
-                            loading="lazy"
-                          />
-
-                          {/* Hover overlay with info */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/70 via-Primarycolor/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-6">
-                            <div>
-                              <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
-                                {displayName}
-                              </h3>
-                              <p className="text-sm font-display text-white/70 tabular-nums">
-                                {formatPrice(product.price)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
+                {products.map((product, index) => (
+                  <ParallaxProductCard
+                    key={product.id || index}
+                    product={product}
+                    index={index}
+                    formatPrice={formatPrice}
+                  />
+                ))}
               </div>
             ) : null}
 
             {/* Mobile shop all */}
             <div className="flex sm:hidden justify-center mt-8">
-              <Link to="/shop" className="btn btn-outline text-xs">
-                Shop all products
-              </Link>
+              <Button asChild variant="outline" size="sm" className="w-full max-w-[200px]">
+                <Link to="/shop">
+                  Shop all products
+                </Link>
+              </Button>
             </div>
           </div>
         </section>

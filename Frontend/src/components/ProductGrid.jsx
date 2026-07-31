@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import { Funnel, Rows, SquaresFour } from '@phosphor-icons/react';
+import { Button } from './ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -179,12 +180,12 @@ const ProductGrid = () => {
       ) : error ? (
         <div className="section-container text-center py-16">
           <p className="text-text-secondary font-display text-sm mb-4">Something went wrong loading products.</p>
-          <button
+          <Button
             onClick={fetchProducts}
-            className="btn btn-primary btn-sm"
+            size="sm"
           >
             Try again
-          </button>
+          </Button>
         </div>
       ) : displayedProducts.length === 0 ? (
         <div className="section-container text-center py-16">
@@ -209,12 +210,12 @@ const ProductGrid = () => {
           {/* Load more */}
           {hasMoreProducts && (
             <div className="flex justify-center mt-12 md:mt-16">
-              <button
+              <Button
                 onClick={handleLoadMore}
-                className="btn btn-outline"
+                variant="outline"
               >
                 Load more ({products.length - displayedProducts.length} remaining)
-              </button>
+              </Button>
             </div>
           )}
         </div>

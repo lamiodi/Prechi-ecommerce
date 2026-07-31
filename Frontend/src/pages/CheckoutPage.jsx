@@ -30,6 +30,7 @@ import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
 import SEO from '../components/SEO';
+import { Button } from '../components/ui/button';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -916,18 +917,22 @@ const CheckoutPage = () => {
                                       <p className="text-xs text-text-tertiary">{addr.city}, {addr.state} {addr.zip_code}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <button
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
                                         onClick={(e) => { e.stopPropagation(); handleEditAddress('addresses', addr); }}
-                                        className="p-1 hover:text-Primarycolor text-text-tertiary transition-colors"
+                                        className="h-8 w-8 text-text-tertiary hover:text-Primarycolor"
                                       >
                                         <PencilSimple size={16} />
-                                      </button>
-                                      <button
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
                                         onClick={(e) => { e.stopPropagation(); handleDeleteAddress('addresses', addr.id); }}
-                                        className="p-1 hover:text-rose-600 text-text-tertiary transition-colors"
+                                        className="h-8 w-8 text-text-tertiary hover:text-rose-600"
                                       >
                                         <Trash size={16} />
-                                      </button>
+                                      </Button>
                                     </div>
                                   </div>
                                 </div>
@@ -942,13 +947,15 @@ const CheckoutPage = () => {
                       )}
 
                       {!showShippingForm && (
-                        <button
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           onClick={() => { setEditingShippingAddress(null); setShowShippingForm(true); }}
-                          className="btn btn-secondary btn-sm w-full flex items-center justify-center gap-2"
+                          className="w-full flex items-center justify-center gap-2"
                         >
                           <Plus size={14} />
                           Add new shipping address
-                        </button>
+                        </Button>
                       )}
 
                       {showShippingForm && (
@@ -1072,20 +1079,23 @@ const CheckoutPage = () => {
                   {/* Step Buttons */}
                   <div className="flex items-center justify-between pt-4 border-t border-border">
                     {currentStep > 1 && (
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => setCurrentStep(currentStep - 1)}
-                        className="btn btn-secondary btn-sm"
                       >
                         Previous Step
-                      </button>
+                      </Button>
                     )}
                     {currentStep < 2 && (
-                      <button
+                      <Button
+                        variant="default"
+                        size="sm"
                         onClick={() => handleNextStep(currentStep + 1)}
-                        className="btn btn-primary btn-sm ml-auto"
+                        className="ml-auto"
                       >
                         Continue to Next Step
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
