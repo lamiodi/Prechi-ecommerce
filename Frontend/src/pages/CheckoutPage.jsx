@@ -19,7 +19,6 @@ import {
 } from '@phosphor-icons/react';
 import Navbar2 from '../components/Navbar2';
 import Footer from '../components/Footer';
-import GuestCheckoutModal from '../components/checkout/GuestCheckoutModal';
 import OrderSummary from '../components/checkout/OrderSummary';
 const BillingAddressForm = React.lazy(() => import('../components/BillingAddressForm'));
 const ShippingAddressForm = React.lazy(() => import('../components/ShippingAddressForm'));
@@ -31,6 +30,7 @@ import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
 import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -112,7 +112,7 @@ const CheckoutPage = () => {
   });
   const [createdUserId, setCreatedUserId] = useState(() => localStorage.getItem('prechi_guest_id') || null);
   const [guestFormSubmitted, setGuestFormSubmitted] = useState(() => !!localStorage.getItem('prechi_guest_id'));
-  const [showGuestModal, setShowGuestModal] = useState(() => !localStorage.getItem('token') && !localStorage.getItem('prechi_guest_id'));
+  const [showGuestModal, setShowGuestModal] = useState(false);
   const [guestFormErrors, setGuestFormErrors] = useState({});
   const [existingUserType, setExistingUserType] = useState(null);
   const [requiredForm, setRequiredForm] = useState(null);
@@ -121,12 +121,27 @@ const CheckoutPage = () => {
   const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
   const [idempotencyKey] = useState(() => uuidv4());
 
-  const validateStep1 = () => {
+  const validateStep1 = useCallback(() => {
     const missing = [];
-    if (isGuest && !guestFormSubmitted) missing.push("Guest contact information is required");
+    if (isGuest) {
+      const gErrors = {};
+      if (!guestForm.name || !guestForm.name.trim()) gErrors.name = 'Please enter your full name';
+      if (!guestForm.email || !guestForm.email.trim()) gErrors.email = 'Please enter your email address';
+      else if (!/\S+@\S+\.\S+/.test(guestForm.email)) gErrors.email = 'Please enter a valid email';
+      if (!guestForm.phone_number || !guestForm.phone_number.trim()) gErrors.phone_number = 'Please enter your phone number';
+
+      if (Object.keys(gErrors).length > 0) {
+        setGuestFormErrors(gErrors);
+        missing.push("Guest contact information (Name, Email, Phone) is required");
+      } else {
+        setGuestFormErrors({});
+      }
+    }
+
     const hasShipping = isAuthenticated()
       ? (shippingAddressId && shippingAddresses.length > 0) || shippingForm.address_line_1
       : shippingForm.address_line_1;
+
     if (!hasShipping) {
       missing.push("Shipping address is missing");
       setRequiredForm('shipping');
@@ -141,9 +156,9 @@ const CheckoutPage = () => {
     }
     setMissingFieldsSummary([]);
     return true;
-  };
+  }, [isGuest, guestForm, shippingAddressId, shippingAddresses.length, shippingForm, country, shippingMethod, isAuthenticated]);
 
-  const validateStep2 = () => {
+  const validateStep2 = useCallback(() => {
     const missing = [];
     const hasBilling = isAuthenticated()
       ? (billingAddressOption === 'same' && (shippingAddressId || shippingForm.address_line_1)) || (billingAddressId && billingAddresses.length > 0)
@@ -159,17 +174,29 @@ const CheckoutPage = () => {
     }
     setMissingFieldsSummary([]);
     return true;
-  };
+  }, [isAuthenticated, billingAddressOption, shippingAddressId, shippingForm.address_line_1, billingAddressId, billingAddresses.length, billingForm.address_line_1]);
 
-  const handleNextStep = (step) => {
+  const handleNextStep = useCallback(async (step) => {
     if (step === 2) {
-      if (validateStep1()) setCurrentStep(2);
-      else window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (!validateStep1()) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (isGuest && (!createdUserId || !guestFormSubmitted)) {
+        setIsProcessing(true);
+        const tempId = await handleGuestFormSubmit();
+        setIsProcessing(false);
+        if (!tempId) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+      }
+      setCurrentStep(2);
     } else if (step === 3) {
       if (validateStep2()) setCurrentStep(3);
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  };
+  }, [validateStep1, isGuest, createdUserId, guestFormSubmitted, handleGuestFormSubmit, validateStep2]);
 
   const handleGuestFormChange = useCallback((field, value) => {
     setGuestForm(prev => ({ ...prev, [field]: value }));
@@ -704,14 +731,14 @@ const CheckoutPage = () => {
           const guestCart = JSON.parse(guestCartData);
           setCart(guestCart);
           setIsGuest(true);
-          setShowGuestModal(true);
+          setShowShippingForm(true);
           setLoading(false);
           return;
         } catch (err) {}
       }
       setCart({ cartId: null, subtotal: 0, tax: 0, total: 0, items: [] });
       setIsGuest(true);
-      setShowGuestModal(true);
+      setShowShippingForm(true);
       setLoading(false);
       return;
     }
@@ -834,64 +861,118 @@ const CheckoutPage = () => {
             </div>
           )}
 
-          {/* Guest Checkout Modal overlay */}
-          {isGuest && showGuestModal && (
-            <GuestCheckoutModal
-              guestForm={guestForm}
-              guestFormErrors={guestFormErrors}
-              existingUserType={existingUserType}
-              requiredForm={requiredForm}
-              onGuestFormChange={handleGuestFormChange}
-              onLoginRedirect={handleLoginRedirect}
-              onSubmitGuestForm={handleGuestFormSubmit}
-              loading={loading}
-              navigate={navigate}
-            />
+          {/* Step indicator */}
+          <div className="grid grid-cols-3 gap-2 mb-8 border-b border-border pb-4">
+            {[
+              { step: 1, label: "1. Shipping & Delivery" },
+              { step: 2, label: "2. Payment & Billing" },
+              { step: 3, label: "3. Order Review" },
+            ].map((s) => (
+              <button
+                key={s.step}
+                onClick={() => handleNextStep(s.step)}
+                className={`py-2 text-left text-xs uppercase tracking-[0.08em] font-semibold transition-all border-b-2 ${
+                  currentStep >= s.step
+                    ? 'border-Primarycolor text-Primarycolor'
+                    : 'border-transparent text-text-tertiary hover:text-text-secondary'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          {missingFieldsSummary.length > 0 && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-sm text-amber-800 text-xs">
+              <p className="font-semibold uppercase tracking-wider mb-1">Required Information Missing:</p>
+              <ul className="list-disc pl-4 space-y-0.5">
+                {missingFieldsSummary.map((m, idx) => (
+                  <li key={idx}>{m}</li>
+                ))}
+              </ul>
+            </div>
           )}
 
-          {(!isGuest || guestFormSubmitted) && (
-            <>
-              {/* Step indicator */}
-              <div className="grid grid-cols-3 gap-2 mb-8 border-b border-border pb-4">
-                {[
-                  { step: 1, label: "1. Shipping & Delivery" },
-                  { step: 2, label: "2. Payment & Billing" },
-                  { step: 3, label: "3. Order Review" },
-                ].map((s) => (
-                  <button
-                    key={s.step}
-                    onClick={() => handleNextStep(s.step)}
-                    className={`py-2 text-left text-xs uppercase tracking-[0.08em] font-semibold transition-all border-b-2 ${
-                      currentStep >= s.step
-                        ? 'border-Primarycolor text-Primarycolor'
-                        : 'border-transparent text-text-tertiary hover:text-text-secondary'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+            {/* Form Steps Column */}
+            <div className="lg:col-span-7 space-y-8">
+              {/* Step 1: Shipping */}
+              <div className={currentStep === 1 ? "block space-y-6" : "hidden"}>
+                {/* Contact Information (for guests) */}
+                {isGuest && (
+                  <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-border">
+                      <div>
+                        <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor">
+                          Contact Information
+                        </h2>
+                        <p className="text-xs text-text-tertiary mt-0.5">Quick order setup without creating an account</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleLoginRedirect}
+                        className="text-xs text-Primarycolor hover:underline font-medium"
+                      >
+                        Already have an account? Log in
+                      </button>
+                    </div>
 
-              {missingFieldsSummary.length > 0 && (
-                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-sm text-amber-800 text-xs">
-                  <p className="font-semibold uppercase tracking-wider mb-1">Required Information Missing:</p>
-                  <ul className="list-disc pl-4 space-y-0.5">
-                    {missingFieldsSummary.map((m, idx) => (
-                      <li key={idx}>{m}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">
+                          Full Name *
+                        </label>
+                        <Input
+                          type="text"
+                          value={guestForm.name}
+                          onChange={(e) => handleGuestFormChange('name', e.target.value)}
+                          placeholder="e.g. Alex Morgan"
+                          className={guestFormErrors.name ? 'border-rose-500' : ''}
+                        />
+                        {guestFormErrors.name && (
+                          <p className="text-[11px] text-rose-600 mt-1">{guestFormErrors.name}</p>
+                        )}
+                      </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-                {/* Form Steps Column */}
-                <div className="lg:col-span-7 space-y-8">
-                  {/* Step 1: Shipping */}
-                  <div className={currentStep === 1 ? "block space-y-6" : "hidden"}>
-                    <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
-                      <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-3 border-b border-border">
-                        Shipping Address
-                      </h2>
+                      <div>
+                        <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">
+                          Phone Number *
+                        </label>
+                        <Input
+                          type="tel"
+                          value={guestForm.phone_number}
+                          onChange={(e) => handleGuestFormChange('phone_number', e.target.value)}
+                          placeholder="+234 800 000 0000"
+                          className={guestFormErrors.phone_number ? 'border-rose-500' : ''}
+                        />
+                        {guestFormErrors.phone_number && (
+                          <p className="text-[11px] text-rose-600 mt-1">{guestFormErrors.phone_number}</p>
+                        )}
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">
+                          Email Address *
+                        </label>
+                        <Input
+                          type="email"
+                          value={guestForm.email}
+                          onChange={(e) => handleGuestFormChange('email', e.target.value)}
+                          placeholder="alex@example.com"
+                          className={guestFormErrors.email ? 'border-rose-500' : ''}
+                        />
+                        {guestFormErrors.email && (
+                          <p className="text-[11px] text-rose-600 mt-1">{guestFormErrors.email}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-Secondarycolor border border-border rounded-sm p-6 space-y-4">
+                  <h2 className="text-base font-semibold uppercase tracking-[0.08em] text-Primarycolor pb-3 border-b border-border">
+                    Shipping Address
+                  </h2>
 
                       {shippingAddresses.length > 0 ? (
                         <div className="space-y-4">
@@ -1122,6 +1203,7 @@ const CheckoutPage = () => {
                     billingForm={billingForm}
                     billingAddressId={billingAddressId}
                     isGuest={isGuest}
+                    guestForm={guestForm}
                     createdUserId={createdUserId}
                     guestFormSubmitted={guestFormSubmitted}
                     requiredForm={requiredForm}
@@ -1129,8 +1211,6 @@ const CheckoutPage = () => {
                   />
                 </div>
               </div>
-            </>
-          )}
         </div>
       </main>
 

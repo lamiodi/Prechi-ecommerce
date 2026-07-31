@@ -23,6 +23,7 @@ const OrderSummary = React.memo(({
   billingForm,
   billingAddressId,
   isGuest,
+  guestForm,
   createdUserId,
   guestFormSubmitted,
   requiredForm,
@@ -48,56 +49,33 @@ const OrderSummary = React.memo(({
 
           return (
             <div key={cartItem.id || index} className="flex gap-3 items-center py-2 border-b border-border/50 last:border-0">
-              <div className="relative flex-shrink-0 w-14 h-18 bg-surface rounded-sm overflow-hidden border border-border">
-                <img
-                  src={displayImage}
-                  alt={item.name || 'Product'}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = '/images/placeholder.jpg';
-                  }}
-                />
-                <div className="absolute top-1 right-1 bg-Primarycolor text-white text-[0.65rem] rounded-full h-4 w-4 flex items-center justify-center font-bold">
-                  {cartItem.quantity || 1}
-                </div>
+              <img
+                src={displayImage}
+                alt={item.name || 'Product'}
+                className="w-12 h-14 object-cover rounded-sm border border-border flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0 text-xs">
+                <p className="font-semibold text-Primarycolor truncate">{item.name || 'Unknown Item'}</p>
+                <p className="text-text-tertiary">Qty: {cartItem.quantity || 1}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-Primarycolor text-xs truncate">
-                  {item.name || 'Unknown Item'}
-                </h4>
-                {item.is_product && (item.color || item.size) && (
-                  <p className="text-[0.7rem] text-text-tertiary mt-0.5 capitalize">
-                    {item.color || item.color_name} {item.size && `• Size ${item.size || item.size_name}`}
-                  </p>
-                )}
-                <div className="mt-1 flex items-center justify-between text-xs">
-                  <span className="text-text-tertiary font-normal">
-                    Qty: {cartItem.quantity || 1}
-                  </span>
-                  <span className="font-semibold text-Primarycolor tabular-nums">
-                    ₦{itemTotal.toLocaleString()}
-                  </span>
-                </div>
-              </div>
+              <span className="font-semibold text-xs text-Primarycolor tabular-nums">
+                ₦{itemTotal.toLocaleString()}
+              </span>
             </div>
           );
         })}
       </div>
 
-      {/* Coupon Code Section */}
-      <div className="mb-6 pt-2 border-t border-border">
-        <CouponCode
-          subtotal={displaySubtotal}
-          onDiscountApplied={(amount) => setCouponDiscount(amount)}
-        />
-      </div>
+      <CouponCode
+        cartTotal={displaySubtotal}
+        onApplyCoupon={(code, discount) => setCouponDiscount(discount)}
+        appliedCoupon={appliedCoupon}
+      />
 
-      <div className="border-t border-border pt-4 space-y-2 text-xs text-text-secondary">
-        <div className="flex justify-between">
+      <div className="space-y-3 pt-4 border-t border-border text-xs">
+        <div className="flex justify-between text-text-secondary">
           <span>Subtotal</span>
-          <span className="font-medium text-Primarycolor tabular-nums">
-            ₦{displaySubtotal.toLocaleString()}
-          </span>
+          <span className="font-medium text-Primarycolor tabular-nums">₦{displaySubtotal.toLocaleString()}</span>
         </div>
 
         {displayFirstOrderDiscount > 0 && (
@@ -114,23 +92,21 @@ const OrderSummary = React.memo(({
           </div>
         )}
 
-        <div className="flex justify-between">
-          <span>Shipping</span>
-          <span className="font-medium text-Primarycolor tabular-nums">
-            {isNigeria ? `₦${(shippingMethod?.total_cost || 0).toLocaleString()}` : 'Calculated at checkout'}
-          </span>
-        </div>
-
-        {!isNigeria && (
-          <div className="flex justify-between">
+        {isNigeria ? (
+          <div className="flex justify-between text-text-secondary">
+            <span>Shipping</span>
+            <span className="font-medium text-Primarycolor tabular-nums">
+              {shippingMethod ? `₦${shippingMethod.total_cost.toLocaleString()}` : 'Select method'}
+            </span>
+          </div>
+        ) : (
+          <div className="flex justify-between text-text-secondary">
             <span>Tax (5%)</span>
             <span className="font-medium text-Primarycolor tabular-nums">₦{displayTax.toLocaleString()}</span>
           </div>
         )}
-      </div>
 
-      <div className="border-t border-border mt-4 pt-4">
-        <div className="flex justify-between text-base font-semibold text-Primarycolor">
+        <div className="flex justify-between pt-3 border-t border-border text-sm font-semibold text-Primarycolor">
           <span>Total</span>
           <span className="tabular-nums">₦{displayTotal.toLocaleString()}</span>
         </div>
