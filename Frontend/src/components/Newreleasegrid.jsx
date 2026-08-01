@@ -5,7 +5,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import { ArrowRight } from '@phosphor-icons/react';
 import { Button } from './ui/button';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
 const NewReleaseGrid = () => {
   const [products, setProducts] = useState([]);
@@ -13,19 +13,6 @@ const NewReleaseGrid = () => {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const { currency, exchangeRate, country, loading: contextLoading } = useContext(CurrencyContext);
-
-  const isBrief = useCallback((product) => {
-    if (!product) return false;
-    if (!product.is_product && product.bundle_types && product.bundle_types.length > 0) {
-      return product.bundle_types.some(type => {
-        const typeLower = type.toLowerCase();
-        return typeLower.includes('brief') || typeLower.includes('underwear') || typeLower.includes('boxer') || typeLower.includes('trunk');
-      });
-    }
-    const name = (product.name || '').toLowerCase();
-    const category = (product.category || '').toLowerCase();
-    return name.includes('brief') || name.includes('boxer') || name.includes('underwear') || name.includes('trunk') || category === 'briefs';
-  }, []);
 
   const fetchNewReleases = useCallback(async () => {
     try {
@@ -37,20 +24,12 @@ const NewReleaseGrid = () => {
         throw new Error(errData.message || 'Failed to fetch products');
       }
       const productData = await response.json();
-      let filteredProducts = productData
+      const filteredProducts = productData
         .filter(item => item.is_product)
         .map(item => ({
           ...item,
           productId: item.product_id || item.id
         }));
-
-      filteredProducts = [...filteredProducts].sort((a, b) => {
-        const aIsBrief = isBrief(a);
-        const bIsBrief = isBrief(b);
-        if (aIsBrief && !bIsBrief) return -1;
-        if (!aIsBrief && bIsBrief) return 1;
-        return 0;
-      });
 
       setProducts(filteredProducts.slice(0, 4));
     } catch (err) {
@@ -58,7 +37,7 @@ const NewReleaseGrid = () => {
     } finally {
       setLoading(false);
     }
-  }, [isBrief]);
+  }, []);
 
   useEffect(() => {
     fetchNewReleases();

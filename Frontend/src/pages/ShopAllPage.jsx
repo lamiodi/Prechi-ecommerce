@@ -100,19 +100,6 @@ const ShopAllPage = () => {
   const currentMeta = metaConfig[currentFilter] || metaConfig['All'];
   useMetaTags(currentMeta.title, currentMeta.description);
 
-  const isBrief = useCallback((product) => {
-    if (!product) return false;
-    if (!product.is_product && product.bundle_types && product.bundle_types.length > 0) {
-      return product.bundle_types.some(type => {
-        const typeLower = type.toLowerCase();
-        return typeLower.includes('brief') || typeLower.includes('underwear') || typeLower.includes('boxer') || typeLower.includes('trunk');
-      });
-    }
-    const name = (product.name || '').toLowerCase();
-    const cat = (product.category || '').toLowerCase();
-    return name.includes('brief') || name.includes('boxer') || name.includes('underwear') || name.includes('trunk') || cat === 'briefs';
-  }, []);
-
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -129,14 +116,6 @@ const ShopAllPage = () => {
         if (!item.is_product) return { ...baseItem, is_product: false, bundle_types: item.bundle_types || [] };
         return { ...baseItem, is_product: true, variantId: item.variantId, sizes: item.sizes || [] };
       });
-      if (!category) {
-        processedData.sort((a, b) => {
-          const aIsBrief = isBrief(a); const bIsBrief = isBrief(b);
-          if (aIsBrief && !bIsBrief) return -1;
-          if (!aIsBrief && bIsBrief) return 1;
-          return 0;
-        });
-      }
       setProducts(processedData);
       if (category) {
         const normalizedCategory = category.toLowerCase();
@@ -151,7 +130,7 @@ const ShopAllPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [category, isBrief, categories.length]);
+  }, [category, categories.length]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 

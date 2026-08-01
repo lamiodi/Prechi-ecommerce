@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy, useContext, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, useScroll, useTransform } from 'motion/react';
@@ -11,6 +11,12 @@ import Footer from '../components/Footer';
 import HeroSection from '../components/HeroSection';
 import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
+import { CircularGallery } from '../components/ui/circular-gallery-2';
+
+import img1 from '../assets/images/IMG_4552.JPG';
+import img2 from '../assets/images/IMG_4554.JPG';
+import img3 from '../assets/images/IMG_4558.JPG';
+import img4 from '../assets/images/IMG_4559.JPG';
 
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
@@ -23,7 +29,6 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
     offset: ["start end", "end start"]
   });
   
-  // Create a subtle parallax effect for the image
   const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   const productUrl = product.is_product
@@ -47,7 +52,7 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
     >
       <Link
         to={productUrl}
-        className="group relative block overflow-hidden bg-surface"
+        className="group relative block overflow-hidden bg-surface rounded-sm border border-border/40"
       >
         <div className="aspect-[3/4] overflow-hidden relative">
           <motion.img
@@ -59,13 +64,12 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
             loading="lazy"
           />
 
-          {/* Hover overlay with info */}
-          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/70 via-Primarycolor/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-6">
+          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/80 via-Primarycolor/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-5">
             <div>
               <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
                 {displayName}
               </h3>
-              <p className="text-sm font-display text-white/70 tabular-nums">
+              <p className="text-sm font-display font-semibold text-white/90 tabular-nums">
                 {formatPrice(product.price)}
               </p>
             </div>
@@ -79,6 +83,37 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '') + '/api'
   : 'https://prechi-ecommerce.onrender.com/api';
+
+const DEFAULT_FEATURED_PRODUCTS = [
+  {
+    id: 1,
+    name: 'ASH & PINK TRACKSUIT SET',
+    price: 70000,
+    image: img1,
+    is_product: true,
+  },
+  {
+    id: 2,
+    name: 'NAVY BLUE TRACKSUIT SET',
+    price: 70000,
+    image: img2,
+    is_product: true,
+  },
+  {
+    id: 3,
+    name: 'Brown Diamond Set',
+    price: 70000,
+    image: img3,
+    is_product: true,
+  },
+  {
+    id: 4,
+    name: 'Pink Diamond Set',
+    price: 70000,
+    image: img4,
+    is_product: true,
+  },
+];
 
 const LandingPage = () => {
   const [products, setProducts] = useState([]);
@@ -120,12 +155,13 @@ const LandingPage = () => {
       try {
         setProductsLoading(true);
         const res = await axios.get(`${API_BASE_URL}/shopall`);
-        if (Array.isArray(res.data)) {
-          const shuffled = res.data.sort(() => 0.5 - Math.random());
-          setProducts(shuffled.slice(0, 4));
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setProducts(res.data.slice(0, 4));
+        } else {
+          setProducts(DEFAULT_FEATURED_PRODUCTS);
         }
       } catch (error) {
-        // Silent fail - the showcase section will show skeletons
+        setProducts(DEFAULT_FEATURED_PRODUCTS);
       } finally {
         setProductsLoading(false);
       }
@@ -136,6 +172,23 @@ const LandingPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
+
+  // Format circular gallery items with visible product name AND price text
+  const galleryItems = useMemo(() => {
+    const activeProducts = products.length > 0 ? products : DEFAULT_FEATURED_PRODUCTS;
+    return activeProducts.map((prod) => {
+      const formattedPrice = formatPrice(prod.price || 70000);
+      let name = prod.name || 'Featured Product';
+      if (name.includes('–')) name = name.split('–')[0].trim();
+      return {
+        image: prod.image || img1,
+        text: `${name} — ${formattedPrice}`,
+        name: name,
+        price: formattedPrice,
+        url: prod.is_product ? `/product/${prod.id}` : `/bundle/${prod.id}`
+      };
+    });
+  }, [products, country, exchangeRate]);
 
   return (
     <PageTransition className="min-h-[100dvh] bg-Secondarycolor grain-overlay">
@@ -150,12 +203,12 @@ const LandingPage = () => {
         {/* Hero */}
         <HeroSection />
 
-        {/* Editorial Showcase Grid */}
-        <section className="py-12 md:py-16 lg:py-20 bg-Secondarycolor">
-          <div className="section-container mb-8 md:mb-10">
+        {/* Editorial Showcase Grid / Circular Gallery */}
+        <section className="py-12 md:py-16 lg:py-20 bg-Secondarycolor overflow-hidden">
+          <div className="section-container mb-6 md:mb-8">
             <div className="flex items-end justify-between">
               <div>
-                <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-text-tertiary mb-3 block">
+                <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-text-tertiary mb-2 block">
                   Featured
                 </span>
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight text-Primarycolor">
@@ -172,25 +225,30 @@ const LandingPage = () => {
             </div>
           </div>
 
+          {/* Interactive 3D Circular Gallery */}
+          <div className="w-full relative h-[480px] sm:h-[550px] md:h-[620px] mb-8">
+            <CircularGallery
+              items={galleryItems}
+              bend={3}
+              borderRadius={0.06}
+              scrollEase={0.03}
+              scrollSpeed={2.5}
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* Product Cards with Visible Names and Prices */}
           <div className="section-container">
-            {productsLoading || contextLoading ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="aspect-[3/4] skeleton rounded-sm" />
-                ))}
-              </div>
-            ) : products.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                {products.map((product, index) => (
-                  <ParallaxProductCard
-                    key={product.id || index}
-                    product={product}
-                    index={index}
-                    formatPrice={formatPrice}
-                  />
-                ))}
-              </div>
-            ) : null}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+              {(products.length > 0 ? products : DEFAULT_FEATURED_PRODUCTS).map((product, index) => (
+                <ParallaxProductCard
+                  key={product.id || index}
+                  product={product}
+                  index={index}
+                  formatPrice={formatPrice}
+                />
+              ))}
+            </div>
 
             {/* Mobile shop all */}
             <div className="flex sm:hidden justify-center mt-8">
