@@ -10,7 +10,7 @@
 **Full Website Title:** Diamond Set - Navy Blue & Sky Blue
 
 **Product Details:**
-- **Base Price:** ₦70,000 (All sizes use same base price)
+- **Base Price:** ₦75,000 (All sizes use same base price)
 - **Category:** diamond-set
 - **Gender:** unisex
 - **SKU Prefix:** DS-NB
@@ -37,7 +37,7 @@
 **Full Website Title:** Diamond Set - Ash & Pink
 
 **Product Details:**
-- **Base Price:** ₦70,000 (All sizes use same base price)
+- **Base Price:** ₦75,000 (All sizes use same base price)
 - **Category:** diamond-set
 - **Gender:** unisex
 - **SKU Prefix:** DS-AP
@@ -66,7 +66,7 @@
 ### Step 2: Fill Product Information
 1. **Product Name:** Use the exact names listed above
 2. **Description:** Copy the descriptions provided
-3. **Base Price:** Set to ₦70,000 (All sizes use same base price)
+3. **Base Price:** Set to ₦75,000 (All sizes use same base price)
 4. **Category:** Select "diamond-set" or create if not exists
 5. **Gender:** Select "unisex"
 6. **SKU Prefix:** Use the specified prefixes (DS-NB or DS-AP)

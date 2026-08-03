@@ -20,14 +20,14 @@ ORDER BY size_order;
 /*
 -- Example of how to set up pricing for diamond sets:
 
--- For products with base price ₦70,000 (S-2XL)
+-- For products with base price ₦75,000 (S-2XL)
 -- Plus sizes (3XL-5XL) would be ₦80,000
 
 INSERT INTO public.products (name, description, base_price, sku_prefix, category, gender)
 VALUES 
-('Diamond Set - Brown & Carton', 'Premium 3-piece diamond set in brown and carton colors', 70000, 'DS-BC', 'Sets', 'Women'),
-('Diamond Set - Navy & Sky Blue', 'Premium 3-piece diamond set in navy blue and sky blue', 70000, 'DS-NS', 'Sets', 'Women'),
-('Diamond Set - Ash & Pink', 'Premium 3-piece diamond set in ash and pink colors', 70000, 'DS-AP', 'Sets', 'Women');
+('Diamond Set - Brown & Carton', 'Premium 3-piece diamond set in brown and carton colors', 75000, 'DS-BC', 'Sets', 'Women'),
+('Diamond Set - Navy & Sky Blue', 'Premium 3-piece diamond set in navy blue and sky blue', 75000, 'DS-NS', 'Sets', 'Women'),
+('Diamond Set - Ash & Pink', 'Premium 3-piece diamond set in ash and pink colors', 75000, 'DS-AP', 'Sets', 'Women');
 */
 
 -- Step 4: Set up size-specific pricing (if needed for individual pieces)
@@ -45,7 +45,7 @@ SELECT
   s.size_name,
   s.size_order,
   CASE 
-    WHEN s.size_name IN ('S', 'M', 'L', 'XL', 'XXL') THEN 'Regular Size - ₦70,000'
+    WHEN s.size_name IN ('S', 'M', 'L', 'XL', 'XXL') THEN 'Regular Size - ₦75,000'
     WHEN s.size_name IN ('3XL', '4XL', '5XL') THEN 'Plus Size - ₦80,000'
     ELSE 'Other'
   END as pricing_category

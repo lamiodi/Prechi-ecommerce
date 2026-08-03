@@ -22,7 +22,6 @@ import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
 import { useCartDrawer } from "../context/CartDrawerContext";
 import { CurrencyContext } from "../pages/CurrencyContext";
-import ReviewSection from "../components/ReviewSection";
 import DescriptionSection from "../components/DescriptionSection";
 import { toastSuccess, toastError } from "../utils/toastConfig";
 import ProductSchema from "../components/ProductSchema";
@@ -765,12 +764,9 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Description & Reviews tabs */}
+          {/* Description section */}
           <div className="mt-20 border-t border-border pt-16">
             <DescriptionSection description={data?.description} />
-            <div className="mt-16">
-              <ReviewSection productId={id} />
-            </div>
           </div>
 
         </div>
