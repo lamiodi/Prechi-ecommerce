@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import { ArrowRight } from '@phosphor-icons/react';
 import { Button } from './ui/button';
+import { SkeletonPulse } from './skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
@@ -52,16 +53,16 @@ const NewReleaseGrid = () => {
       <section className="py-12 md:py-16 lg:py-20">
         <div className="section-container">
           <div className="flex items-end justify-between mb-8 md:mb-10">
-            <div className="h-8 skeleton rounded-sm w-40" />
-            <div className="h-4 skeleton rounded-sm w-20" />
+            <SkeletonPulse className="h-8 w-40" />
+            <SkeletonPulse className="h-4 w-20" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex flex-col">
-                <div className="w-full aspect-[3/4] skeleton rounded-sm" />
+                <SkeletonPulse className="w-full aspect-[3/4] border border-border/30" />
                 <div className="pt-4 space-y-2.5">
-                  <div className="h-3.5 skeleton rounded-sm w-3/4" />
-                  <div className="h-3 skeleton rounded-sm w-1/3" />
+                  <SkeletonPulse className="h-3.5 w-3/4" />
+                  <SkeletonPulse className="h-3 w-1/3" />
                 </div>
               </div>
             ))}
@@ -151,7 +152,7 @@ const ProductCard = ({ product, onImageError }) => {
     <div className="group flex flex-col">
       <Link to={`/product/${productId}?variant=${variantId}`} className="block relative overflow-hidden bg-surface">
         <div className="relative w-full aspect-[3/4] overflow-hidden">
-          {!imageLoaded && <div className="absolute inset-0 skeleton" />}
+          {!imageLoaded && <SkeletonPulse className="absolute inset-0" rounded="" />}
 
           {isSoldOut && (
             <div className="absolute inset-0 bg-Primarycolor/50 flex items-center justify-center z-10">

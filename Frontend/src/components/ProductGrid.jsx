@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import { Funnel, Rows, SquaresFour } from '@phosphor-icons/react';
 import { Button } from './ui/button';
+import { SkeletonPulse } from './skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -70,13 +71,13 @@ const ProductGrid = () => {
     e.target.style.opacity = '0';
   }, []);
 
-  // Skeleton card
+  // Skeleton card with GSAP shimmer
   const SkeletonCard = () => (
     <div className="flex flex-col">
-      <div className="w-full aspect-[3/4] skeleton rounded-sm" />
+      <SkeletonPulse className="w-full aspect-[3/4] border border-border/30" />
       <div className="pt-4 space-y-2.5">
-        <div className="h-3.5 skeleton rounded-sm w-3/4" />
-        <div className="h-3 skeleton rounded-sm w-1/3" />
+        <SkeletonPulse className="h-3.5 w-3/4" />
+        <SkeletonPulse className="h-3 w-1/3" />
       </div>
     </div>
   );
@@ -232,7 +233,7 @@ const ProductCard = ({ product, onImageError }) => {
         <div className="relative w-full aspect-[3/4] overflow-hidden">
           {/* Skeleton placeholder */}
           {!imageLoaded && (
-            <div className="absolute inset-0 skeleton" />
+            <SkeletonPulse className="absolute inset-0" rounded="" />
           )}
           <img
             src={image}

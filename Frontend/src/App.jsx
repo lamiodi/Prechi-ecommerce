@@ -7,6 +7,7 @@ import { CurrencyProvider } from './pages/CurrencyContext';
 import { CartDrawerProvider } from './context/CartDrawerContext';
 import SideCartDrawer from './components/SideCartDrawer';
 import SmoothScroll from './components/SmoothScroll';
+import { ShopSkeleton } from './components/skeletons';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import gsap from 'gsap';
@@ -86,7 +87,7 @@ function App() {
             <SmoothScroll>
               <ScrollToTop />
               <SideCartDrawer />
-              <Suspense fallback={<PageLoader />}>
+              <Suspense fallback={<ShopSkeleton />}>
                 <AnimatePresence mode="wait">
                   <Routes location={location} key={location.pathname}>
                     <Route path="/search" element={<SearchResults />} />

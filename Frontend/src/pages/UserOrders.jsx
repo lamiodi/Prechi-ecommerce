@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
+import { SkeletonPulse } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
 
@@ -95,9 +96,19 @@ const UserOrders = () => {
           )}
 
           {ordersLoading ? (
-            <div className="py-20 text-center">
-              <CircleNotch size={24} className="animate-spin text-Primarycolor mx-auto mb-3" />
-              <p className="text-sm font-display text-text-tertiary">Loading orders...</p>
+            <div className="bg-surface border border-border overflow-hidden rounded-sm p-6 space-y-4">
+              <div className="flex justify-between items-center pb-4 border-b border-border">
+                <SkeletonPulse className="h-4 w-32" />
+                <SkeletonPulse className="h-4 w-24" />
+              </div>
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-3 border-b border-border/50">
+                  <SkeletonPulse className="h-4 w-20" />
+                  <SkeletonPulse className="h-4 w-28" />
+                  <SkeletonPulse className="h-4 w-16" />
+                  <SkeletonPulse className="h-6 w-24 rounded-full" />
+                </div>
+              ))}
             </div>
           ) : orders.length === 0 ? (
             <div className="py-20 text-center bg-surface rounded-sm border border-border">
