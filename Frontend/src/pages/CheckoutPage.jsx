@@ -57,7 +57,14 @@ const CheckoutPage = () => {
   const [billingAddresses, setBillingAddresses] = useState([]);
   const [shippingAddressId, setShippingAddressId] = useState(null);
   const [billingAddressId, setBillingAddressId] = useState(null);
-  const [shippingMethod, setShippingMethod] = useState(null);
+  const [shippingMethod, setShippingMethod] = useState({
+    id: 1,
+    method: 'Delivery within Lagos Island',
+    total_cost: 4000,
+    estimated_delivery: '3–5 business days',
+    icon: 'truck',
+    description: 'Fast delivery within Lagos Island'
+  });
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderNote, setOrderNote] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -123,20 +130,20 @@ const CheckoutPage = () => {
 
   const shippingOptions = [
     {
-      id: 2,
-      method: 'Delivery within Lagos Mainland',
-      total_cost: 4000,
-      estimated_delivery: '5–7 business days',
-      icon: 'package',
-      description: 'Reliable delivery within Lagos Mainland'
-    },
-    {
       id: 1,
       method: 'Delivery within Lagos Island',
-      total_cost: 6000,
+      total_cost: 4000,
       estimated_delivery: '3–5 business days',
       icon: 'truck',
       description: 'Fast delivery within Lagos Island'
+    },
+    {
+      id: 2,
+      method: 'Delivery within Lagos Mainland',
+      total_cost: 6000,
+      estimated_delivery: '5–7 business days',
+      icon: 'package',
+      description: 'Reliable delivery within Lagos Mainland'
     },
     {
       id: 3,
@@ -513,8 +520,7 @@ const CheckoutPage = () => {
       let paymentResponse = await axios.post(`${API_BASE_URL}/api/paystack/initialize`, paymentData);
       let paymentInfo = paymentResponse.data.data || paymentResponse.data;
 
-      if (isGuest) localStorage.removeItem('guestCart');
-      toast.success('Order placed!');
+      toast.success('Order initiated!');
       localStorage.setItem('lastOrderReference', orderResponse.data.order?.reference || orderData.reference);
       localStorage.setItem('pendingOrderId', orderId);
 
@@ -530,15 +536,21 @@ const CheckoutPage = () => {
           currency: paymentData.currency,
           reference: paymentData.reference,
           callback: () => {
+            if (isGuest) localStorage.removeItem('guestCart');
             toast.success('Payment successful!');
             navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
           },
           onClose: () => {
-            if (isGuest) navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
-            else navigate(`/orders/${orderId}`);
+            if (isGuest) {
+              localStorage.removeItem('guestCart');
+              navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
+            } else {
+              navigate(`/orders/${orderId}`);
+            }
           }
         });
       } else if (authorizationUrl) {
+        if (isGuest) localStorage.removeItem('guestCart');
         window.location.href = authorizationUrl;
       }
     } catch (err) {

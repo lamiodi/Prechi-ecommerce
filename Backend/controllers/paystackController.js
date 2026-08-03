@@ -1,9 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import sql from '../db/index.js';
-import { sendDeliveryFeePaymentLinkEmail } from '../utils/emailService.js';
-
-dotenv.config();
+import { sendDeliveryFeePaymentLinkEmail, sendOrderConfirmationEmail } from '../utils/emailService.js';
 
 dotenv.config();
 
@@ -18,18 +16,16 @@ if (!PAYSTACK_SECRET_KEY) {
 
 export const initializePayment = async (req, res) => {
   try {
-    const { order_id, reference, email, amount, currency, callback_url } = req.body;
+    const { order_id, reference, email, currency, callback_url } = req.body;
 
-    // Add more validation
-    if (!order_id || !reference || !amount || !currency) {
+    if (!order_id || !reference) {
       console.error('Missing required fields for payment initialization');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Validate email separately with a clear message
     if (!email || !email.includes('@')) {
-      console.error(`Invalid or missing email for payment initialization: order_id=${order_id}, email=${email}`);
-      return res.status(400).json({ error: 'A valid email address is required for payment. Please ensure your billing details include an email address.' });
+      console.error(`Invalid or missing email for payment initialization: order_id=${order_id}`);
+      return res.status(400).json({ error: 'A valid email address is required for payment.' });
     }
 
     // Check if order exists and is in pending state
@@ -51,26 +47,20 @@ export const initializePayment = async (req, res) => {
       return res.status(400).json({ error: 'Payment already processed or cancelled' });
     }
 
-    // Verify amount and currency match - Paystack expects amount in kobo/cents
-    const orderTotal = Number(order.total); // postgres may return numeric as string
+    // Always use server-calculated amount from DB order total in kobo
+    const orderTotal = Number(order.total);
     const expectedAmountInKobo = Math.round(orderTotal * 100);
     const orderCurrency = String(order.currency || 'NGN');
-    if (orderCurrency !== currency || Math.abs(expectedAmountInKobo - amount) > 100) { // Allow ₦1 tolerance
-      console.error(`Invalid amount or currency. Expected: ${expectedAmountInKobo} ${orderCurrency}, got: ${amount} ${currency}`);
-      return res.status(400).json({ error: `Invalid amount or currency. Expected: ${expectedAmountInKobo} ${orderCurrency}, got: ${amount} ${currency}` });
-    }
 
-    // Construct callback URL
     const finalCallbackUrl = callback_url || `${process.env.FRONTEND_URL || 'http://localhost:5173'}/thank-you`;
 
     try {
-      // Initialize Paystack transaction
       const response = await axios.post(
         `${PAYSTACK_BASE_URL}/transaction/initialize`,
         {
           email,
-          amount: amount, // Amount is already in kobo from frontend
-          currency,
+          amount: expectedAmountInKobo,
+          currency: orderCurrency,
           reference,
           callback_url: finalCallbackUrl,
           metadata: {
@@ -92,7 +82,6 @@ export const initializePayment = async (req, res) => {
         }
       );
 
-      // Check if data exists in response
       if (!response.data || !response.data.data) {
         console.error('Invalid response from Paystack:', response.data);
         return res.status(502).json({ error: 'Invalid response from payment provider' });
@@ -109,25 +98,14 @@ export const initializePayment = async (req, res) => {
       res.status(200).json({ authorization_url, access_code, reference: paystackReference });
     } catch (err) {
       console.error('❌ Error initializing Paystack payment:', err.response?.data || err.message);
-      
-      // Enhanced error handling
       if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Paystack API Error Response:', JSON.stringify(err.response.data, null, 2));
-        
-        // If 401, it means backend key is invalid. 
-        // If 400, maybe duplicate reference or bad data.
-        
         return res.status(err.response.status).json({ 
           error: err.response.data?.message || 'Payment provider error',
           details: err.response.data 
         });
       } else if (err.request) {
-        // The request was made but no response was received
         return res.status(504).json({ error: 'Payment provider timeout' });
       } else {
-        // Something happened in setting up the request that triggered an Error
         return res.status(500).json({ error: 'Payment initialization failed' });
       }
     }
@@ -162,13 +140,13 @@ export const verifyPayment = async (req, res) => {
     const order = orderCheck[0];
     const wantsJson = req.headers.accept?.includes('application/json') || req.query.json === 'true' || req.method === 'POST';
 
-    if (order.payment_status === 'completed') {
-      console.warn(`Payment already verified for reference=${reference}`);
+    if (order.payment_status === 'completed' || order.payment_status === 'failed') {
+      console.warn(`Payment status already final (${order.payment_status}) for reference=${reference}`);
       if (wantsJson) {
-        return res.status(200).json({ message: 'Payment already verified', order });
+        return res.status(200).json({ message: `Payment already marked as ${order.payment_status}`, order });
       }
       const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
-      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=already_verified`);
+      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=${order.payment_status}`);
     }
 
     const response = await axios.get(`${PAYSTACK_BASE_URL}/transaction/verify/${reference}`, {
@@ -192,17 +170,12 @@ export const verifyPayment = async (req, res) => {
 
       await sql.begin(async sql => {
         for (const item of orderItems) {
-          if (item.variant_id) {
-            if (item.size_id) {
-              await sql`
-                UPDATE variant_sizes
-                SET stock_quantity = stock_quantity + ${item.quantity}
-                WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
-              `;
-              console.log(`✅ Restocked ${item.quantity} units for variant_id=${item.variant_id}, size_id=${item.size_id}`);
-            } else {
-              console.error(`Skipping restocking for variant_id=${item.variant_id} due to missing size_id`);
-            }
+          if (item.variant_id && item.size_id) {
+            await sql`
+              UPDATE variant_sizes
+              SET stock_quantity = stock_quantity + ${item.quantity}
+              WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+            `;
           } else if (item.bundle_id) {
             const bundleItems = item.bundle_details ? (typeof item.bundle_details === 'string' ? JSON.parse(item.bundle_details) : item.bundle_details) : [];
             for (const bi of bundleItems) {
@@ -212,18 +185,15 @@ export const verifyPayment = async (req, res) => {
                   SET stock_quantity = stock_quantity + ${item.quantity}
                   WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
                 `;
-              } else {
-                console.error(`Skipping restocking for bundle item variant_id=${bi.variant_id} due to missing size_id`);
               }
             }
-            console.log(`✅ Restocked ${item.quantity} units for bundle_id=${item.bundle_id}`);
           }
         }
 
         await sql`
           UPDATE orders 
           SET payment_status = 'failed', updated_at = NOW()
-          WHERE reference = ${reference}
+          WHERE reference = ${reference} AND payment_status = 'pending'
         `;
       });
 
@@ -235,23 +205,71 @@ export const verifyPayment = async (req, res) => {
       return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=failed`);
     }
 
+    // Verify amount and currency against database order
+    const expectedAmountInKobo = Math.round(Number(order.total) * 100);
+    const orderCurrency = String(order.currency || 'NGN');
+
+    if (data.amount < expectedAmountInKobo - 100 || data.currency !== orderCurrency) {
+      console.error(`Security alert: Amount mismatch for reference=${reference}. Expected: ${expectedAmountInKobo} ${orderCurrency}, got: ${data.amount} ${data.currency}`);
+      return res.status(400).json({ error: 'Payment amount or currency mismatch' });
+    }
+
+    let isNewlyCompleted = false;
+
     await sql.begin(async sql => {
       const updatedOrders = await sql`
         UPDATE orders
         SET payment_status = 'completed',
             status = 'processing',
             updated_at = NOW()
-        WHERE reference = ${reference} AND deleted_at IS NULL
+        WHERE reference = ${reference} AND payment_status = 'pending' AND deleted_at IS NULL
         RETURNING id, user_id, total, currency, cart_id
       `;
 
-      const updatedOrder = updatedOrders[0];
-
-      if (updatedOrder.cart_id) {
-        await sql`DELETE FROM cart_items WHERE cart_id = ${updatedOrder.cart_id}`;
-        console.log(`✅ Cleared cart items for cart_id=${updatedOrder.cart_id}, order_id=${updatedOrder.id}, reference=${reference}`);
+      if (updatedOrders.length > 0) {
+        isNewlyCompleted = true;
+        const updatedOrder = updatedOrders[0];
+        if (updatedOrder.cart_id) {
+          await sql`DELETE FROM cart_items WHERE cart_id = ${updatedOrder.cart_id}`;
+          console.log(`✅ Cleared cart items for cart_id=${updatedOrder.cart_id}, reference=${reference}`);
+        }
       }
     });
+
+    if (isNewlyCompleted) {
+      // Trigger confirmation email if not sent
+      try {
+        const [fullOrder] = await sql`
+          SELECT 
+            o.id, o.payment_status, o.total, o.currency, o.email_sent,
+            u.email as user_email, u.first_name as user_first_name, u.is_temporary,
+            ba.full_name as billing_full_name, ba.email as billing_email
+          FROM orders o
+          LEFT JOIN users u ON o.user_id = u.id
+          LEFT JOIN billing_addresses ba ON o.billing_address_id = ba.id
+          WHERE o.reference = ${reference}
+        `;
+        if (fullOrder && !fullOrder.email_sent) {
+          const targetEmail = fullOrder.is_temporary ? (fullOrder.billing_email || fullOrder.user_email) : (fullOrder.user_email || fullOrder.billing_email);
+          const targetName = fullOrder.is_temporary ? (fullOrder.billing_full_name || fullOrder.user_first_name || 'Customer') : (fullOrder.user_first_name || fullOrder.billing_full_name || 'Customer');
+          if (targetEmail) {
+            await sendOrderConfirmationEmail(
+              targetEmail,
+              targetName,
+              fullOrder.id,
+              fullOrder.total,
+              fullOrder.currency,
+              'completed',
+              fullOrder.is_temporary
+            );
+            await sql`UPDATE orders SET email_sent = true WHERE id = ${fullOrder.id}`;
+            console.log(`✅ Confirmation email sent for reference=${reference}`);
+          }
+        }
+      } catch (emailErr) {
+        console.error(`Failed to send email during verifyPayment: ${emailErr.message}`);
+      }
+    }
 
     console.log(`✅ Payment verified for reference=${reference}, order_id=${order.id}`);
 
