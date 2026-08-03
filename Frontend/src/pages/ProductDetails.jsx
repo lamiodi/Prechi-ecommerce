@@ -16,7 +16,9 @@ import {
   Package,
   CircleNotch,
   WarningCircle,
-  Sparkle
+  Sparkle,
+  Tag,
+  ArrowRight
 } from "@phosphor-icons/react";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
@@ -492,17 +494,30 @@ const ProductDetails = () => {
       />
       <Navbar2 />
 
-      {/* Member Promo Bar */}
-      <div className="bg-Primarycolor text-white py-2.5 px-4 mt-16 sm:mt-20 border-b border-white/10">
-        <div className="section-container flex items-center justify-between text-xs font-display">
-          <div className="flex items-center gap-2">
-            <Sparkle size={14} className="text-yellow-400" weight="fill" />
-            <span className="font-medium">First Order Discount</span>
-            <span className="text-white/60 hidden sm:inline">&mdash; Sign up to receive 10% off your purchase.</span>
+      {/* Premium Member Promo Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-Primarycolor via-[#1e1e1e] to-Primarycolor text-white mt-16 sm:mt-20 border-b border-white/10 shadow-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none" />
+        <div className="section-container relative py-3.5 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/25 text-[0.65rem] font-display font-semibold uppercase tracking-widest">
+                <Tag size={12} weight="fill" className="text-amber-400" />
+                Insider Privilege
+              </span>
+              <p className="text-xs sm:text-sm font-display text-white/90">
+                <span className="font-semibold text-white">Enjoy 10% Off Your First Order</span>
+                <span className="text-white/60 hidden md:inline"> &mdash; Sign up today for instant member perks & early access to drops.</span>
+              </p>
+            </div>
+            
+            <Link
+              to="/signup"
+              className="group inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-Primarycolor hover:bg-amber-300 transition-all duration-300 text-xs font-display font-semibold uppercase tracking-wider shadow-sm flex-shrink-0"
+            >
+              <span>Claim 10% Off</span>
+              <ArrowRight size={13} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          <Link to="/signup" className="underline hover:text-white/80 transition-colors uppercase tracking-wider font-semibold text-[0.7rem]">
-            Claim Offer
-          </Link>
         </div>
       </div>
 
@@ -755,9 +770,9 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Description section */}
-          <div className="mt-20 border-t border-border pt-16">
-            <DescriptionSection description={data?.description} />
+          {/* Description & Care Instructions section */}
+          <div className="mt-16 sm:mt-20 border-t border-border pt-12 sm:pt-16">
+            <DescriptionSection isProduct={isProduct} description={data?.description} data={data} />
           </div>
 
         </div>

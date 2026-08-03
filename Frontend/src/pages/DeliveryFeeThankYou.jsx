@@ -5,7 +5,7 @@ import axios from 'axios';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
 const DeliveryFeeThankYou = () => {
   const [loading, setLoading] = useState(true);

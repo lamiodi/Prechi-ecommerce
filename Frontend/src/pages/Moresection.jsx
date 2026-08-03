@@ -729,7 +729,7 @@ const MorePage = () => {
                     { id: 'help-0', topic: 'Order Status & Tracking', desc: 'Check your order progress and delivery status', icon: <Package className="w-5 h-5" /> },
                     { id: 'help-1', topic: 'Size Exchange', desc: 'Request a different size for your purchase', icon: <Shirt className="w-5 h-5" /> },
                     { id: 'help-2', topic: 'Payment Issues', desc: 'Resolve payment and billing problems', icon: <CreditCard className="w-5 h-5" /> },
-                    { id: 'help-3', topic: 'Product Care Instructions', desc: 'Learn how to care for your Tia products', icon: <Shirt className="w-5 h-5" /> },
+                    { id: 'help-3', topic: 'Product Care Instructions', desc: 'Learn how to care for your Prechi products', icon: <Shirt className="w-5 h-5" /> },
                     { id: 'help-4', topic: 'Wholesale Inquiries', desc: 'Bulk orders and business partnerships', icon: <Building className="w-5 h-5" /> },
                     { id: 'help-5', topic: 'Technical Support', desc: 'Website issues and account problems', icon: <Monitor className="w-5 h-5" /> }
                   ].map((item) => (

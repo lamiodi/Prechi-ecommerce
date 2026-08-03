@@ -10,7 +10,7 @@ import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
 import { SkeletonPulse } from '../components/skeletons';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://tia-backend-r331.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
 const UserOrders = () => {
   const { user } = useAuth();
