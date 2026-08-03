@@ -194,21 +194,30 @@ async function handleSuccessfulPayment(reference, res) {
     return res.status(200).json({ message: 'Payment already verified' });
   }
 
+  let isNewlyCompleted = false;
+
   try {
     await sql.begin(async sql => {
-      // Update order status - keep status as 'Pending' for admin review
-      await sql`
+      const updateResult = await sql`
         UPDATE orders 
         SET payment_status = 'completed', updated_at = NOW() 
-        WHERE reference = ${reference}
+        WHERE reference = ${reference} AND payment_status = 'pending'
+        RETURNING id
       `;
 
-      // Clear cart if exists
-      if (orderDetails.cart_id) {
-        await sql`DELETE FROM cart_items WHERE cart_id = ${orderDetails.cart_id}`;
-        console.log(`✅ Cleared cart items for cart_id=${orderDetails.cart_id}, reference=${reference}`);
+      if (updateResult.length > 0) {
+        isNewlyCompleted = true;
+        if (orderDetails.cart_id) {
+          await sql`DELETE FROM cart_items WHERE cart_id = ${orderDetails.cart_id}`;
+          console.log(`✅ Cleared cart items for cart_id=${orderDetails.cart_id}, reference=${reference}`);
+        }
       }
     });
+
+    if (!isNewlyCompleted) {
+      console.warn(`Payment was already completed by another thread/callback for reference=${reference}`);
+      return res.status(200).json({ message: 'Payment already processed' });
+    }
   } catch (dbError) {
     console.error(`Database error updating order for reference=${reference}:`, dbError);
     return res.status(500).json({ error: 'Database error updating order' });

@@ -536,21 +536,16 @@ const CheckoutPage = () => {
           currency: paymentData.currency,
           reference: paymentData.reference,
           callback: () => {
-            if (isGuest) localStorage.removeItem('guestCart');
-            toast.success('Payment successful!');
+            toast.success('Payment completed! Verifying order...');
             navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
           },
           onClose: () => {
-            if (isGuest) {
-              localStorage.removeItem('guestCart');
-              navigate(`/thank-you?reference=${paymentData.reference}&orderId=${orderId}`);
-            } else {
-              navigate(`/orders/${orderId}`);
-            }
+            toast.info('Payment window closed. You can complete your payment when ready.');
+            setLoading(false);
+            setIsProcessing(false);
           }
         });
       } else if (authorizationUrl) {
-        if (isGuest) localStorage.removeItem('guestCart');
         window.location.href = authorizationUrl;
       }
     } catch (err) {

@@ -495,31 +495,34 @@ export const createOrder = async (req, res) => {
         }
       }
 
-      // Calculate shipping and tax
+      // Enforce canonical shipping cost and discount validation
+      const canonicalOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
+      let validatedShippingCost = 0;
       if (delivery_option === 'standard' && address.country.toLowerCase() === 'nigeria') {
-        if (shipping_cost < 0) {
-          console.error('Validation failed: Invalid shipping cost');
-          throw new Error('Invalid shipping cost');
-        }
-        calculatedSubtotal += shipping_cost;
+        validatedShippingCost = canonicalOption ? canonicalOption.total_cost : (shipping_cost > 0 ? shipping_cost : 4000);
+        calculatedSubtotal += validatedShippingCost;
       } else if (delivery_option === 'international') {
-        calculatedSubtotal += 0; // Shipping cost TBD
+        validatedShippingCost = 0;
       }
 
+      // Discount validation - coupons/discounts are currently disabled
+      const validatedDiscount = 0;
+
       const calculatedTax = tax || (delivery_option === 'international' ? Number((calculatedSubtotal * 0.05).toFixed(2)) : 0);
-      const calculatedTotal = Number((calculatedSubtotal - discount + calculatedTax).toFixed(2));
+      const calculatedTotal = Number((calculatedSubtotal - validatedDiscount + calculatedTax).toFixed(2));
+
+      if (calculatedTotal <= 0) {
+        console.error('Validation failed: Total must be greater than zero');
+        throw new Error('Invalid order total. Total must be greater than zero.');
+      }
 
       // Allow ₦1 (1 unit) tolerance for floating-point rounding differences
       if (Math.abs(calculatedTotal - total) > 1) {
-        console.error(`Validation failed: Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}, discount ${discount}, shipping: ${shipping_cost}`);
+        console.error(`Validation failed: Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}`);
         throw new Error(`Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}. Please refresh your cart and try again.`);
       }
 
-      // Skip base_currency_total validation — all orders are in NGN, no conversion needed
-
-      // Resolve shipping method string
-      const shippingOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
-      const shippingMethodName = shippingOption ? shippingOption.method : 'Standard Delivery';
+      const shippingMethodName = canonicalOption ? canonicalOption.method : 'Standard Delivery';
 
       // Try to insert order with idempotency key
       let order;
@@ -635,17 +638,17 @@ export const createOrder = async (req, res) => {
         `;
 
         if (item.variant_id) {
-          // Update stock for variant
+          // Update stock for variant with DB-level stock availability check
           if (item.size_id) {
             const [updateResult] = await sql`
               UPDATE variant_sizes 
               SET stock_quantity = stock_quantity - ${item.quantity} 
-              WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id}
+              WHERE variant_id = ${item.variant_id} AND size_id = ${item.size_id} AND stock_quantity >= ${item.quantity}
               RETURNING stock_quantity
             `;
             if (!updateResult) {
-              console.error(`Stock update failed: No stock found for variant ${item.variant_id}, size ${item.size_id}`);
-              throw new Error(`Failed to update stock for variant ${item.variant_id}, size ${item.size_id}`);
+              console.error(`Stock update failed: Insufficient stock for variant ${item.variant_id}, size ${item.size_id}`);
+              throw new Error(`Insufficient stock for product. Stock level changed during checkout.`);
             }
             console.log(`Updated stock for variant ${item.variant_id}, size ${item.size_id}: ${updateResult.stock_quantity}`);
           } else {
@@ -659,12 +662,12 @@ export const createOrder = async (req, res) => {
               const [updateResult] = await sql`
                 UPDATE variant_sizes 
                 SET stock_quantity = stock_quantity - ${item.quantity} 
-                WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id}
+                WHERE variant_id = ${bi.variant_id} AND size_id = ${bi.size_id} AND stock_quantity >= ${item.quantity}
                 RETURNING stock_quantity
               `;
               if (!updateResult) {
-                console.error(`Stock update failed: No stock found for bundle item variant ${bi.variant_id}, size ${bi.size_id}`);
-                throw new Error(`Failed to update stock for bundle item variant ${bi.variant_id}, size ${bi.size_id}`);
+                console.error(`Stock update failed: Insufficient stock for bundle item variant ${bi.variant_id}, size ${bi.size_id}`);
+                throw new Error(`Insufficient stock for bundle item. Stock level changed during checkout.`);
               }
               console.log(`Updated stock for bundle item variant ${bi.variant_id}, size ${bi.size_id}: ${updateResult.stock_quantity}`);
             } else {
