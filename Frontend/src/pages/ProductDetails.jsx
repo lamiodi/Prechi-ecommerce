@@ -27,6 +27,7 @@ import { toastSuccess, toastError } from "../utils/toastConfig";
 import ProductSchema from "../components/ProductSchema";
 import SEO from "../components/SEO";
 import { Button } from "../components/ui/button";
+import ProductDetailsSkeleton from "../components/skeletons/ProductDetailsSkeleton";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -386,17 +387,7 @@ const ProductDetails = () => {
   };
 
   if (loading || contextLoading || authLoading) {
-    return (
-      <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor">
-        <Navbar2 />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <CircleNotch size={28} className="animate-spin text-Primarycolor mx-auto mb-3" />
-            <p className="text-xs font-display uppercase tracking-[0.08em] text-text-tertiary">Loading piece...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ProductDetailsSkeleton />;
   }
 
   if (error || !productData) {

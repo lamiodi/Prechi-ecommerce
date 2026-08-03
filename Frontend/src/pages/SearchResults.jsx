@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
+import { SearchSkeleton } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api`
@@ -127,25 +128,7 @@ const SearchResults = () => {
   };
 
   if (loading || contextLoading) {
-    return (
-      <div className="typography container-padding flex flex-col min-h-screen">
-        <Navbar2 />
-        <div className={`grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 mb-8 ${mobileLayout === 'one'
-            ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-            : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-          }`}>
-          {[...Array(12)].map((_, index) => (
-            <div key={index} className="bg-gray-100 rounded-xl p-3 animate-pulse shadow-sm">
-              <div className="w-full aspect-[3/4] bg-gray-200 rounded-lg mb-3"></div>
-              <div className="h-4 bg-gray-200 rounded mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
-              <div className="h-8 bg-gray-200 rounded-lg"></div>
-            </div>
-          ))}
-        </div>
-        <Footer />
-      </div>
-    );
+    return <SearchSkeleton />;
   }
 
   if (error) {

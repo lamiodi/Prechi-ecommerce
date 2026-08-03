@@ -9,6 +9,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
 import { Button } from '../components/ui/button';
+import { SkeletonPulse } from '../components/skeletons';
 
 const useMetaTags = (title, description) => {
   useEffect(() => {
@@ -164,13 +165,13 @@ const ShopAllPage = () => {
 
   const getPageTitle = () => currentFilter === 'All' ? 'All Products' : currentFilter;
 
-  // Skeleton card
+  // Skeleton card with GSAP shimmer
   const SkeletonCard = () => (
     <div className="flex flex-col">
-      <div className="w-full aspect-[3/4] skeleton rounded-sm" />
+      <SkeletonPulse className="w-full aspect-[3/4] border border-border/30" />
       <div className="pt-4 space-y-2.5">
-        <div className="h-3.5 skeleton rounded-sm w-3/4" />
-        <div className="h-3 skeleton rounded-sm w-1/3" />
+        <SkeletonPulse className="h-3.5 w-3/4" />
+        <SkeletonPulse className="h-3 w-1/3" />
       </div>
     </div>
   );
@@ -357,7 +358,7 @@ const ProductCard = ({ product, onImageError }) => {
     <div className="group flex flex-col">
       <Link to={productUrl} className="block relative overflow-hidden bg-surface">
         <div className="relative w-full aspect-[3/4] overflow-hidden">
-          {!imageLoaded && <div className="absolute inset-0 skeleton" />}
+          {!imageLoaded && <SkeletonPulse className="absolute inset-0" rounded="" />}
           <img
             src={image}
             alt={displayName}
