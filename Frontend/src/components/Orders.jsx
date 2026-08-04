@@ -451,7 +451,19 @@ const Orders = () => {
             </div>
           </div>
         </div>
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="space-y-4 py-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+              </div>
+            ))}
+          </div>
+        ) : orders.length === 0 ? (
           <div className="text-center py-8"><p className="text-gray-500 font-PatrickHand">No orders found.</p></div>
         ) : (
           <>

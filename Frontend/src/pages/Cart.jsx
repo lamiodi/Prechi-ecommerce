@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from './CurrencyContext';
+import { CartSkeleton } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -977,30 +978,8 @@ const Cart = () => {
   );
 
   // Handle loading states AFTER all hooks are declared
-  if (authLoading || contextLoading) {
-    console.log('Cart page showing loading state:', { authLoading, contextLoading });
-    return (
-      <div
-        style={{
-          '--color-Primarycolor': '#1E1E1E',
-          '--color-Secondarycolor': '#ffffff',
-          '--color-Accent': '#6E6E6E',
-          '--font-Manrope': '"Manrope", "sans-serif"',
-          '--font-PatrickHand': '"Jost", "sans-serif"',
-        }}
-      >
-        <Navbar2 />
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="flex flex-col items-center justify-center text-gray-600">
-            <Loader2 className="animate-spin h-8 w-8 text-Primarycolor" />
-            <p className="mt-2 text-sm font-PatrickHand">Loading cart...</p>
-          </div>
-        </div>
-        <Suspense fallback={null}>
-          <Footer />
-        </Suspense>
-      </div>
-    );
+  if (authLoading || contextLoading || isCartLoading) {
+    return <CartSkeleton />;
   }
 
   return (

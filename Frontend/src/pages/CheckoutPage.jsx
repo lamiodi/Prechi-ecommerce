@@ -34,6 +34,7 @@ import PaystackPop from '@paystack/inline-js';
 import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { CheckoutSkeleton } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -817,17 +818,7 @@ const CheckoutPage = () => {
   const { displaySubtotal, displayFirstOrderDiscount, displayCouponDiscount, displayTax, displayTotal } = calculatedValues;
 
   if (authLoading || contextLoading || loading) {
-    return (
-      <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor font-display">
-        <Navbar2 />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <CircleNotch size={28} className="animate-spin text-Primarycolor mx-auto mb-3" />
-            <p className="text-xs font-display uppercase tracking-[0.08em] text-text-tertiary">Preparing checkout...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <CheckoutSkeleton />;
   }
 
   return (

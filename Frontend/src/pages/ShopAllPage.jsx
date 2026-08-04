@@ -9,7 +9,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
 import { Button } from '../components/ui/button';
-import { SkeletonPulse } from '../components/skeletons';
+import { SkeletonPulse, ShopSkeleton } from '../components/skeletons';
 
 const useMetaTags = (title, description) => {
   useEffect(() => {
@@ -270,13 +270,7 @@ const ShopAllPage = () => {
 
           {/* Product grid */}
           {loading || contextLoading ? (
-            <div className={`grid gap-x-3 gap-y-8 sm:gap-x-4 sm:gap-y-10 lg:gap-x-5 lg:gap-y-12 ${
-              mobileLayout === 'one'
-                ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-            }`}>
-              {[...Array(12)].map((_, i) => <SkeletonCard key={i} />)}
-            </div>
+            <ShopSkeleton />
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-text-secondary font-display text-sm mb-4">Something went wrong loading products.</p>

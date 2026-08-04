@@ -24,6 +24,7 @@ import Customers from '../components/Customers';
 import AdminNewsletterDashboard from '../components/AdminNewsletterDashboard';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import SEO from '../components/SEO';
+import { AdminDashboardSkeleton } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -125,9 +126,7 @@ const AdminDashboard = () => {
       )}
 
       {loading ? (
-        <div className="flex justify-center items-center py-24">
-          <CircleNotch size={24} className="animate-spin text-Primarycolor" />
-        </div>
+        <AdminDashboardSkeleton />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Revenue */}

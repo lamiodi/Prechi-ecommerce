@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import SEO from '../components/SEO';
 import { Button } from '../components/ui/button';
-import { SkeletonPulse } from '../components/skeletons';
+import { SkeletonPulse, UserOrdersSkeleton } from '../components/skeletons';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
@@ -69,6 +69,7 @@ const UserOrders = () => {
   };
 
   if (!user) return null;
+  if (ordersLoading) return <UserOrdersSkeleton />;
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-Secondarycolor">
