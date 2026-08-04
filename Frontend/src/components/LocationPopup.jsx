@@ -23,7 +23,7 @@ const exchangeRateCache = new Map()
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 const LocationPopup = React.memo(() => {
-  const [showPopup, setShowPopup] = useState(true)
+  const [showPopup, setShowPopup] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState("NG")
   const [isFetching, setIsFetching] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -31,11 +31,24 @@ const LocationPopup = React.memo(() => {
   const { setCurrency, setCountry, setExchangeRate } = useContext(CurrencyContext)
 
   useEffect(() => {
-    if (showPopup) {
-      const timer = setTimeout(() => setIsVisible(true), 50) // Reduced delay
-      return () => clearTimeout(timer)
+    // Check if user saved a country previously
+    const savedCountry = localStorage.getItem("selectedCountry")
+    if (savedCountry) {
+      setSelectedCountry(savedCountry)
     }
-  }, [showPopup])
+
+    // Check if modal was already closed/dismissed in this session
+    const isDismissed = sessionStorage.getItem("locationPopupDismissed")
+    if (!isDismissed) {
+      // Delay popup by 6 seconds after page loads so it does not pop up immediately
+      const popupTimer = setTimeout(() => {
+        setShowPopup(true)
+        setTimeout(() => setIsVisible(true), 50)
+      }, 6000)
+
+      return () => clearTimeout(popupTimer)
+    }
+  }, [])
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -52,14 +65,15 @@ const LocationPopup = React.memo(() => {
   }, [handleKeyDown])
 
   useEffect(() => {
-    if (showPopup && popupRef.current) {
+    if (showPopup && isVisible && popupRef.current) {
       popupRef.current.focus({ preventScroll: true })
     }
-  }, [showPopup])
+  }, [showPopup, isVisible])
 
   const handleClose = useCallback(() => {
     setIsVisible(false)
-    setTimeout(() => setShowPopup(false), 200) // Reduced animation time
+    sessionStorage.setItem("locationPopupDismissed", "true")
+    setTimeout(() => setShowPopup(false), 200)
   }, [])
 
   const fetchExchangeRate = useCallback(async (currency) => {
@@ -100,6 +114,7 @@ const LocationPopup = React.memo(() => {
 
       setSelectedCountry(code)
       localStorage.setItem("selectedCountry", code)
+      sessionStorage.setItem("locationPopupDismissed", "true")
 
       setCurrency(currency)
       setCountry(name)
