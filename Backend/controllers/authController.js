@@ -320,18 +320,33 @@ export const createTemporaryUser = async (req, res) => {
     const first_name = nameParts[0] || '';
     const last_name = nameParts.slice(1).join(' ') || '';
     
-    // Check if there's an existing temporary user with the same email AND phone number
-    const [existingTemporaryUser] = await sql`
+    // Check if there's any existing user with the same email or phone number
+    const [existingUser] = await sql`
       SELECT id, first_name, last_name, email, phone_number, is_temporary, first_order 
       FROM users 
-      WHERE email = ${email} AND phone_number = ${phone_number} AND is_temporary = TRUE
+      WHERE email = ${email} OR (phone_number IS NOT NULL AND phone_number = ${phone_number})
+      LIMIT 1
     `;
     
-    if (existingTemporaryUser) {
-      // Return the existing temporary user's ID
+    if (existingUser) {
+      if (existingUser.is_temporary) {
+        // Update details for the temporary account
+        const [updatedUser] = await sql`
+          UPDATE users
+          SET first_name = ${first_name}, last_name = ${last_name}, phone_number = ${phone_number}, updated_at = NOW()
+          WHERE id = ${existingUser.id}
+          RETURNING id, first_name, last_name, email, phone_number, is_temporary, first_order
+        `;
+        return res.status(200).json({
+          user: updatedUser || existingUser,
+          message: 'Existing temporary account updated',
+          isExisting: true
+        });
+      }
+
       return res.status(200).json({
-        user: existingTemporaryUser,
-        message: 'Existing temporary account found',
+        user: existingUser,
+        message: 'Existing account found',
         isExisting: true
       });
     }
@@ -352,21 +367,40 @@ export const createTemporaryUser = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     
-    // Create the temporary user
-    const [newUser] = await sql`
-      INSERT INTO users (first_name, last_name, email, phone_number, password, is_temporary, first_order)
-      VALUES (${first_name}, ${last_name}, ${email}, ${phone_number}, ${hashedPassword}, ${true}, ${false})
-      RETURNING id, first_name, last_name, email, phone_number, is_temporary, first_order
-    `;
-    
-    // Return user data without token
-    res.status(201).json({
-      user: newUser,
-      message: 'Temporary account created successfully',
-      isExisting: false
-    });
+    try {
+      // Create the temporary user
+      const [newUser] = await sql`
+        INSERT INTO users (first_name, last_name, email, phone_number, password, is_temporary, first_order)
+        VALUES (${first_name}, ${last_name}, ${email}, ${phone_number}, ${hashedPassword}, ${true}, ${false})
+        RETURNING id, first_name, last_name, email, phone_number, is_temporary, first_order
+      `;
+      
+      return res.status(201).json({
+        user: newUser,
+        message: 'Temporary account created successfully',
+        isExisting: false
+      });
+    } catch (dbErr) {
+      // Fallback: If duplicate constraint occurs, fetch the user record
+      if (dbErr.code === '23505' || dbErr.message?.includes('unique') || dbErr.message?.includes('duplicate')) {
+        const [fallbackUser] = await sql`
+          SELECT id, first_name, last_name, email, phone_number, is_temporary, first_order 
+          FROM users 
+          WHERE email = ${email} OR phone_number = ${phone_number}
+          LIMIT 1
+        `;
+        if (fallbackUser) {
+          return res.status(200).json({
+            user: fallbackUser,
+            message: 'Existing account retrieved',
+            isExisting: true
+          });
+        }
+      }
+      throw dbErr;
+    }
   } catch (err) {
     console.error('Error creating temporary user:', err);
-    res.status(500).json({ error: 'Failed to create temporary account' });
+    res.status(500).json({ error: 'Failed to create temporary account', details: err.message });
   }
 };

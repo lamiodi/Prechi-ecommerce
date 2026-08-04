@@ -47,8 +47,11 @@ const OrderSummary = React.memo(({
             displayImage = displayImage?.image_url || displayImage?.url || '/images/placeholder.jpg';
           }
 
+          const sizeDisplay = item.size || cartItem.size_name || item.size_name || (typeof item.size === 'string' ? item.size : null);
+          const colorDisplay = item.color || cartItem.color_name || item.color_name || item.variant?.color_name || null;
+
           return (
-            <div key={cartItem.id || index} className="flex gap-3 items-center py-2 border-b border-border/50 last:border-0">
+            <div key={cartItem.id || index} className="flex gap-3 items-center py-2.5 border-b border-border/50 last:border-0">
               <img
                 src={displayImage}
                 alt={item.name || 'Product'}
@@ -56,7 +59,32 @@ const OrderSummary = React.memo(({
               />
               <div className="flex-1 min-w-0 text-xs">
                 <p className="font-semibold text-Primarycolor truncate">{item.name || 'Unknown Item'}</p>
-                <p className="text-text-tertiary">Qty: {cartItem.quantity || 1}</p>
+                
+                {/* Size & Color Metadata Display */}
+                {(sizeDisplay || colorDisplay) && (
+                  <div className="flex items-center gap-2 text-text-tertiary text-[11px] mt-0.5">
+                    {sizeDisplay && (
+                      <span>Size: <strong className="font-medium text-Primarycolor">{sizeDisplay}</strong></span>
+                    )}
+                    {sizeDisplay && colorDisplay && <span>•</span>}
+                    {colorDisplay && (
+                      <span>Color: <strong className="font-medium text-Primarycolor">{colorDisplay}</strong></span>
+                    )}
+                  </div>
+                )}
+
+                {/* Bundle Sub-items Display */}
+                {Array.isArray(item.items) && item.items.length > 0 && (
+                  <div className="mt-1 text-[10px] text-text-tertiary space-y-0.5 bg-surface/50 p-1.5 rounded border border-border/40">
+                    {item.items.map((bItem, bIdx) => (
+                      <p key={bIdx} className="truncate">
+                        • {bItem.color_name || bItem.color || 'Item'} {bItem.size_name || bItem.size ? `(${bItem.size_name || bItem.size})` : ''}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-text-tertiary text-[11px] mt-0.5">Qty: {cartItem.quantity || 1}</p>
               </div>
               <span className="font-semibold text-xs text-Primarycolor tabular-nums">
                 ₦{itemTotal.toLocaleString()}

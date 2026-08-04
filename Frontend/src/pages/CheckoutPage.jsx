@@ -422,15 +422,20 @@ const CheckoutPage = () => {
       const orderData = {
         user_id: userId,
         shipping_data: (!isAuthenticated() || !shippingAddressId) ? shippingForm : null,
-        billing_data: (!isAuthenticated() || billingAddressOption !== 'same')
+        billing_data: (!isAuthenticated() || !shippingAddressId || billingAddressOption !== 'same')
           ? (billingAddressOption === 'same'
             ? {
               ...shippingForm,
-              full_name: guestForm.name || billingForm.full_name || user?.name || '',
+              full_name: guestForm.name || billingForm.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : user?.email) || 'Valued Customer',
               email: guestForm.email || billingForm.email || user?.email || '',
-              phone_number: guestForm.phone_number || shippingForm.phone_number,
+              phone_number: guestForm.phone_number || shippingForm.phone_number || '',
             }
-            : billingForm)
+            : {
+              ...billingForm,
+              full_name: billingForm.full_name || guestForm.name || (user?.first_name ? `${user.first_name} ${user.last_name}` : user?.email) || 'Valued Customer',
+              email: billingForm.email || guestForm.email || user?.email || '',
+              phone_number: billingForm.phone_number || guestForm.phone_number || shippingForm.phone_number || '',
+            })
           : null,
         address_id: (isAuthenticated() && shippingAddressId) ? parseInt(shippingAddressId) : null,
         billing_address_id: (isAuthenticated() && billingAddressId && billingAddressOption !== 'same')
@@ -456,6 +461,7 @@ const CheckoutPage = () => {
             : null;
           const resolvedBundleId = item.item?.is_product ? null : (item.bundle_id ?? item.item?.id ?? null);
           const resolvedSizeId = item.size_id ?? item.item?.size_id ?? null;
+          const cartItemSizeName = item.size_name || item.item?.size_name || item.item?.size || item.size || null;
 
           const resolveImgUrl = (raw) => {
             if (!raw) return null;
@@ -477,8 +483,8 @@ const CheckoutPage = () => {
                 : item.item?.images?.[0]) ||
               null,
             product_name: item.item?.name || 'Unknown Item',
-            color_name: item.item?.color || item.item?.variant?.color_name || null,
-            size_name: item.item?.size || item.size_name || null,
+            color_name: item.item?.color || item.item?.variant?.color_name || item.color_name || null,
+            size_name: cartItemSizeName,
           };
 
           const bundleItems = item.item?.items;

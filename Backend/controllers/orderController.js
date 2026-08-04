@@ -145,8 +145,8 @@ export const createOrder = async (req, res) => {
       let address;
       let billingAddress;
 
-      if (shipping_data && billing_data) { // Guest mode: create addresses
-        // Create shipping address without address_line_2
+      if (shipping_data) { // Create addresses from shipping_data and billing_data
+        // Create shipping address
         const [newAddress] = await sql`
           INSERT INTO addresses (
             user_id, title, address_line_1, landmark, city, state, zip_code, country, created_at
@@ -158,7 +158,7 @@ export const createOrder = async (req, res) => {
             ${shipping_data.city}, 
             ${shipping_data.state || null}, 
             ${shipping_data.zip_code || null}, 
-            ${shipping_data.country}, 
+            ${shipping_data.country || 'Nigeria'}, 
             NOW()
           )
           RETURNING id, country, address_line_1, city, state, zip_code
@@ -166,20 +166,31 @@ export const createOrder = async (req, res) => {
         finalAddressId = newAddress.id;
         address = newAddress;
 
-        // Create billing address without address_line_2
+        const effectiveBilling = billing_data || {
+          full_name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email || 'Valued Customer',
+          email: user.email || 'customer@prechi.com',
+          phone_number: shipping_data.phone_number || null,
+          address_line_1: shipping_data.address_line_1,
+          city: shipping_data.city,
+          state: shipping_data.state || null,
+          zip_code: shipping_data.zip_code || null,
+          country: shipping_data.country || 'Nigeria'
+        };
+
+        // Create billing address
         const [newBillingAddress] = await sql`
           INSERT INTO billing_addresses (
             user_id, full_name, email, phone_number, address_line_1, city, state, zip_code, country, created_at
           ) VALUES (
             ${user_id}, 
-            ${billing_data.full_name}, 
-            ${billing_data.email}, 
-            ${billing_data.phone_number || null}, 
-            ${billing_data.address_line_1},
-            ${billing_data.city}, 
-            ${billing_data.state || null}, 
-            ${billing_data.zip_code || null}, 
-            ${billing_data.country}, 
+            ${effectiveBilling.full_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Valued Customer'}, 
+            ${effectiveBilling.email || user.email || 'customer@prechi.com'}, 
+            ${effectiveBilling.phone_number || null}, 
+            ${effectiveBilling.address_line_1},
+            ${effectiveBilling.city}, 
+            ${effectiveBilling.state || null}, 
+            ${effectiveBilling.zip_code || null}, 
+            ${effectiveBilling.country || 'Nigeria'}, 
             NOW()
           )
           RETURNING id
