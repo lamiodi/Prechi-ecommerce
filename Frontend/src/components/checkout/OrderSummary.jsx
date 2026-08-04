@@ -140,17 +140,12 @@ const OrderSummary = React.memo(({
 
       {/* Place Order CTA Button */}
       <Button
+        id="btn-place-order"
         variant="default"
         size="lg"
         onClick={handlePlaceOrder}
-        disabled={
-          isProcessing || loading ||
-          (!shippingForm.address_line_1 && !shippingAddressId) ||
-          (!billingForm.address_line_1 && !billingAddressId && billingAddressOption !== 'same') ||
-          (isNigeria && !shippingMethod) ||
-          (isGuest && !createdUserId && !guestFormSubmitted)
-        }
-        className="mt-6 w-full"
+        disabled={isProcessing || loading}
+        className="mt-6 w-full font-semibold shadow-sm hover:shadow transition-all"
       >
         {isProcessing || loading ? (
           <span className="flex items-center justify-center gap-2">

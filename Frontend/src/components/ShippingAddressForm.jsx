@@ -190,28 +190,32 @@ const ShippingAddressForm = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            ZIP/Postal Code
-          </label>
-          <Input
-            type="text"
-            name="zip_code"
-            value={formData.zip_code}
-            onChange={handleChange}
-            placeholder="ZIP/Postal code"
-          />
-        </div>
+        {formData.country?.trim().toLowerCase() !== 'nigeria' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              ZIP / Postal Code *
+            </label>
+            <Input
+              id="shipping-zip-code"
+              type="text"
+              name="zip_code"
+              value={formData.zip_code}
+              onChange={handleChange}
+              placeholder="ZIP/Postal code"
+            />
+          </div>
+        )}
         
-        <div>
+        <div className={formData.country?.trim().toLowerCase() === 'nigeria' ? 'md:col-span-2' : ''}>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Country *
           </label>
           <select
+            id="shipping-country"
             name="country"
             value={formData.country}
             onChange={handleChange}
-            className={`w-full p-2 border rounded-md ${
+            className={`w-full p-2 border rounded-md text-sm ${
               errors.country ? 'border-red-500' : 'border-gray-300'
             }`}
           >
