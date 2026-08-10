@@ -615,7 +615,7 @@ const ProductDetails = () => {
               {/* Header */}
               <div>
                 <span className="text-[0.7rem] uppercase tracking-[0.15em] text-text-tertiary font-medium block mb-2">
-                  Prechi Sportswear
+                  Prechi
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-display font-semibold text-Primarycolor tracking-tight mb-3">
                   {name}

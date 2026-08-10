@@ -356,7 +356,7 @@ const Login = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/20 to-transparent" />
             <div className="absolute bottom-16 left-12 right-12 text-white">
               <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-white/50 mb-3 block">
-                Prechi Sportswear
+                Prechi 
               </span>
               <h2 className="text-2xl lg:text-3xl font-display font-semibold tracking-tight mb-2">
                 {image.title}
