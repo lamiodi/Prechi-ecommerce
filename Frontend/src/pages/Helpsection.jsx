@@ -45,14 +45,12 @@ const HelpPage = () => {
 
   const sizeChart = {
     sets: [
-      { size: 'XS', waist: '26-28', hip: '32-34' },
       { size: 'S', waist: '28-30', hip: '34-36' },
       { size: 'M', waist: '32-34', hip: '38-40' },
       { size: 'L', waist: '36-38', hip: '42-44' },
       { size: 'XL', waist: '40-42', hip: '46-48' }
     ],
     tracksuits: [
-      { size: 'XS', chest: '32-34', waist: '26-28', length: '26' },
       { size: 'S', chest: '34-36', waist: '28-30', length: '27' },
       { size: 'M', chest: '38-40', waist: '32-34', length: '28' },
       { size: 'L', chest: '42-44', waist: '36-38', length: '29' },

@@ -88,7 +88,7 @@ const ProductDetailsSkeleton = () => {
               <div data-skel>
                 <SkeletonPulse className="h-3 w-20 mb-3" />
                 <div className="grid grid-cols-5 gap-2">
-                  {['XS', 'S', 'M', 'L', 'XL'].map((_, i) => (
+                  {['S', 'M', 'L', 'XL', '2XL'].map((_, i) => (
                     <SkeletonPulse key={i} className="h-11" />
                   ))}
                 </div>

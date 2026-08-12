@@ -8,7 +8,8 @@ const HeroSection = () => {
   const videoRef = useRef(null);
   const sectionRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(true);
-  const [videoSrc, setVideoSrc] = useState('/IMG_9987.mp4');
+  const heroVideoUrl = "/IMG_0348.MP4";
+  const [videoSrc, setVideoSrc] = useState(heroVideoUrl);
 
   // Parallax setup
   const { scrollYProgress } = useScroll({
@@ -22,33 +23,9 @@ const HeroSection = () => {
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  const desktopVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867614/Prechi_Clothing_-_Made_for_You._1_hj54pu.mp4";
-  const mobileVideoUrl = "https://res.cloudinary.com/dgcwviufp/video/upload/f_auto,q_auto/v1752867619/Prechi_Clothing_-_Made_for_You._2_j9h7aw.mp4";
-  const localVideoUrl = "/IMG_9987.mp4";
-
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const preferredUrl = isMobile ? mobileVideoUrl : desktopVideoUrl;
-
-    const testPreferredVideo = async () => {
-      try {
-        const res = await fetch(preferredUrl, { method: 'HEAD' });
-        if (res.ok) {
-          setVideoSrc(preferredUrl);
-        } else {
-          setVideoSrc(localVideoUrl);
-        }
-      } catch {
-        setVideoSrc(localVideoUrl);
-      }
-    };
-
-    testPreferredVideo();
-  }, []);
-
   const handleVideoError = () => {
-    if (videoSrc !== localVideoUrl) {
-      setVideoSrc(localVideoUrl);
+    if (videoSrc !== heroVideoUrl) {
+      setVideoSrc(heroVideoUrl);
     }
   };
 

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toastSuccess, toastError } from '../utils/toastConfig';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 const api = axios.create({
@@ -47,7 +48,6 @@ const PRESET_COLORS = [
   { id: 13, color_name: 'Brown' },
 ];
 const PRESET_SIZES = [
-  { size_id: 1, size_name: 'XS' },
   { size_id: 2, size_name: 'S' },
   { size_id: 3, size_name: 'M' },
   { size_id: 4, size_name: 'L' },
@@ -127,15 +127,19 @@ const InventoryManager = () => {
         } else {
           setBundles((prev) => prev.filter((b) => b.id !== confirmDelete.id));
         }
-        setSuccess(
-          `${confirmDelete.type.charAt(0).toUpperCase() + confirmDelete.type.slice(1)} deleted successfully`
-        );
+        const delSuccessMsg = `${confirmDelete.type.charAt(0).toUpperCase() + confirmDelete.type.slice(1)} deleted successfully`;
+        setSuccess(delSuccessMsg);
+        toastSuccess(delSuccessMsg);
         setConfirmDelete(null);
         setTimeout(() => setSuccess(''), 5000);
       }
     } catch (err) {
       console.error('Delete error:', err);
-      setError(err.response?.data?.error || 'Deletion failed. Please try again.');
+      const serverErr = err.response?.data?.error;
+      const serverDetails = err.response?.data?.details;
+      const msg = serverErr && serverDetails ? `${serverErr}: ${serverDetails}` : (serverErr || err.message || 'Deletion failed. Please try again.');
+      setError(msg);
+      toastError(msg);
     } finally {
       setActionLoading(false);
     }
@@ -174,8 +178,13 @@ const InventoryManager = () => {
       setProducts((prev) =>
         prev.map((p) => (p.id === productId ? { ...p, is_new_release: value } : p))
       );
+      toastSuccess('Product badge updated');
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to update new release flag');
+      const serverErr = err.response?.data?.error;
+      const serverDetails = err.response?.data?.details;
+      const msg = serverErr && serverDetails ? `${serverErr}: ${serverDetails}` : (serverErr || 'Failed to update new release flag');
+      setError(msg);
+      toastError(msg);
     }
   };
 
@@ -199,10 +208,16 @@ const InventoryManager = () => {
           }),
         };
       });
-      setSuccess(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
+      const mediaSuccess = `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`;
+      setSuccess(mediaSuccess);
+      toastSuccess(mediaSuccess);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
-      setError(err.response?.data?.error || `Failed to delete ${type}`);
+      const serverErr = err.response?.data?.error;
+      const serverDetails = err.response?.data?.details;
+      const msg = serverErr && serverDetails ? `${serverErr}: ${serverDetails}` : (serverErr || `Failed to delete ${type}`);
+      setError(msg);
+      toastError(msg);
     } finally {
       setActionLoading(false);
     }
@@ -216,10 +231,13 @@ const InventoryManager = () => {
         setActionLoading(true);
         await api.delete(`/variants/${variantId}`);
         setSuccess('Variant deleted successfully');
+        toastSuccess('Variant deleted successfully');
       } catch (err) {
-        setError(err.response?.data?.error || 'Failed to delete variant');
-        setActionLoading(false);
-        return;
+        const serverErr = err.response?.data?.error;
+        const serverDetails = err.response?.data?.details;
+        const msg = serverErr && serverDetails ? `${serverErr}: ${serverDetails}` : (serverErr || 'Failed to delete variant');
+        setError(msg);
+        toastError(msg);
       } finally {
         setActionLoading(false);
       }
@@ -321,13 +339,17 @@ const InventoryManager = () => {
         for (const variant of variants) {
           if (!variant.is_new && variant.images?.length > 0) {
             const primaryId = selectedPrimary[variant.id];
-            const imageOrders = variant.images.map((img, idx) => ({
-              id: img.id,
-              position: idx + 1,
-              is_primary: primaryId ? img.id === primaryId : img.is_primary,
-            }));
+            const validImageOrders = variant.images
+              .filter((img) => img && typeof img === 'object' && img.id && !isNaN(Number(img.id)))
+              .map((img, idx) => ({
+                id: img.id,
+                position: idx + 1,
+                is_primary: primaryId ? img.id === primaryId : Boolean(img.is_primary),
+              }));
 
-            await api.put(`/variants/${variant.id}/reorder-images`, { imageOrders });
+            if (validImageOrders.length > 0) {
+              await api.put(`/variants/${variant.id}/reorder-images`, { imageOrders: validImageOrders });
+            }
           }
         }
 
@@ -360,15 +382,28 @@ const InventoryManager = () => {
         });
       }
 
-      setSuccess(
-        `${editingItem.type.charAt(0).toUpperCase() + editingItem.type.slice(1)} updated successfully`
-      );
+      const successMsg = `${editingItem.type.charAt(0).toUpperCase() + editingItem.type.slice(1)} updated successfully`;
+      setSuccess(successMsg);
+      toastSuccess(successMsg);
       setEditingItem(null);
       fetchData();
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
       console.error('Update error:', err);
-      setError(err.response?.data?.error || 'Update failed. Please try again.');
+      const serverError = err.response?.data?.error;
+      const serverDetails = err.response?.data?.details;
+      
+      let userFriendlyMsg = 'Update failed. Please try again.';
+      if (serverError && serverDetails) {
+        userFriendlyMsg = `${serverError}: ${serverDetails}`;
+      } else if (serverError) {
+        userFriendlyMsg = serverError;
+      } else if (err.message) {
+        userFriendlyMsg = err.message;
+      }
+
+      setError(userFriendlyMsg);
+      toastError(userFriendlyMsg);
     } finally {
       setActionLoading(false);
     }

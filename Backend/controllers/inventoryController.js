@@ -289,20 +289,28 @@ export const reorderVariantImages = async (req, res) => {
     return res.status(400).json({ error: 'imageOrders array is required' });
   }
 
+  const validOrders = imageOrders.filter((item) => item && item.id && !isNaN(Number(item.id)));
+  if (validOrders.length === 0) {
+    return res.json({ success: true, message: 'No valid image orders to update' });
+  }
+
   try {
     await sql.begin(async (sql) => {
-      for (const item of imageOrders) {
+      for (const item of validOrders) {
         await sql`
           UPDATE product_images 
-          SET position = ${item.position}, is_primary = ${item.is_primary || false}
-          WHERE id = ${item.id} AND variant_id = ${variantId}
+          SET position = ${parseInt(item.position) || 1}, is_primary = ${Boolean(item.is_primary)}
+          WHERE id = ${parseInt(item.id)} AND variant_id = ${parseInt(variantId)}
         `;
       }
     });
     res.json({ success: true, message: 'Images reordered successfully' });
   } catch (err) {
     console.error('Error reordering images:', err);
-    res.status(500).json({ error: 'Failed to reorder images' });
+    res.status(500).json({ 
+      error: 'Failed to reorder images', 
+      details: err.message || 'Database execution error during image reordering' 
+    });
   }
 };
 

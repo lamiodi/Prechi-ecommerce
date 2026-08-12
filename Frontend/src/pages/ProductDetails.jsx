@@ -459,7 +459,7 @@ const ProductDetails = () => {
     : [];
 
   const sortSizes = (sizes) => {
-    const sizeOrder = ['XS', 'S', 'M', 'L', 'XL'];
+    const sizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
     return sizes.sort((a, b) => {
       const aIndex = sizeOrder.indexOf(a.size_name);
       const bIndex = sizeOrder.indexOf(b.size_name);
