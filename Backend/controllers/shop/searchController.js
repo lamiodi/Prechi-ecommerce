@@ -39,7 +39,7 @@ export const searchProducts = async (req, res) => {
         p.id AS product_id,
         p.base_price AS price,
         pv.id AS variant_id,
-        p.name AS variant_name,
+        COALESCE(pv.name, p.name) AS display_name,
         p.name AS product_name,
         p.created_at,
         p.category,
@@ -124,7 +124,7 @@ export const searchProducts = async (req, res) => {
     // Format products
     const products = productRes.map(row => ({
       id: row.product_id,
-      name: row.variant_name,
+      name: row.display_name,
       productName: row.product_name,
       price: row.price,
       image: row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image',

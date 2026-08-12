@@ -22,6 +22,8 @@ export const getProducts = async (req, res) => {
         p.description,
         p.base_price AS price,
         p.sku_prefix AS design_code,
+        p.category,
+        p.gender,
         p.is_active,
         p.is_new_release,
         (SELECT array_agg(DISTINCT pi.image_url)
@@ -48,6 +50,7 @@ export const getProducts = async (req, res) => {
             'color_id', pv.color_id,
             'color_name', c.color_name,
             'sku', pv.sku,
+            'is_active', pv.is_active,
             'sizes', (
               SELECT jsonb_agg(
                 jsonb_build_object(
@@ -66,8 +69,9 @@ export const getProducts = async (req, res) => {
                 jsonb_build_object(
                   'id', pi.id,
                   'image_url', pi.image_url,
-                  'is_primary', pi.is_primary
-                )
+                  'is_primary', pi.is_primary,
+                  'position', COALESCE(pi.position, 0)
+                ) ORDER BY pi.is_primary DESC, COALESCE(pi.position, 0) ASC, pi.id ASC
               )
               FROM product_images pi
               WHERE pi.variant_id = pv.id
@@ -198,56 +202,72 @@ export const deleteBundle = async (req, res) => {
   }
 };
 
-// Update product price, stock, and variant details
+// Update product, variant, stock, and price details
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, base_price, variants, is_new_release } = req.body;
+  const { name, description, base_price, sku_prefix, category, gender, is_active, is_new_release, variants } = req.body;
 
   try {
     await sql.begin(async (sql) => {
       // Update product level details
-      if (name || base_price || typeof is_new_release === 'boolean') {
-        const updates = {};
-        if (name) updates.name = name;
-        if (base_price) updates.base_price = base_price;
-        if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
+      const updates = {};
+      if (name !== undefined) updates.name = name;
+      if (description !== undefined) updates.description = description;
+      if (base_price !== undefined) updates.base_price = base_price;
+      if (sku_prefix !== undefined) updates.sku_prefix = sku_prefix;
+      if (category !== undefined) updates.category = category;
+      if (gender !== undefined) updates.gender = gender;
+      if (typeof is_active === 'boolean') updates.is_active = is_active;
+      if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
 
-        if (Object.keys(updates).length > 0) {
-          await sql`UPDATE products SET ${sql(updates)} WHERE id = ${id}`;
-        }
+      if (Object.keys(updates).length > 0) {
+        await sql`UPDATE products SET ${sql(updates)} WHERE id = ${id}`;
       }
 
       if (variants?.length) {
         for (const variant of variants) {
-          // Update variant name (if provided and different)
-          // Note: Frontend sends 'name' inside variant object if we add it there.
-          // Currently getProducts query returns 'sku' but not explicit variant 'name' column if it exists in product_variants table?
-          // Let's check the schema. Usually product_variants has a name or it uses color/size.
-          // The getProducts query selects 'p.name' as product name, and 'c.color_name' for variant.
-          // Let's assume the user wants to update the 'name' column in 'product_variants' table if it exists,
-          // OR they mean the 'sku' or just the display name which is often 'Product Name - Color'.
-          // The user said "name in product_variant table".
-          // Let's check if 'product_variants' table has a 'name' column.
-          // Based on create_tables.js (which I read earlier but might need to recall), 
-          // product_variants usually has: id, product_id, color_id, sku, is_active, etc.
-          // If it has a 'name' column, we should update it.
-          // I will assume it does or add it to the query. 
-          // Wait, in getProducts query:
-          // SELECT ... (SELECT jsonb_agg(jsonb_build_object(..., 'sku', pv.sku, ...)))
-          // It doesn't select 'name' from pv. 
-          // But I'll add the update logic for 'name' in product_variants if it is passed.
-
-          if (variant.name !== undefined) {
-            const variantName = variant.name === '' ? null : variant.name;
-            await sql`UPDATE product_variants SET name = ${variantName} WHERE id = ${variant.id}`;
-          }
-
-          for (const size of variant.sizes || []) {
-            await sql`
-              UPDATE variant_sizes
-              SET stock_quantity = ${size.stock_quantity}, price = ${size.price || 0}
-              WHERE variant_id = ${variant.id} AND size_id = ${size.size_id}
+          if (variant.is_new) {
+            // Create brand new variant for this product
+            const colorId = variant.color_id || 1;
+            const prefix = sku_prefix || 'PRD';
+            const sku = `${prefix}-${colorId}-${Date.now().toString().slice(-4)}`;
+            const [newVar] = await sql`
+              INSERT INTO product_variants (product_id, color_id, sku, name, is_active)
+              VALUES (${id}, ${colorId}, ${sku}, ${variant.name || null}, TRUE)
+              RETURNING id
             `;
+            const newVarId = newVar.id;
+
+            // Insert size stock & price
+            for (const size of variant.sizes || []) {
+              await sql`
+                INSERT INTO variant_sizes (variant_id, size_id, stock_quantity, price)
+                VALUES (${newVarId}, ${size.size_id}, ${parseInt(size.stock_quantity) || 0}, ${parseFloat(size.price) || 0})
+                ON CONFLICT (variant_id, size_id) 
+                DO UPDATE SET stock_quantity = EXCLUDED.stock_quantity, price = EXCLUDED.price
+              `;
+            }
+          } else {
+            // Update existing variant
+            if (variant.name !== undefined || variant.color_id !== undefined || typeof variant.is_active === 'boolean') {
+              const vUpdates = {};
+              if (variant.name !== undefined) vUpdates.name = variant.name === '' ? null : variant.name;
+              if (variant.color_id !== undefined) vUpdates.color_id = variant.color_id;
+              if (typeof variant.is_active === 'boolean') vUpdates.is_active = variant.is_active;
+
+              if (Object.keys(vUpdates).length > 0) {
+                await sql`UPDATE product_variants SET ${sql(vUpdates)} WHERE id = ${variant.id}`;
+              }
+            }
+
+            for (const size of variant.sizes || []) {
+              await sql`
+                INSERT INTO variant_sizes (variant_id, size_id, stock_quantity, price)
+                VALUES (${variant.id}, ${size.size_id}, ${parseInt(size.stock_quantity) || 0}, ${parseFloat(size.price) || 0})
+                ON CONFLICT (variant_id, size_id)
+                DO UPDATE SET stock_quantity = EXCLUDED.stock_quantity, price = EXCLUDED.price
+              `;
+            }
           }
         }
       }
@@ -256,7 +276,50 @@ export const updateProduct = async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating product:', err);
-    res.status(500).json({ error: 'Failed to update product' });
+    res.status(500).json({ error: 'Failed to update product', details: err.message });
+  }
+};
+
+// Reorder images for a variant
+export const reorderVariantImages = async (req, res) => {
+  const { variantId } = req.params;
+  const { imageOrders } = req.body;
+
+  if (!Array.isArray(imageOrders)) {
+    return res.status(400).json({ error: 'imageOrders array is required' });
+  }
+
+  try {
+    await sql.begin(async (sql) => {
+      for (const item of imageOrders) {
+        await sql`
+          UPDATE product_images 
+          SET position = ${item.position}, is_primary = ${item.is_primary || false}
+          WHERE id = ${item.id} AND variant_id = ${variantId}
+        `;
+      }
+    });
+    res.json({ success: true, message: 'Images reordered successfully' });
+  } catch (err) {
+    console.error('Error reordering images:', err);
+    res.status(500).json({ error: 'Failed to reorder images' });
+  }
+};
+
+// Delete a single variant
+export const deleteVariant = async (req, res) => {
+  const { variantId } = req.params;
+  try {
+    await sql.begin(async (sql) => {
+      await sql`DELETE FROM product_images WHERE variant_id = ${variantId}`;
+      await sql`DELETE FROM product_videos WHERE variant_id = ${variantId}`;
+      await sql`DELETE FROM variant_sizes WHERE variant_id = ${variantId}`;
+      await sql`DELETE FROM product_variants WHERE id = ${variantId}`;
+    });
+    res.json({ success: true, message: 'Variant deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting variant:', err);
+    res.status(500).json({ error: 'Failed to delete variant' });
   }
 };
 

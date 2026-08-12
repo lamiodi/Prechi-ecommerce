@@ -92,7 +92,7 @@ export const getShopAll = async (req, res) => {
         SELECT 
           p.id AS product_id,
           pv.id AS variant_id,
-          pv.name AS variant_name,
+          COALESCE(pv.name, p.name) AS display_name,
           p.base_price AS price,
           (
             SELECT pi.image_url 
@@ -115,7 +115,7 @@ export const getShopAll = async (req, res) => {
         SELECT 
           p.id AS product_id,
           pv.id AS variant_id,
-          pv.name AS variant_name,
+          COALESCE(pv.name, p.name) AS display_name,
           p.base_price AS price,
           (
             SELECT pi.image_url 
@@ -137,7 +137,7 @@ export const getShopAll = async (req, res) => {
         SELECT 
           p.id AS product_id,
           pv.id AS variant_id,
-          pv.name AS variant_name,
+          COALESCE(pv.name, p.name) AS display_name,
           p.base_price AS price,
           (
             SELECT pi.image_url 
@@ -157,7 +157,7 @@ export const getShopAll = async (req, res) => {
 
     const products = productRes.map(row => ({
       id: row.product_id,
-      name: row.variant_name,
+      name: row.display_name,
       price: row.price,
       image: row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image',
       color: row.color_name,
