@@ -30,6 +30,7 @@ import ProductSchema from "../components/ProductSchema";
 import SEO from "../components/SEO";
 import { Button } from "../components/ui/button";
 import ProductDetailsSkeleton from "../components/skeletons/ProductDetailsSkeleton";
+import { toTitleCase } from "../lib/utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '')
@@ -618,7 +619,7 @@ const ProductDetails = () => {
                   Prechi
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-display font-semibold text-Primarycolor tracking-tight mb-3">
-                  {name}
+                  {toTitleCase(name)}
                 </h1>
                 
                 {/* Price Display */}
@@ -641,7 +642,7 @@ const ProductDetails = () => {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs uppercase tracking-[0.08em] font-medium text-text-secondary">
-                      Color: <span className="text-Primarycolor capitalize">{selectedColor}</span>
+                      Color: <span className="text-Primarycolor">{toTitleCase(selectedColor)}</span>
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2.5">

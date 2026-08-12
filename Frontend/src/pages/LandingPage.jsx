@@ -20,6 +20,8 @@ import img4 from '../assets/images/IMG_4559.JPG';
 const LocationPopup = lazy(() => import('../components/LocationPopup'));
 const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget'));
 
+import { toTitleCase } from '../lib/utils';
+
 // Parallax Product Card Component
 const ParallaxProductCard = ({ product, index, formatPrice }) => {
   const ref = useRef(null);
@@ -36,6 +38,7 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
 
   let displayName = product.name || 'Product';
   if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
+  displayName = toTitleCase(displayName);
 
   return (
     <motion.div
@@ -86,14 +89,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 const DEFAULT_FEATURED_PRODUCTS = [
   {
     id: 1,
-    name: 'ASH & PINK TRACKSUIT SET',
+    name: 'Ash & Pink Tracksuit Set',
     price: 75000,
     image: img1,
     is_product: true,
   },
   {
     id: 2,
-    name: 'NAVY BLUE TRACKSUIT SET',
+    name: 'Navy Blue Tracksuit Set',
     price: 75000,
     image: img2,
     is_product: true,

@@ -23,6 +23,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toastSuccess, toastError } from '../utils/toastConfig';
+import { toTitleCase } from '../lib/utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 const api = axios.create({
@@ -575,7 +576,7 @@ const InventoryManager = () => {
                           ) : (
                             <ChevronDown className="h-4 w-4 mr-1.5 text-gray-500 flex-shrink-0" />
                           )}
-                          <span>{product.name}</span>
+                          <span>{toTitleCase(product.name)}</span>
                           {product.is_new_release && (
                             <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
                               New

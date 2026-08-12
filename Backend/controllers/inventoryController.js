@@ -202,6 +202,26 @@ export const deleteBundle = async (req, res) => {
   }
 };
 
+// Helper to convert strings to Title Case
+const toTitleCase = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  return str
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map(word => {
+      if (!word) return '';
+      if (word.includes('-')) {
+        return word
+          .split('-')
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+          .join('-');
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+};
+
 // Helper to ensure color_id safely exists in the database
 const resolveColorId = async (sql, colorId, colorName) => {
   if (colorId && !isNaN(Number(colorId))) {
@@ -209,12 +229,13 @@ const resolveColorId = async (sql, colorId, colorName) => {
     if (existing.length > 0) return existing[0].id;
   }
   if (colorName && typeof colorName === 'string' && colorName.trim()) {
-    const byName = await sql`SELECT id FROM colors WHERE LOWER(color_name) = LOWER(${colorName.trim()})`;
+    const formattedColorName = toTitleCase(colorName);
+    const byName = await sql`SELECT id FROM colors WHERE LOWER(color_name) = LOWER(${formattedColorName})`;
     if (byName.length > 0) return byName[0].id;
 
     const [inserted] = await sql`
       INSERT INTO colors (color_name)
-      VALUES (${colorName.trim()})
+      VALUES (${formattedColorName})
       RETURNING id
     `;
     return inserted.id;
@@ -232,11 +253,11 @@ export const updateProduct = async (req, res) => {
     await sql.begin(async (sql) => {
       // Update product level details
       const updates = {};
-      if (name !== undefined) updates.name = name;
+      if (name !== undefined) updates.name = toTitleCase(name);
       if (description !== undefined) updates.description = description;
       if (base_price !== undefined) updates.base_price = base_price;
       if (sku_prefix !== undefined) updates.sku_prefix = sku_prefix;
-      if (category !== undefined) updates.category = category;
+      if (category !== undefined) updates.category = toTitleCase(category);
       if (gender !== undefined) updates.gender = gender;
       if (typeof is_active === 'boolean') updates.is_active = is_active;
       if (typeof is_new_release === 'boolean') updates.is_new_release = is_new_release;
@@ -248,6 +269,7 @@ export const updateProduct = async (req, res) => {
       if (variants?.length) {
         for (const variant of variants) {
           const validColorId = await resolveColorId(sql, variant.color_id, variant.color_name);
+          const formattedVarName = variant.name ? toTitleCase(variant.name) : null;
 
           if (variant.is_new) {
             // Create brand new variant for this product
@@ -255,7 +277,7 @@ export const updateProduct = async (req, res) => {
             const sku = `${prefix}-${validColorId}-${Date.now().toString().slice(-4)}`;
             const [newVar] = await sql`
               INSERT INTO product_variants (product_id, color_id, sku, name, is_active)
-              VALUES (${id}, ${validColorId}, ${sku}, ${variant.name || null}, TRUE)
+              VALUES (${id}, ${validColorId}, ${sku}, ${formattedVarName}, TRUE)
               RETURNING id
             `;
             const newVarId = newVar.id;
@@ -272,7 +294,7 @@ export const updateProduct = async (req, res) => {
           } else {
             // Update existing variant
             const vUpdates = {};
-            if (variant.name !== undefined) vUpdates.name = variant.name === '' ? null : variant.name;
+            if (variant.name !== undefined) vUpdates.name = variant.name === '' ? null : toTitleCase(variant.name);
             vUpdates.color_id = validColorId;
             if (typeof variant.is_active === 'boolean') vUpdates.is_active = variant.is_active;
 

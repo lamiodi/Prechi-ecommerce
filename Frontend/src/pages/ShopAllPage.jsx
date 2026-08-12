@@ -10,6 +10,7 @@ import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
 import { Button } from '../components/ui/button';
 import { SkeletonPulse, ShopSkeleton } from '../components/skeletons';
+import { toTitleCase } from '../lib/utils';
 
 const useMetaTags = (title, description) => {
   useEffect(() => {
@@ -338,7 +339,7 @@ const ProductCard = ({ product, onImageError }) => {
 
   const isSoldOut = is_product ? (total_stock === 0) : false;
 
-  let displayName = name || 'Unnamed Product';
+  let displayName = toTitleCase(name || 'Unnamed Product');
 
   const productUrl = is_product
     ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`

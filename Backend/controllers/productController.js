@@ -121,19 +121,43 @@ export const uploadProduct = async (req, res) => {
     });
   }
 
+const toTitleCase = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  return str
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map(word => {
+      if (!word) return '';
+      if (word.includes('-')) {
+        return word
+          .split('-')
+          .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+          .join('-');
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+};
+
   try {
     await sql.begin(async (sql) => {
+      const formattedName = toTitleCase(name);
+      const formattedCategory = category ? toTitleCase(category) : null;
+
       const [product] = await sql`
         INSERT INTO products (name, description, base_price, sku_prefix, category, gender)
-        VALUES (${name}, ${description || ''}, ${base_price || null}, ${sku_prefix}, ${category || null}, ${gender || null})
+        VALUES (${formattedName}, ${description || ''}, ${base_price || null}, ${sku_prefix}, ${formattedCategory}, ${gender || null})
         RETURNING id
       `;
       const productId = product.id;
 
       for (const [index, variant] of variants.entries()) {
+        const formattedVariantName = variant.name ? toTitleCase(variant.name) : null;
+
         const [variantResult] = await sql`
           INSERT INTO product_variants (product_id, color_id, sku, name)
-          VALUES (${productId}, ${variant.color_id}, ${`${sku_prefix}-${index}`}, ${variant.name || null})
+          VALUES (${productId}, ${variant.color_id}, ${`${sku_prefix}-${index}`}, ${formattedVariantName})
           RETURNING id
         `;
         const variantId = variantResult.id;
