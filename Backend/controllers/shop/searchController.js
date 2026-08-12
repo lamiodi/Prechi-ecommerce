@@ -35,7 +35,7 @@ export const searchProducts = async (req, res) => {
 
     // ── Product queries ──────────────────────────────────────────────────────
     const productSelectBase = `
-      SELECT 
+      SELECT DISTINCT ON (p.id, pv.color_id)
         p.id AS product_id,
         p.base_price AS price,
         pv.id AS variant_id,
@@ -56,18 +56,20 @@ export const searchProducts = async (req, res) => {
       WHERE p.is_active = TRUE AND pv.is_active = TRUE
     `;
 
+    const orderSuffix = ` ORDER BY p.id DESC, pv.color_id, pv.id ASC`;
+
     let productRes;
     if (isCategorySearch) {
       if (mappedCategory === '3-in-1' || mappedCategory === '5-in-1') {
         // For bundle-type searches, fall through to name search on products
-        productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.name) LIKE $1`, [searchTerm]);
+        productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.name) LIKE $1${orderSuffix}`, [searchTerm]);
       } else if (mappedCategory === 'new') {
-        productRes = await sql.unsafe(`${productSelectBase} AND p.is_new_release = TRUE`, []);
+        productRes = await sql.unsafe(`${productSelectBase} AND p.is_new_release = TRUE${orderSuffix}`, []);
       } else {
-        productRes = await sql.unsafe(`${productSelectBase} AND p.category = $1`, [mappedCategory]);
+        productRes = await sql.unsafe(`${productSelectBase} AND p.category = $1${orderSuffix}`, [mappedCategory]);
       }
     } else {
-      productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.name) LIKE $1`, [searchTerm]);
+      productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.name) LIKE $1${orderSuffix}`, [searchTerm]);
     }
 
     // ── Bundle queries ───────────────────────────────────────────────────────

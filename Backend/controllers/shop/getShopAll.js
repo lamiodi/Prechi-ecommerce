@@ -89,7 +89,7 @@ export const getShopAll = async (req, res) => {
 
     if (category && category.toLowerCase() === 'new') {
       productRes = await sql`
-        SELECT 
+        SELECT DISTINCT ON (p.id, pv.color_id)
           p.id AS product_id,
           pv.id AS variant_id,
           COALESCE(pv.name, p.name) AS display_name,
@@ -108,11 +108,12 @@ export const getShopAll = async (req, res) => {
         JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
           AND p.is_new_release = TRUE
+        ORDER BY p.id DESC, pv.color_id, pv.id ASC
       `;
     } else if (category) {
       const cat = category.toLowerCase();
       productRes = await sql`
-        SELECT 
+        SELECT DISTINCT ON (p.id, pv.color_id)
           p.id AS product_id,
           pv.id AS variant_id,
           COALESCE(pv.name, p.name) AS display_name,
@@ -131,10 +132,11 @@ export const getShopAll = async (req, res) => {
         JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
           AND LOWER(p.category) = LOWER(${cat})
+        ORDER BY p.id DESC, pv.color_id, pv.id ASC
       `;
     } else {
       productRes = await sql`
-        SELECT 
+        SELECT DISTINCT ON (p.id, pv.color_id)
           p.id AS product_id,
           pv.id AS variant_id,
           COALESCE(pv.name, p.name) AS display_name,
@@ -152,6 +154,7 @@ export const getShopAll = async (req, res) => {
         JOIN product_variants pv ON p.id = pv.product_id
         JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
+        ORDER BY p.id DESC, pv.color_id, pv.id ASC
       `;
     }
 
