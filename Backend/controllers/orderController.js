@@ -970,7 +970,7 @@ export const getOrderById = async (req, res) => {
     }
 
     const items = await sql`
-      SELECT oi.*, p.name as product_name
+      SELECT oi.*, COALESCE(oi.product_name, p.name) as product_name
       FROM order_items oi
       LEFT JOIN product_variants pv ON oi.variant_id = pv.id
       LEFT JOIN products p ON pv.product_id = p.id

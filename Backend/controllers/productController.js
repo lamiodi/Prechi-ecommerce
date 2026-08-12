@@ -170,13 +170,28 @@ const toTitleCase = (str) => {
         }
 
         const images = files[`images_${index}`] || [];
-        for (const file of images) {
-          const uploaded = await cloudinary.uploader.upload(file.path);
-          await sql`
-            INSERT INTO product_images (variant_id, image_url, is_primary)
-            VALUES (${variantId}, ${uploaded.secure_url}, ${images.indexOf(file) === 0})
-          `;
-          await fs.unlink(file.path);
+        if (images.length > 0) {
+          const uploadedImages = await Promise.all(
+            images.map(async (file, imgIdx) => {
+              const uploaded = await cloudinary.uploader.upload(file.path, {
+                folder: 'prechi_products',
+                transformation: [{ quality: 'auto' }, { fetch_format: 'auto' }]
+              });
+              await fs.unlink(file.path).catch(() => {});
+              return {
+                url: uploaded.secure_url,
+                isPrimary: imgIdx === 0,
+                position: imgIdx
+              };
+            })
+          );
+
+          for (const img of uploadedImages) {
+            await sql`
+              INSERT INTO product_images (variant_id, image_url, is_primary, position)
+              VALUES (${variantId}, ${img.url}, ${img.isPrimary}, ${img.position})
+            `;
+          }
         }
 
         // Handle video uploads
@@ -206,7 +221,7 @@ const toTitleCase = (str) => {
             INSERT INTO product_videos (variant_id, video_url, video_thumbnail_url, title, position, is_primary)
             VALUES (${variantId}, ${uploaded.secure_url}, ${thumbnailUrl}, ${`Product Video ${videos.indexOf(file) + 1}`}, ${videos.indexOf(file)}, ${videos.indexOf(file) === 0})
           `;
-          await fs.unlink(file.path);
+          await fs.unlink(file.path).catch(() => {});
         }
       }
     });

@@ -272,21 +272,35 @@ export const updateProduct = async (req, res) => {
           const formattedVarName = variant.name ? toTitleCase(variant.name) : null;
 
           if (variant.is_new) {
-            // Create brand new variant for this product
-            const prefix = sku_prefix || 'PRD';
-            const sku = `${prefix}-${validColorId}-${Date.now().toString().slice(-4)}`;
-            const [newVar] = await sql`
-              INSERT INTO product_variants (product_id, color_id, sku, name, is_active)
-              VALUES (${id}, ${validColorId}, ${sku}, ${formattedVarName}, TRUE)
-              RETURNING id
+            // Check if active variant with same color already exists to prevent duplicates
+            const existingVar = await sql`
+              SELECT id FROM product_variants 
+              WHERE product_id = ${id} AND color_id = ${validColorId} AND is_active = TRUE AND deleted_at IS NULL
+              LIMIT 1
             `;
-            const newVarId = newVar.id;
+
+            let targetVarId;
+            if (existingVar.length > 0) {
+              targetVarId = existingVar[0].id;
+              if (formattedVarName) {
+                await sql`UPDATE product_variants SET name = ${formattedVarName} WHERE id = ${targetVarId}`;
+              }
+            } else {
+              const prefix = sku_prefix || 'PRD';
+              const sku = `${prefix}-${validColorId}-${Date.now().toString().slice(-4)}`;
+              const [newVar] = await sql`
+                INSERT INTO product_variants (product_id, color_id, sku, name, is_active)
+                VALUES (${id}, ${validColorId}, ${sku}, ${formattedVarName}, TRUE)
+                RETURNING id
+              `;
+              targetVarId = newVar.id;
+            }
 
             // Insert size stock & price
             for (const size of variant.sizes || []) {
               await sql`
                 INSERT INTO variant_sizes (variant_id, size_id, stock_quantity, price)
-                VALUES (${newVarId}, ${size.size_id}, ${parseInt(size.stock_quantity) || 0}, ${parseFloat(size.price) || 0})
+                VALUES (${targetVarId}, ${size.size_id}, ${parseInt(size.stock_quantity) || 0}, ${parseFloat(size.price) || 0})
                 ON CONFLICT (variant_id, size_id) 
                 DO UPDATE SET stock_quantity = EXCLUDED.stock_quantity, price = EXCLUDED.price
               `;
