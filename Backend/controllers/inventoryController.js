@@ -202,6 +202,27 @@ export const deleteBundle = async (req, res) => {
   }
 };
 
+// Helper to ensure color_id safely exists in the database
+const resolveColorId = async (sql, colorId, colorName) => {
+  if (colorId && !isNaN(Number(colorId))) {
+    const existing = await sql`SELECT id FROM colors WHERE id = ${parseInt(colorId)}`;
+    if (existing.length > 0) return existing[0].id;
+  }
+  if (colorName && typeof colorName === 'string' && colorName.trim()) {
+    const byName = await sql`SELECT id FROM colors WHERE LOWER(color_name) = LOWER(${colorName.trim()})`;
+    if (byName.length > 0) return byName[0].id;
+
+    const [inserted] = await sql`
+      INSERT INTO colors (color_name)
+      VALUES (${colorName.trim()})
+      RETURNING id
+    `;
+    return inserted.id;
+  }
+  const firstColor = await sql`SELECT id FROM colors ORDER BY id ASC LIMIT 1`;
+  return firstColor[0]?.id || 1;
+};
+
 // Update product, variant, stock, and price details
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
@@ -226,14 +247,15 @@ export const updateProduct = async (req, res) => {
 
       if (variants?.length) {
         for (const variant of variants) {
+          const validColorId = await resolveColorId(sql, variant.color_id, variant.color_name);
+
           if (variant.is_new) {
             // Create brand new variant for this product
-            const colorId = variant.color_id || 1;
             const prefix = sku_prefix || 'PRD';
-            const sku = `${prefix}-${colorId}-${Date.now().toString().slice(-4)}`;
+            const sku = `${prefix}-${validColorId}-${Date.now().toString().slice(-4)}`;
             const [newVar] = await sql`
               INSERT INTO product_variants (product_id, color_id, sku, name, is_active)
-              VALUES (${id}, ${colorId}, ${sku}, ${variant.name || null}, TRUE)
+              VALUES (${id}, ${validColorId}, ${sku}, ${variant.name || null}, TRUE)
               RETURNING id
             `;
             const newVarId = newVar.id;
@@ -249,16 +271,12 @@ export const updateProduct = async (req, res) => {
             }
           } else {
             // Update existing variant
-            if (variant.name !== undefined || variant.color_id !== undefined || typeof variant.is_active === 'boolean') {
-              const vUpdates = {};
-              if (variant.name !== undefined) vUpdates.name = variant.name === '' ? null : variant.name;
-              if (variant.color_id !== undefined) vUpdates.color_id = variant.color_id;
-              if (typeof variant.is_active === 'boolean') vUpdates.is_active = variant.is_active;
+            const vUpdates = {};
+            if (variant.name !== undefined) vUpdates.name = variant.name === '' ? null : variant.name;
+            vUpdates.color_id = validColorId;
+            if (typeof variant.is_active === 'boolean') vUpdates.is_active = variant.is_active;
 
-              if (Object.keys(vUpdates).length > 0) {
-                await sql`UPDATE product_variants SET ${sql(vUpdates)} WHERE id = ${variant.id}`;
-              }
-            }
+            await sql`UPDATE product_variants SET ${sql(vUpdates)} WHERE id = ${variant.id}`;
 
             for (const size of variant.sizes || []) {
               await sql`
