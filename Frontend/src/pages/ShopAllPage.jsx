@@ -116,7 +116,7 @@ const ShopAllPage = () => {
       const res = await api.get(endpoint);
       if (!Array.isArray(res.data)) throw new Error('Unexpected response format');
       const processedData = res.data.map(item => {
-        const baseItem = { id: item.id, name: item.name, price: item.price, image: item.image, created_at: item.created_at, category: item.category, total_stock: item.total_stock };
+        const baseItem = { id: item.id, name: item.name, price: item.price, image: item.image, images: item.images, created_at: item.created_at, category: item.category, total_stock: item.total_stock };
         if (!item.is_product) return { ...baseItem, is_product: false, bundle_types: item.bundle_types || [] };
         return { ...baseItem, is_product: true, variantId: item.variantId, sizes: item.sizes || [], colors: item.colors || [] };
       });

@@ -37,6 +37,7 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState({});
   const cardRef = useRef(null);
   const touchStartX = useRef(null);
@@ -54,6 +55,39 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
   const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
 
   const hasMultipleImages = imageList.length > 1;
+
+  // Track viewport visibility with IntersectionObserver
+  useEffect(() => {
+    const node = cardRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      if (node) observer.unobserve(node);
+    };
+  }, []);
+
+  // Preload next image in line to ensure instantaneous 60fps transitions
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+    const nextIndex = (currentIndex + 1) % imageList.length;
+    const nextUrl = imageList[nextIndex];
+    if (nextUrl) {
+      const img = new Image();
+      img.src = nextUrl;
+    }
+  }, [currentIndex, imageList, hasMultipleImages]);
 
   // Next image handler with loop
   const handleNext = useCallback((e) => {
@@ -80,22 +114,21 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
     setCurrentIndex(index);
   }, []);
 
-  // Performance-optimized auto slideshow timer
+  // Dynamic auto slideshow for visible cards as user scrolls
   useEffect(() => {
-    if (!autoPlay || !hasMultipleImages) return;
+    if (!autoPlay || !hasMultipleImages || !isVisible) return;
 
-    // Faster slideshow when user hovers (2.2s), slower staggered slideshow when idle (4.5s - 6s)
-    const intervalTime = isHovered ? 2200 : Math.floor(4500 + Math.random() * 1500);
+    // Fast slideshow when hovered (1.5s), smooth auto-cycling when visible in viewport (2.6s - 3.2s)
+    const intervalTime = isHovered ? 1500 : Math.floor(2600 + (id % 5) * 200);
 
     timerRef.current = setInterval(() => {
-      // Only auto-advance if hovered OR randomly periodically
       setCurrentIndex((prev) => (prev + 1) % imageList.length);
     }, intervalTime);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [autoPlay, hasMultipleImages, isHovered, imageList.length]);
+  }, [autoPlay, hasMultipleImages, isVisible, isHovered, imageList.length, id]);
 
   // Touch Swipe Handlers for Mobile
   const handleTouchStart = (e) => {
@@ -117,6 +150,18 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
     touchStartX.current = null;
   };
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    // Instantly advance to next image on hover if multiple images available
+    if (hasMultipleImages) {
+      setCurrentIndex((prev) => (prev + 1) % imageList.length);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
   const handleImageLoad = (idx) => {
     setImagesLoaded((prev) => ({ ...prev, [idx]: true }));
   };
@@ -125,8 +170,8 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
     <div
       ref={cardRef}
       className="group flex flex-col"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <Link
         to={productUrl}
