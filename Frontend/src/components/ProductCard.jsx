@@ -146,10 +146,14 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
                 key={`${imgUrl}-${idx}`}
                 src={imgUrl}
                 alt={`${displayName} - view ${idx + 1}`}
-                className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out group-hover:scale-[1.03] ${
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-out will-change-transform group-hover:scale-[1.03] ${
                   isCurrent ? 'opacity-100 z-1' : 'opacity-0 z-0'
                 }`}
-                style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+                style={{
+                  transitionTimingFunction: 'cubic-bezier(0.25, 1, 0.5, 1)',
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden'
+                }}
                 onError={onImageError}
                 onLoad={() => handleImageLoad(idx)}
                 loading={idx === 0 ? 'eager' : 'lazy'}
