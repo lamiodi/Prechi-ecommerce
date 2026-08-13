@@ -37,28 +37,41 @@ export const searchProducts = async (req, res) => {
 
     // ── Product queries ──────────────────────────────────────────────────────
     const productSelectBase = `
-      SELECT DISTINCT ON (p.id, pv.color_id)
+      SELECT DISTINCT ON (p.id)
         p.id AS product_id,
-        p.base_price AS price,
-        pv.id AS variant_id,
-        COALESCE(pv.name, p.name) AS display_name,
         p.name AS product_name,
+        p.base_price AS price,
         p.created_at,
         p.category,
         (
+          SELECT pv.id 
+          FROM product_variants pv 
+          WHERE pv.product_id = p.id AND pv.is_active = TRUE 
+          ORDER BY pv.id ASC LIMIT 1
+        ) AS variant_id,
+        (
           SELECT pi.image_url 
           FROM product_images pi 
-          WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+          JOIN product_variants pv ON pi.variant_id = pv.id
+          WHERE pv.product_id = p.id AND pv.is_active = TRUE
+          ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
           LIMIT 1
         ) AS primary_image,
-        c.color_name
+        (
+          SELECT JSON_AGG(JSON_BUILD_OBJECT('color_name', c.color_name, 'color_code', c.color_code))
+          FROM (
+            SELECT DISTINCT c.color_name, c.color_code
+            FROM product_variants pv
+            JOIN colors c ON pv.color_id = c.id
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE
+          ) c
+        ) AS colors
       FROM products p
       JOIN product_variants pv ON p.id = pv.product_id
-      JOIN colors c ON pv.color_id = c.id
       WHERE p.is_active = TRUE AND pv.is_active = TRUE
     `;
 
-    const orderSuffix = ` ORDER BY p.id DESC, pv.color_id, pv.id ASC`;
+    const orderSuffix = ` ORDER BY p.id DESC`;
 
     let productRes;
     if (isCategorySearch) {
@@ -68,7 +81,7 @@ export const searchProducts = async (req, res) => {
       } else if (mappedCategory === 'new') {
         productRes = await sql.unsafe(`${productSelectBase} AND p.is_new_release = TRUE${orderSuffix}`, []);
       } else {
-        productRes = await sql.unsafe(`${productSelectBase} AND p.category = $1${orderSuffix}`, [mappedCategory]);
+        productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.category) = LOWER($1)${orderSuffix}`, [mappedCategory]);
       }
     } else {
       productRes = await sql.unsafe(`${productSelectBase} AND LOWER(p.name) LIKE $1${orderSuffix}`, [searchTerm]);
@@ -114,7 +127,7 @@ export const searchProducts = async (req, res) => {
         );
       } else {
         bundleRes = await sql.unsafe(
-          `${bundleSelectBase} AND p.category = $1 GROUP BY p.id, p.name, p.created_at, p.category`,
+          `${bundleSelectBase} AND LOWER(p.category) = LOWER($1) GROUP BY p.id, p.name, p.created_at, p.category`,
           [mappedCategory]
         );
       }
@@ -128,15 +141,15 @@ export const searchProducts = async (req, res) => {
     // Format products
     const products = productRes.map(row => ({
       id: row.product_id,
-      name: row.display_name,
+      name: row.product_name,
       productName: row.product_name,
       price: row.price,
       image: row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image',
-      color: row.color_name,
       variantId: row.variant_id,
       is_product: true,
       created_at: row.created_at,
       category: row.category,
+      colors: row.colors || []
     }));
 
     // Format bundles

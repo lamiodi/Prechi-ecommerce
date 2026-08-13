@@ -82,92 +82,154 @@ export const getShopAll = async (req, res) => {
       return res.status(200).json(bundles);
     }
 
-    // 3. Fetch products — use separate complete queries per filter case
-    //    postgres.js does NOT support embedding a sql`` object inside another sql``,
-    //    so we use distinct queries for each branch.
+    // 3. Fetch products - 1 Card per Product
     let productRes;
 
     if (category && category.toLowerCase() === 'new') {
       productRes = await sql`
-        SELECT DISTINCT ON (p.id, pv.color_id)
+        SELECT DISTINCT ON (p.id)
           p.id AS product_id,
-          pv.id AS variant_id,
-          COALESCE(pv.name, p.name) AS display_name,
+          p.name AS product_name,
           p.base_price AS price,
+          p.category,
+          p.created_at,
+          (
+            SELECT pv.id 
+            FROM product_variants pv 
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE 
+            ORDER BY pv.id ASC LIMIT 1
+          ) AS variant_id,
           (
             SELECT pi.image_url 
             FROM product_images pi 
-            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            JOIN product_variants pv ON pi.variant_id = pv.id
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
-          c.color_name,
-          p.category,
-          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+          COALESCE(
+            (SELECT SUM(vs.stock_quantity) 
+             FROM variant_sizes vs 
+             JOIN product_variants pv ON vs.variant_id = pv.id 
+             WHERE pv.product_id = p.id AND pv.is_active = TRUE), 
+            0
+          ) AS total_stock,
+          (
+            SELECT JSON_AGG(JSON_BUILD_OBJECT('color_name', c.color_name, 'color_code', c.color_code))
+            FROM (
+              SELECT DISTINCT c.color_name, c.color_code
+              FROM product_variants pv
+              JOIN colors c ON pv.color_id = c.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ) c
+          ) AS colors
         FROM products p
         JOIN product_variants pv ON p.id = pv.product_id
-        JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
           AND p.is_new_release = TRUE
-        ORDER BY p.id DESC, pv.color_id, pv.id ASC
+        ORDER BY p.id DESC
       `;
     } else if (category) {
       const cat = category.toLowerCase();
       productRes = await sql`
-        SELECT DISTINCT ON (p.id, pv.color_id)
+        SELECT DISTINCT ON (p.id)
           p.id AS product_id,
-          pv.id AS variant_id,
-          COALESCE(pv.name, p.name) AS display_name,
+          p.name AS product_name,
           p.base_price AS price,
+          p.category,
+          p.created_at,
+          (
+            SELECT pv.id 
+            FROM product_variants pv 
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE 
+            ORDER BY pv.id ASC LIMIT 1
+          ) AS variant_id,
           (
             SELECT pi.image_url 
             FROM product_images pi 
-            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            JOIN product_variants pv ON pi.variant_id = pv.id
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
-          c.color_name,
-          p.category,
-          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+          COALESCE(
+            (SELECT SUM(vs.stock_quantity) 
+             FROM variant_sizes vs 
+             JOIN product_variants pv ON vs.variant_id = pv.id 
+             WHERE pv.product_id = p.id AND pv.is_active = TRUE), 
+            0
+          ) AS total_stock,
+          (
+            SELECT JSON_AGG(JSON_BUILD_OBJECT('color_name', c.color_name, 'color_code', c.color_code))
+            FROM (
+              SELECT DISTINCT c.color_name, c.color_code
+              FROM product_variants pv
+              JOIN colors c ON pv.color_id = c.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ) c
+          ) AS colors
         FROM products p
         JOIN product_variants pv ON p.id = pv.product_id
-        JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
           AND LOWER(p.category) = LOWER(${cat})
-        ORDER BY p.id DESC, pv.color_id, pv.id ASC
+        ORDER BY p.id DESC
       `;
     } else {
       productRes = await sql`
-        SELECT DISTINCT ON (p.id, pv.color_id)
+        SELECT DISTINCT ON (p.id)
           p.id AS product_id,
-          pv.id AS variant_id,
-          COALESCE(pv.name, p.name) AS display_name,
+          p.name AS product_name,
           p.base_price AS price,
+          p.category,
+          p.created_at,
+          (
+            SELECT pv.id 
+            FROM product_variants pv 
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE 
+            ORDER BY pv.id ASC LIMIT 1
+          ) AS variant_id,
           (
             SELECT pi.image_url 
             FROM product_images pi 
-            WHERE pi.variant_id = pv.id AND pi.is_primary = TRUE
+            JOIN product_variants pv ON pi.variant_id = pv.id
+            WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
-          c.color_name,
-          p.category,
-          COALESCE((SELECT SUM(stock_quantity) FROM variant_sizes WHERE variant_id = pv.id), 0) AS total_stock
+          COALESCE(
+            (SELECT SUM(vs.stock_quantity) 
+             FROM variant_sizes vs 
+             JOIN product_variants pv ON vs.variant_id = pv.id 
+             WHERE pv.product_id = p.id AND pv.is_active = TRUE), 
+            0
+          ) AS total_stock,
+          (
+            SELECT JSON_AGG(JSON_BUILD_OBJECT('color_name', c.color_name, 'color_code', c.color_code))
+            FROM (
+              SELECT DISTINCT c.color_name, c.color_code
+              FROM product_variants pv
+              JOIN colors c ON pv.color_id = c.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+            ) c
+          ) AS colors
         FROM products p
         JOIN product_variants pv ON p.id = pv.product_id
-        JOIN colors c ON pv.color_id = c.id
         WHERE p.is_active = TRUE AND pv.is_active = TRUE
-        ORDER BY p.id DESC, pv.color_id, pv.id ASC
+        ORDER BY p.id DESC
       `;
     }
 
     const products = productRes.map(row => ({
       id: row.product_id,
-      name: row.display_name,
+      name: row.product_name,
       price: row.price,
       image: row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image',
-      color: row.color_name,
       variantId: row.variant_id,
       category: row.category,
+      created_at: row.created_at,
       is_product: true,
-      total_stock: parseInt(row.total_stock || 0)
+      total_stock: parseInt(row.total_stock || 0),
+      colors: row.colors || []
     }));
 
     return res.status(200).json(products);

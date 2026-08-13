@@ -116,7 +116,7 @@ const ShopAllPage = () => {
       const processedData = res.data.map(item => {
         const baseItem = { id: item.id, name: item.name, price: item.price, image: item.image, created_at: item.created_at, category: item.category, total_stock: item.total_stock };
         if (!item.is_product) return { ...baseItem, is_product: false, bundle_types: item.bundle_types || [] };
-        return { ...baseItem, is_product: true, variantId: item.variantId, sizes: item.sizes || [] };
+        return { ...baseItem, is_product: true, variantId: item.variantId, sizes: item.sizes || [], colors: item.colors || [] };
       });
       setProducts(processedData);
       if (category) {
@@ -332,8 +332,22 @@ const ShopAllPage = () => {
 };
 
 // ─── Product Card ─────────────────────────────────────────────────
+const colorMap = {
+  Black: "#000000",
+  White: "#FFFFFF",
+  Brown: "#8B4513",
+  Grey: "#808080",
+  "Light Grey": "#D3D3D3",
+  Pink: "#FFC0CB",
+  Lilac: "#C8A2C8",
+  Blue: "#0000FF",
+  "Navy Blue": "#000080",
+  Green: "#008000",
+  Red: "#FF0000",
+};
+
 const ProductCard = ({ product, onImageError }) => {
-  const { id, name, price, image, is_product, variantId, bundle_types, total_stock } = product;
+  const { id, name, price, image, is_product, variantId, bundle_types, total_stock, colors } = product;
   const { currency, exchangeRate, country } = useContext(CurrencyContext);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -394,14 +408,33 @@ const ProductCard = ({ product, onImageError }) => {
             {displayName}
           </h3>
         </Link>
-        <p className="mt-1 text-sm font-display text-text-secondary tabular-nums">
-          {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-            style: 'currency',
-            currency: displayCurrency,
-            minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-            maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-          })}
-        </p>
+        <div className="mt-1 flex items-center justify-between">
+          <p className="text-sm font-display text-text-secondary tabular-nums">
+            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
+              style: 'currency',
+              currency: displayCurrency,
+              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
+              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
+            })}
+          </p>
+
+          {colors && colors.length > 1 && (
+            <div className="flex items-center gap-1" title={`${colors.length} options available`}>
+              {colors.slice(0, 4).map((c, i) => (
+                <span
+                  key={i}
+                  className="w-2.5 h-2.5 rounded-full border border-black/20"
+                  style={{ backgroundColor: colorMap[c.color_name] || c.color_code || '#000000' }}
+                />
+              ))}
+              {colors.length > 4 && (
+                <span className="text-[0.65rem] text-text-tertiary font-display font-medium">
+                  +{colors.length - 4}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

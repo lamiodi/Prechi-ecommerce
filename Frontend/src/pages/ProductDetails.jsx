@@ -533,7 +533,7 @@ const ProductDetails = () => {
   const mediaList = [...images, ...videos];
 
   const name = isProduct
-    ? (selectedVariant?.variant_name || data?.name || "Unnamed Product")
+    ? (data?.name || selectedVariant?.variant_name || "Unnamed Product")
     : (data?.name || "Unnamed Bundle");
 
   const getSizeSpecificPrice = () => {
