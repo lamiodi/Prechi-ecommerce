@@ -66,6 +66,18 @@ const ProductDetails = () => {
     const sku = (p?.sku_prefix || '').toUpperCase();
     const nameStr = (p?.name || '').toLowerCase();
 
+    // 0. Prechi Milkshake 3-Piece Set (product ID 41 / MSP) - Base ₦100,000 + Optional Inner Wear (+₦10,000)
+    if (idNum === 41 || sku === 'MSP' || nameStr.includes('milkshake')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full 3-Piece Set (Crop Tank + Hoodie + Cargo Skirt)', price: 100000 }
+        ],
+        addons: [
+          { id: 'inner', label: 'Matching Inner Wear', price: 10000 }
+        ]
+      };
+    }
+
     // 1. Prechi Signature Leather Bag (productone) - No split, no add-ons
     if (idNum === 44 || sku === 'PSB' || nameStr.includes('signature leather bag')) {
       return null;
