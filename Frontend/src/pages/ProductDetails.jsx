@@ -65,12 +65,13 @@ const ProductDetails = () => {
     const idNum = Number(p?.id);
     const sku = (p?.sku_prefix || '').toUpperCase();
     const nameStr = (p?.name || '').toLowerCase();
+    const baseProductPrice = Number(p?.price || p?.base_price) || 0;
 
     // 0. Prechi Milkshake 3-Piece Set (product ID 41 / MSP) - Base ₦100,000 + Optional Inner Wear (+₦10,000)
     if (idNum === 41 || sku === 'MSP' || nameStr.includes('milkshake')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full 3-Piece Set (Crop Tank + Hoodie + Cargo Skirt)', price: 100000 }
+          { id: 'full', label: 'Full 3-Piece Set (Crop Tank + Hoodie + Cargo Skirt)', price: baseProductPrice || 100000 }
         ],
         addons: [
           { id: 'inner', label: 'Matching Inner Wear', price: 10000 }
@@ -87,7 +88,7 @@ const ProductDetails = () => {
     if (idNum === 45 || sku === 'SSS' || nameStr.includes('skirt set') || nameStr.includes('short skirt')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full Two-Piece Skirt Set', price: 80000 }
+          { id: 'full', label: 'Full Two-Piece Skirt Set', price: baseProductPrice || 80000 }
         ],
         addons: [
           { id: 'inner', label: 'Matching White Inner Tank Top', price: 10000 }
@@ -99,7 +100,7 @@ const ProductDetails = () => {
     if (idNum === 46 || sku === 'BTS' || (nameStr.includes('bright tracksuit') && !nameStr.includes('men'))) {
       return {
         pieces: [
-          { id: 'full', label: 'Full Tracksuit Set (Top + Pant)', price: 80000 },
+          { id: 'full', label: 'Full Tracksuit Set (Top + Pant)', price: baseProductPrice || 80000 },
           { id: 'pant', label: 'Track Pant Only', price: 60000 },
           { id: 'top', label: 'Track Top Only', price: 20000 }
         ]
@@ -110,7 +111,7 @@ const ProductDetails = () => {
     if (idNum === 47 || sku === 'MBS' || nameStr.includes('men bright set')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full Set (Top + Pant)', price: 85000 },
+          { id: 'full', label: 'Full Set (Top + Pant)', price: baseProductPrice || 85000 },
           { id: 'pant', label: 'Track Pant Only', price: 60000 },
           { id: 'top', label: 'Top Only', price: 25000 }
         ],
@@ -120,14 +121,14 @@ const ProductDetails = () => {
       };
     }
 
-    // 5. Prechi Black Set Men (productfive) - Base ₦100,000 | Pant (₦50,000) | Top (₦50,000) | No add-ons
+    // 5. Prechi Black Set Men (productfive) - Base ₦110,000 | Pant (₦50,000) | Top (₦50,000) | No add-ons
     if (idNum === 48 || sku === 'BSM' || nameStr.includes('black set men')) {
       const isSleeveless = selectedVariant?.name?.toLowerCase().includes('sleeveless');
       const topLabel = isSleeveless ? 'Sleeveless Top Only' : 'T-Shirt Top Only';
       const fullLabel = isSleeveless ? 'Full Set (Sleeveless Top + Pant)' : 'Full Set (T-Shirt Top + Pant)';
       return {
         pieces: [
-          { id: 'full', label: fullLabel, price: 100000 },
+          { id: 'full', label: fullLabel, price: baseProductPrice || 110000 },
           { id: 'pant', label: 'Pant Only', price: 50000 },
           { id: 'top', label: topLabel, price: 50000 }
         ]
@@ -138,7 +139,7 @@ const ProductDetails = () => {
     if (idNum === 49 || sku === 'NST' || nameStr.includes('niga striped') || nameStr.includes('striped tracksuit')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full Tracksuit Set (Round Neck + Pant)', price: 110000 },
+          { id: 'full', label: 'Full Tracksuit Set (Round Neck + Pant)', price: baseProductPrice || 110000 },
           { id: 'top', label: 'Round Neck Top Only', price: 60000 },
           { id: 'pant', label: 'Track Pant Only', price: 50000 }
         ]
@@ -149,7 +150,7 @@ const ProductDetails = () => {
     if (idNum === 50 || sku === 'NWT' || nameStr.includes('navy blue & white t set') || nameStr.includes('white t set') || nameStr.includes('navy blue t set')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full T-Shirt Set', price: 120000 }
+          { id: 'full', label: 'Full T-Shirt Set', price: baseProductPrice || 120000 }
         ],
         addons: [
           { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }
@@ -161,7 +162,7 @@ const ProductDetails = () => {
     if (idNum === 51 || sku === 'WFS' || nameStr.includes('white fix set') || nameStr.includes('white fix')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full 2-Piece Set', price: 120000 }
+          { id: 'full', label: 'Full 2-Piece Set', price: baseProductPrice || 120000 }
         ],
         addons: [
           { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }
