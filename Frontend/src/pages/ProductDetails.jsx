@@ -55,7 +55,83 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [bundleType, setBundleType] = useState("3-in-1");
-  const [selectedBundleVariants, setSelectedBundleVariants] = useState({});
+  const [selectedPieceId, setSelectedPieceId] = useState("full");
+  const [selectedAddonIds, setSelectedAddonIds] = useState([]);
+
+  const getPricingSplitConfig = (dataObj) => {
+    if (!dataObj || dataObj.type !== "product") return null;
+    const p = dataObj.data;
+    const idNum = Number(p?.id);
+    const sku = (p?.sku_prefix || '').toUpperCase();
+    const nameStr = (p?.name || '').toLowerCase();
+
+    if (idNum === 45 || sku === 'PSB' || nameStr.includes('skirt set') || nameStr.includes('short skirt')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full Two-Piece Skirt Set', price: 80000 }
+        ],
+        addons: [
+          { id: 'inner', label: 'Matching White Inner Tank Top', price: 10000 }
+        ]
+      };
+    }
+
+    if (idNum === 46 || sku === 'SSS' || (nameStr.includes('bright tracksuit') && !nameStr.includes('men'))) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full Tracksuit Set (Top + Pant)', price: 80000 },
+          { id: 'pant', label: 'Track Pant Only', price: 60000 },
+          { id: 'top', label: 'Track Top Only', price: 20000 }
+        ]
+      };
+    }
+
+    if (idNum === 47 || sku === 'BTS' || nameStr.includes('men bright set')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full Set (Top + Pant)', price: 85000 },
+          { id: 'pant', label: 'Track Pant Only', price: 60000 },
+          { id: 'top', label: 'Top Only', price: 25000 }
+        ],
+        addons: [
+          { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }
+        ]
+      };
+    }
+
+    if (idNum === 48 || sku === 'MBS' || nameStr.includes('black set men')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full Set (Sleeveless + Pant)', price: 100000 },
+          { id: 'pant', label: 'Pant Only', price: 50000 },
+          { id: 'top', label: 'Sleeveless Top Only', price: 50000 }
+        ]
+      };
+    }
+
+    if (idNum === 49 || sku === 'BSM' || nameStr.includes('niga striped') || nameStr.includes('striped tracksuit')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full Tracksuit Set (Round Neck + Pant)', price: 110000 },
+          { id: 'top', label: 'Round Neck Top Only', price: 60000 },
+          { id: 'pant', label: 'Track Pant Only', price: 50000 }
+        ]
+      };
+    }
+
+    if (idNum === 50 || sku === 'NST' || nameStr.includes('navy blue & white t set') || nameStr.includes('white t set')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full T-Shirt Set', price: 120000 }
+        ],
+        addons: [
+          { id: 'bag', label: 'Matching Signature Leather Bag', price: 70000 }
+        ]
+      };
+    }
+
+    return null;
+  };
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
 
@@ -257,8 +333,8 @@ const ProductDetails = () => {
           const img = selectedVariant.images[0];
           productImage = img?.image_url || img?.url || img || productImage;
         }
-        const productName = productData?.data?.name || "Unnamed Product";
-        const sizeSpecificPrice = getSizeSpecificPrice();
+        const productName = getCustomizedProductName();
+        const sizeSpecificPrice = getCalculatedUnitPrice();
 
         if (isAuthenticated()) {
           const userId = getUserId();
@@ -273,6 +349,7 @@ const ProductDetails = () => {
             variant_id: selectedVariant.variant_id,
             size_id: selectedSizeObj.size_id,
             quantity,
+            price: sizeSpecificPrice,
           });
           toastSuccess("Product added to cart");
           window.dispatchEvent(new Event("cartUpdated"));
@@ -445,7 +522,54 @@ const ProductDetails = () => {
     return selectedSizeObj?.price || data?.price || 0;
   };
 
-  const rawPrice = isProduct ? getSizeSpecificPrice() : getBundlePrice();
+  const getCalculatedUnitPrice = () => {
+    if (!isProduct) return getBundlePrice();
+    const config = getPricingSplitConfig(productData);
+    if (!config) return getSizeSpecificPrice();
+
+    const pieceObj = config.pieces?.find((p) => p.id === selectedPieceId) || config.pieces?.[0];
+    const basePiecePrice = pieceObj ? pieceObj.price : getSizeSpecificPrice();
+
+    const sizes = Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [];
+    const defaultSizeObj = sizes.find((s) => s.size_name === 'S' || s.size_name === 'M') || sizes[0];
+    const defaultSizePrice = defaultSizeObj?.price || data?.price || 0;
+    const currentSizeObj = sizes.find((s) => s.size_name === selectedSize);
+    const currentSizePrice = currentSizeObj?.price || defaultSizePrice;
+    const sizeOffset = Math.max(0, currentSizePrice - defaultSizePrice);
+
+    const addonsPrice = (config.addons || [])
+      .filter((a) => selectedAddonIds.includes(a.id))
+      .reduce((sum, a) => sum + a.price, 0);
+
+    return basePiecePrice + sizeOffset + addonsPrice;
+  };
+
+  const getCustomizedProductName = () => {
+    let baseName = productData?.data?.name || "Unnamed Product";
+    const config = getPricingSplitConfig(productData);
+    if (!config) return baseName;
+
+    const pieceObj = config.pieces?.find((p) => p.id === selectedPieceId);
+    let details = [];
+    if (pieceObj && pieceObj.id !== 'full') {
+      details.push(pieceObj.label);
+    }
+    if (config.addons) {
+      config.addons.forEach((a) => {
+        if (selectedAddonIds.includes(a.id)) {
+          details.push(`+ ${a.label}`);
+        }
+      });
+    }
+    if (details.length > 0) {
+      return `${baseName} (${details.join(', ')})`;
+    }
+    return baseName;
+  };
+
+  const splitConfig = getPricingSplitConfig(productData);
+
+  const rawPrice = isProduct ? getCalculatedUnitPrice() : getBundlePrice();
   const parsedPrice = Number.parseFloat(rawPrice) || 0;
   const displayPrice = country === "Nigeria" ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
   const displayCurrency = country === "Nigeria" ? "NGN" : "USD";
@@ -702,6 +826,104 @@ const ProductDetails = () => {
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {/* Component / Split Pricing Selector */}
+              {splitConfig && (
+                <div className="space-y-4 bg-surface/50 border border-border p-4 rounded-sm">
+                  {splitConfig.pieces && splitConfig.pieces.length > 1 && (
+                    <div>
+                      <label className="text-xs uppercase tracking-[0.08em] font-medium text-text-secondary block mb-2.5">
+                        Select Option / Component
+                      </label>
+                      <div className="space-y-2">
+                        {splitConfig.pieces.map((piece) => {
+                          const isSelected = selectedPieceId === piece.id;
+                          const itemPriceNGN = piece.price;
+                          const displayPiecePrice = country === "Nigeria" 
+                            ? `₦${itemPriceNGN.toLocaleString()}`
+                            : `$${(itemPriceNGN * exchangeRate).toFixed(2)}`;
+
+                          return (
+                            <button
+                              key={piece.id}
+                              type="button"
+                              onClick={() => setSelectedPieceId(piece.id)}
+                              className={`w-full flex items-center justify-between p-3 rounded-sm border text-left text-xs font-display transition-all duration-200 ${
+                                isSelected
+                                  ? "border-Primarycolor bg-Primarycolor/5 text-Primarycolor font-semibold ring-1 ring-Primarycolor"
+                                  : "border-border hover:border-Primarycolor/50 text-text-secondary bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                                  isSelected ? "border-Primarycolor bg-Primarycolor text-white" : "border-border"
+                                }`}>
+                                  {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                                </div>
+                                <span>{piece.label}</span>
+                              </div>
+                              <span className="font-semibold tabular-nums text-Primarycolor">
+                                {displayPiecePrice}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Optional Add-ons */}
+                  {splitConfig.addons && splitConfig.addons.length > 0 && (
+                    <div className="pt-2 border-t border-border/60">
+                      <label className="text-xs uppercase tracking-[0.08em] font-medium text-text-secondary block mb-2.5">
+                        Optional Add-Ons
+                      </label>
+                      <div className="space-y-2">
+                        {splitConfig.addons.map((addon) => {
+                          const isChecked = selectedAddonIds.includes(addon.id);
+                          const addonPriceNGN = addon.price;
+                          const displayAddonPrice = country === "Nigeria"
+                            ? `+₦${addonPriceNGN.toLocaleString()}`
+                            : `+$${(addonPriceNGN * exchangeRate).toFixed(2)}`;
+
+                          const toggleAddon = () => {
+                            if (isChecked) {
+                              setSelectedAddonIds(selectedAddonIds.filter((id) => id !== addon.id));
+                            } else {
+                              setSelectedAddonIds([...selectedAddonIds, addon.id]);
+                            }
+                          };
+
+                          return (
+                            <button
+                              key={addon.id}
+                              type="button"
+                              onClick={toggleAddon}
+                              className={`w-full flex items-center justify-between p-3 rounded-sm border text-left text-xs font-display transition-all duration-200 ${
+                                isChecked
+                                  ? "border-Primarycolor bg-Primarycolor/5 text-Primarycolor font-semibold ring-1 ring-Primarycolor"
+                                  : "border-border hover:border-Primarycolor/50 text-text-secondary bg-white"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                                  isChecked ? "border-Primarycolor bg-Primarycolor text-white" : "border-border"
+                                }`}>
+                                  {isChecked && <Check size={12} weight="bold" />}
+                                </div>
+                                <span>{addon.label}</span>
+                              </div>
+                              <span className="font-semibold tabular-nums text-Primarycolor">
+                                {displayAddonPrice}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

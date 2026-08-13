@@ -716,10 +716,10 @@ export const getOrderItemsForAdmin = async (req, res) => {
         oi.id,
         oi.quantity,
         oi.price,
-        p.name AS product_name,
-        c.color_name,
-        s.size_name,
-        pi.image_url
+        COALESCE(oi.product_name, p.name) AS product_name,
+        COALESCE(oi.color_name, c.color_name) AS color_name,
+        COALESCE(oi.size_name, s.size_name) AS size_name,
+        COALESCE(oi.image_url, pi.image_url) AS image_url
       FROM order_items oi
       LEFT JOIN product_variants pv ON oi.variant_id = pv.id
       LEFT JOIN products p ON pv.product_id = p.id

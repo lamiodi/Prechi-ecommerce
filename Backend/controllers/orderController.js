@@ -388,13 +388,10 @@ export const createOrder = async (req, res) => {
             expectedPrice = actualBasePrice;
           }
           
-          // Allow small floating point difference
-          if (Math.abs(expectedPrice - item.price) > 1) {
-            console.error(`Validation failed: Price mismatch for variant ${item.variant_id}: expected ${expectedPrice} ${currency}, got ${item.price} ${currency}`);
-            // We'll update the price to match expected price instead of failing
-            // item.price = expectedPrice; 
-            // Or throw error if strict
-             throw new Error(`Price mismatch for variant ${item.variant_id}: expected ${expectedPrice} ${currency}, got ${item.price} ${currency}`);
+          // Allow custom item pricing for split options and add-ons as long as item.price is positive
+          if (item.price <= 0) {
+            console.error(`Validation failed: Invalid price for variant ${item.variant_id}: got ${item.price} ${currency}`);
+            throw new Error(`Invalid price for variant ${item.variant_id}`);
           }
 
           calculatedSubtotal += item.price * item.quantity;
@@ -403,10 +400,10 @@ export const createOrder = async (req, res) => {
             size_id: item.size_id || null,
             quantity: item.quantity,
             price: item.price,
-            product_name: variant.name,
-            image_url: variant.image_url,
-            color_name: variant.color_name,
-            size_name: item.size_name || variant.size_name, // Use size_name from cart item, fallback to variant.size_name
+            product_name: item.name || item.product_name || variant.name,
+            image_url: item.image || item.image_url || variant.image_url,
+            color_name: item.color || item.color_name || variant.color_name,
+            size_name: item.size_name || variant.size_name,
           });
         } else if (item.bundle_id) {
           // Fetch bundle

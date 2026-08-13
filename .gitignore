@@ -106,3 +106,4 @@ public/uploads/
 # Cloudinary temp files
 .cloudinary/
 Frontend/src/components/AdminUploader.jsx
+Frontend/public/products/

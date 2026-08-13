@@ -366,13 +366,15 @@ export const addToCart = async (req, res) => {
           }
         }
 
-        // First, let's check if there are any existing items for this variant and size
+        const itemPrice = (req.body.price && Number(req.body.price) > 0) ? Number(req.body.price) : base_price;
+
+        // First, let's check if there are any existing items for this variant, size, and price
         const existingItems = await sql`
           SELECT id, quantity FROM cart_items 
-          WHERE cart_id = ${cart_id} AND variant_id = ${variant_id} AND size_id = ${size_id} AND bundle_id IS NULL
+          WHERE cart_id = ${cart_id} AND variant_id = ${variant_id} AND size_id = ${size_id} AND price = ${itemPrice} AND bundle_id IS NULL
         `;
 
-        console.log('Existing items for this variant and size:', existingItems);
+        console.log('Existing items for this variant, size, and price:', existingItems);
 
         if (existingItems && existingItems.length > 0) {
           // If there are multiple items, delete all but the first one and update its quantity
@@ -412,9 +414,9 @@ export const addToCart = async (req, res) => {
           // No existing items, add a new one
           await sql`
             INSERT INTO cart_items (cart_id, variant_id, size_id, quantity, is_bundle, price, color_name, size_name)
-            VALUES (${cart_id}, ${variant_id}, ${size_id}, ${quantity}, ${false}, ${base_price}, ${color_name}, ${size_name})
+            VALUES (${cart_id}, ${variant_id}, ${size_id}, ${quantity}, ${false}, ${itemPrice}, ${color_name}, ${size_name})
           `;
-          console.log(`Added new single product: variant_id=${variant_id}, quantity=${quantity}`);
+          console.log(`Added new single product: variant_id=${variant_id}, quantity=${quantity}, price=${itemPrice}`);
         }
       }
       // Handle bundle
