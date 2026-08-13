@@ -93,6 +93,7 @@ const ShopAllPage = () => {
   const metaConfig = {
     'All': { title: 'Shop All - Premium Tracksuits, Sets & Streetwear | Prechi Clothing', description: 'Explore our complete collection of premium tracksuits, coordinated sets, and streetwear.' },
     'Sets': { title: 'Premium Sets Collection | Prechi Clothing', description: 'Discover our luxury coordinated sets collection. Premium comfort sets with superior fit.' },
+    'Bags': { title: 'Signature Leather Bags | Prechi Clothing', description: 'Explore our luxury handcrafted signature leather bags.' },
     'Tracksuits': { title: 'Premium Tracksuits & Activewear | Prechi Clothing', description: 'Shop high-performance tracksuits and activewear. Superior comfort and stylish designs.' },
     'New Arrivals': { title: 'New Arrivals - Latest Collection | Prechi Clothing', description: 'Discover our newest arrivals in premium comfort wear.' },
     '3 in 1': { title: '3-in-1 Premium Bundles | Prechi Clothing', description: 'Explore our exclusive 3-in-1 bundles featuring coordinated sets.' },

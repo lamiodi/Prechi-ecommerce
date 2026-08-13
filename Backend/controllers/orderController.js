@@ -352,7 +352,9 @@ export const createOrder = async (req, res) => {
 
           if (!variant) {
             console.error(`Validation failed: Product variant ${item.variant_id} not found`);
-            return res.status(400).json({ error: `Product variant not found. An item in your cart is no longer available. Please remove it and try again.` });
+            const err = new Error(`Product variant not found. An item in your cart is no longer available. Please remove it and try again.`);
+            err.statusCode = 400;
+            throw err;
           }
 
           // Check stock
@@ -365,17 +367,23 @@ export const createOrder = async (req, res) => {
             `;
             if (!variantSize) {
               console.error(`Validation failed: Size ${item.size_id} not found for variant ${item.variant_id}`);
-              return res.status(400).json({ error: `Size option is no longer available. Please remove this item and try again.` });
+              const err = new Error(`Size option is no longer available. Please remove this item and try again.`);
+              err.statusCode = 400;
+              throw err;
             }
           } else {
             console.error(`Validation failed: Missing size_id for variant ${item.variant_id}`);
-            return res.status(400).json({ error: `Please select a size for this item.` });
+            const err = new Error(`Please select a size for this item.`);
+            err.statusCode = 400;
+            throw err;
           }
 
           const { stock_quantity } = variantSize;
           if (stock_quantity < item.quantity) {
             console.error(`Validation failed: Insufficient stock for variant ${item.variant_id}, requested: ${item.quantity}, available: ${stock_quantity}`);
-            return res.status(400).json({ error: `Insufficient stock for a product in your cart. Only ${stock_quantity} available.` });
+            const err = new Error(`Insufficient stock for a product in your cart. Only ${stock_quantity} available.`);
+            err.statusCode = 400;
+            throw err;
           }
 
           // Validate price
@@ -416,14 +424,18 @@ export const createOrder = async (req, res) => {
 
           if (!bundle) {
             console.error(`Validation failed: Bundle ${item.bundle_id} not found`);
-            return res.status(400).json({ error: `A bundle in your cart is no longer available. Please remove it and try again.` });
+            const err = new Error(`A bundle in your cart is no longer available. Please remove it and try again.`);
+            err.statusCode = 400;
+            throw err;
           }
 
           // Validate bundle item count matches bundle type
           const expectedItemCount = bundle.bundle_type === '3-in-1' ? 3 : 5;
           if (item.bundle_items && item.bundle_items.length !== expectedItemCount) {
             console.error(`Validation failed: Invalid bundle configuration: ${bundle.bundle_type} bundle requires exactly ${expectedItemCount} items, but ${item.bundle_items.length} were provided`);
-            throw new Error(`Invalid bundle configuration: ${bundle.bundle_type} bundle requires exactly ${expectedItemCount} items, but ${item.bundle_items.length} were provided`);
+            const err = new Error(`Invalid bundle configuration: ${bundle.bundle_type} bundle requires exactly ${expectedItemCount} items, but ${item.bundle_items.length} were provided`);
+            err.statusCode = 400;
+            throw err;
           }
 
           // Validate bundle items (from frontend payload)
@@ -443,7 +455,9 @@ export const createOrder = async (req, res) => {
 
               if (!variant) {
                 console.error(`Validation failed: Bundle item variant ${bi.variant_id} not found`);
-                return res.status(400).json({ error: `A product in your bundle is no longer available.` });
+                const err = new Error(`A product in your bundle is no longer available.`);
+                err.statusCode = 400;
+                throw err;
               }
 
               let variantSize;
@@ -455,16 +469,22 @@ export const createOrder = async (req, res) => {
                 `;
                 if (!variantSize) {
                   console.error(`Validation failed: Size ${bi.size_id} not found for bundle item variant ${bi.variant_id}`);
-                  return res.status(400).json({ error: `A size option in your bundle is no longer available.` });
+                  const err = new Error(`A size option in your bundle is no longer available.`);
+                  err.statusCode = 400;
+                  throw err;
                 }
               } else {
                 console.error(`Validation failed: Missing size_id for bundle item variant ${bi.variant_id}`);
-                return res.status(400).json({ error: `Please select a size for all items in your bundle.` });
+                const err = new Error(`Please select a size for all items in your bundle.`);
+                err.statusCode = 400;
+                throw err;
               }
 
               if (variantSize.stock_quantity < item.quantity) {
                 console.error(`Validation failed: Insufficient stock for bundle item variant ${bi.variant_id}, requested: ${item.quantity}, available: ${variantSize.stock_quantity}`);
-                return res.status(400).json({ error: `Insufficient stock for an item in your bundle.` });
+                const err = new Error(`Insufficient stock for an item in your bundle.`);
+                err.statusCode = 400;
+                throw err;
               }
 
               bundleItemsDetails.push({
@@ -722,9 +742,10 @@ export const createOrder = async (req, res) => {
   } catch (err) {
     console.error('❌ Error creating order:', err.message, err.stack);
     console.error('Request body:', req.body);
-    res.status(500).json({
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
       error: err.message,
-      details: err.stack,
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined,
       request: req.body
     });
   }

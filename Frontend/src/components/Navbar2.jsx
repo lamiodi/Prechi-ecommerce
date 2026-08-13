@@ -344,8 +344,10 @@ export default function Navbar2() {
               {[
                 { to: '/shop', label: 'Shop All' },
                 { to: '/shop?category=new', label: 'New Arrivals' },
+                { to: '/shop?category=3in1', label: '3 in 1' },
+                { to: '/shop?category=5in1', label: '5 in 1' },
+                { to: '/shop?category=Bags', label: 'Bags' },
                 { to: '/shop?category=Sets', label: 'Sets' },
-                { to: '/shop?category=Tracksuits', label: 'Tracksuits' },
                 { to: '/help', label: 'Contact' },
                 { to: '/more', label: 'About' },
               ].map(({ to, label }, i) => (

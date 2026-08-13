@@ -109,11 +109,14 @@ const ProductDetails = () => {
 
     // 5. Prechi Black Set Men (productfive) - Base ₦100,000 | Pant (₦50,000) | Top (₦50,000) | No add-ons
     if (idNum === 48 || sku === 'BSM' || nameStr.includes('black set men')) {
+      const isSleeveless = selectedVariant?.name?.toLowerCase().includes('sleeveless');
+      const topLabel = isSleeveless ? 'Sleeveless Top Only' : 'T-Shirt Top Only';
+      const fullLabel = isSleeveless ? 'Full Set (Sleeveless Top + Pant)' : 'Full Set (T-Shirt Top + Pant)';
       return {
         pieces: [
-          { id: 'full', label: 'Full Set (Top + Pant)', price: 100000 },
+          { id: 'full', label: fullLabel, price: 100000 },
           { id: 'pant', label: 'Pant Only', price: 50000 },
-          { id: 'top', label: 'Top Only', price: 50000 }
+          { id: 'top', label: topLabel, price: 50000 }
         ]
       };
     }
