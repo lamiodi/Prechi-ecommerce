@@ -565,10 +565,12 @@ const ProductDetails = () => {
     : (data?.name || "Unnamed Bundle");
 
   const getSizeSpecificPrice = () => {
-    if (!isProduct || !selectedSize || !selectedVariant) return data?.price || 0;
+    if (!isProduct || !selectedSize || !selectedVariant) return Number(data?.price) || 0;
     const sizes = Array.isArray(selectedVariant.sizes) ? selectedVariant.sizes : [];
     const selectedSizeObj = sizes.find(s => s.size_name === selectedSize);
-    return selectedSizeObj?.price || data?.price || 0;
+    const parsedSizePrice = Number(selectedSizeObj?.price) || 0;
+    const basePrice = Number(data?.price) || 0;
+    return parsedSizePrice > 0 ? parsedSizePrice : basePrice;
   };
 
   const getCalculatedUnitPrice = () => {
@@ -581,9 +583,15 @@ const ProductDetails = () => {
 
     const sizes = Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [];
     const defaultSizeObj = sizes.find((s) => s.size_name === 'S' || s.size_name === 'M') || sizes[0];
-    const defaultSizePrice = defaultSizeObj?.price || data?.price || 0;
+    
+    const parseSizePrice = (sObj) => {
+      const p = Number(sObj?.price) || 0;
+      return p > 0 ? p : (Number(data?.price) || 0);
+    };
+
+    const defaultSizePrice = parseSizePrice(defaultSizeObj);
     const currentSizeObj = sizes.find((s) => s.size_name === selectedSize);
-    const currentSizePrice = currentSizeObj?.price || defaultSizePrice;
+    const currentSizePrice = parseSizePrice(currentSizeObj);
     const sizeOffset = Math.max(0, currentSizePrice - defaultSizePrice);
 
     const addonsPrice = (config.addons || [])
@@ -866,16 +874,20 @@ const ProductDetails = () => {
                       Select size
                     </span>
                   </div>
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                     {sizeOptions.map((sz) => {
                       const isSelected = selectedSize === sz.size_name;
                       const isOut = sz.stock_quantity <= 0;
+                      const szPrice = Number(sz.price) > 0 ? Number(sz.price) : Number(data?.price || 0);
+                      const baseP = Number(data?.price || 0);
+                      const priceDiff = szPrice - baseP;
+
                       return (
                         <button
                           key={sz.size_name}
                           disabled={isOut}
                           onClick={() => handleSizeChange(sz.size_name)}
-                          className={`h-11 border text-xs font-display font-medium uppercase tracking-wider rounded-sm transition-all duration-200 ${
+                          className={`h-12 border px-1 flex flex-col items-center justify-center text-xs font-display font-medium uppercase tracking-wider rounded-sm transition-all duration-200 ${
                             isOut
                               ? 'border-border bg-surface text-text-tertiary line-through cursor-not-allowed'
                               : isSelected
@@ -883,7 +895,12 @@ const ProductDetails = () => {
                               : 'border-border text-Primarycolor hover:border-Primarycolor'
                           }`}
                         >
-                          {sz.size_name}
+                          <span className="font-semibold">{sz.size_name}</span>
+                          {priceDiff > 0 && (
+                            <span className={`text-[0.6rem] leading-none mt-0.5 ${isSelected ? 'text-white/80' : 'text-amber-600 font-semibold'}`}>
+                              +{country === 'Nigeria' ? `₦${priceDiff.toLocaleString()}` : `$${(priceDiff * exchangeRate).toFixed(0)}`}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
