@@ -370,9 +370,18 @@ export default function AdminUploader() {
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Upload Product</h2>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center">
-          <AlertCircle className="w-5 h-5 mr-2" />
-          {error}
+        <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
+          <div className="flex items-center font-semibold mb-1">
+            <AlertCircle className="w-5 h-5 mr-2 shrink-0" />
+            {error}
+          </div>
+          {Object.keys(fieldErrors).length > 0 && (
+            <ul className="list-disc list-inside text-xs mt-2 space-y-1 pl-2">
+              {Object.values(fieldErrors).map((msg, idx) => (
+                <li key={idx}>{msg}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
       
@@ -578,6 +587,9 @@ export default function AdminUploader() {
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-3">Add different color variants and their available sizes with stock quantities</p>
+          {fieldErrors.variants && (
+            <p className="text-xs text-red-600 mb-3">{fieldErrors.variants}</p>
+          )}
           {form.variants.map((variant, i) => (
             <div key={i} className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
               <div className="space-y-3">
@@ -593,11 +605,16 @@ export default function AdminUploader() {
                   </label>
                   <input
                     type="text"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      fieldErrors[`variant_${i}_name`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
                     placeholder="e.g., Classic Blue, Sunset Red, Midnight Black"
                     value={variant.name || ''}
                     onChange={(e) => updateVariantField(i, 'name', e.target.value)}
                   />
+                  {fieldErrors[`variant_${i}_name`] && (
+                    <p className="text-xs text-red-600 mt-1">{fieldErrors[`variant_${i}_name`]}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">Give this variant a unique, descriptive name</p>
                 </div>
 
@@ -613,7 +630,9 @@ export default function AdminUploader() {
                   </label>
                   <div className="relative">
                     <select
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        fieldErrors[`variant_${i}_color`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
                       value={variant.color_id || ''}
                       onChange={(e) => updateVariantField(i, 'color_id', e.target.value)}
                     >
@@ -632,6 +651,9 @@ export default function AdminUploader() {
                       />
                     )}
                   </div>
+                  {fieldErrors[`variant_${i}_color`] && (
+                    <p className="text-xs text-red-600 mt-1">{fieldErrors[`variant_${i}_color`]}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">Choose the color that best represents this variant</p>
                   
                   {/* Color swatch preview */}
@@ -654,14 +676,17 @@ export default function AdminUploader() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                    Stock for Each Size
+                    Stock & Price for Each Size
                     <div className="group relative">
                       <Info className="w-3 h-3 text-gray-400 cursor-help" />
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                        Enter available stock quantity for each size
+                        Enter available stock quantity and price for each size
                       </div>
                     </div>
                   </label>
+                  {fieldErrors[`variant_${i}_stock`] && (
+                    <p className="text-xs text-red-600 mb-2 font-medium">{fieldErrors[`variant_${i}_stock`]}</p>
+                  )}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {variant.sizes.map((sz, sIdx) => (
                       <div key={sIdx} className="space-y-1">
@@ -681,10 +706,15 @@ export default function AdminUploader() {
                           min="0"
                           step="0.01"
                           placeholder="Price (₦)"
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
+                          className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs ${
+                            fieldErrors[`variant_${i}_size_${sIdx}_price`] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          }`}
                           value={sz.price}
                           onChange={(e) => updateSizePrice(i, sIdx, e.target.value)}
                         />
+                        {fieldErrors[`variant_${i}_size_${sIdx}_price`] && (
+                          <p className="text-[10px] text-red-600">{fieldErrors[`variant_${i}_size_${sIdx}_price`]}</p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -708,6 +738,9 @@ export default function AdminUploader() {
                     onChange={(e) => handleVariantImageChange(i, e)}
                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
+                  {fieldErrors[`variant_${i}_images`] && (
+                    <p className="text-xs text-red-600 mt-1 font-medium">{fieldErrors[`variant_${i}_images`]}</p>
+                  )}
                   <p className="text-xs text-gray-500 mt-1">Upload clear, high-resolution images (JPG, PNG) showing this color variant</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
                     {variant.previews.map((src, idx) => (
