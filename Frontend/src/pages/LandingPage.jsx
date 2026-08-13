@@ -22,8 +22,8 @@ const WhatsAppChatWidget = lazy(() => import('../components/WhatsAppChatWidget')
 
 import { toTitleCase } from '../lib/utils';
 
-// Parallax Product Card Component
-const ParallaxProductCard = ({ product, index, formatPrice }) => {
+// Parallax Category Card Component
+const ParallaxCategoryCard = ({ category, index }) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -31,14 +31,6 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
   });
   
   const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
-
-  const productUrl = product.is_product
-    ? `/product/${product.id}${product.variantId ? `?variant=${product.variantId}` : ''}`
-    : `/bundle/${product.id}`;
-
-  let displayName = product.name || 'Product';
-  if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
-  displayName = toTitleCase(displayName);
 
   return (
     <motion.div
@@ -53,27 +45,35 @@ const ParallaxProductCard = ({ product, index, formatPrice }) => {
       }}
     >
       <Link
-        to={productUrl}
-        className="group relative block overflow-hidden bg-surface rounded-sm border border-border/40"
+        to={category.link}
+        className="group relative block overflow-hidden bg-surface rounded-sm border border-border/40 aspect-[3/4]"
       >
-        <div className="aspect-[3/4] overflow-hidden relative">
-          <motion.img
-            src={product.image}
-            alt={displayName}
-            className="absolute inset-0 w-full h-[120%] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            style={{ y: imageY, transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-            onError={(e) => { e.target.style.opacity = '0'; }}
-            loading="lazy"
-          />
+        <motion.img
+          src={category.image}
+          alt={category.title}
+          className="absolute inset-0 w-full h-[120%] object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+          style={{ y: imageY, transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+          onError={(e) => { e.target.style.opacity = '0'; }}
+          loading="lazy"
+        />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/80 via-Primarycolor/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 sm:p-5">
-            <div>
-              <h3 className="text-sm sm:text-base font-display font-medium text-white mb-1 line-clamp-1">
-                {displayName}
-              </h3>
-              <p className="text-sm font-display font-semibold text-white/90 tabular-nums">
-                {formatPrice(product.price)}
-              </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/90 via-Primarycolor/30 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-between p-4 sm:p-5">
+          <div className="flex justify-end">
+            <span className="inline-flex items-center gap-1 text-[0.6875rem] font-display font-medium tracking-[0.1em] uppercase text-white/90 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
+              Category
+            </span>
+          </div>
+
+          <div>
+            <h3 className="text-lg sm:text-xl font-display font-bold text-white mb-1 group-hover:translate-x-0.5 transition-transform duration-300">
+              {category.title}
+            </h3>
+            <p className="text-xs sm:text-sm font-display text-white/80 line-clamp-1 mb-3">
+              {category.subtitle}
+            </p>
+            <div className="inline-flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-[0.08em] text-white/90 group-hover:text-white transition-colors duration-300">
+              <span>Explore Collection</span>
+              <ArrowUpRight size={14} weight="bold" className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
             </div>
           </div>
         </div>
@@ -86,36 +86,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}`.replace(/\/api$/, '') + '/api'
   : 'https://prechi-ecommerce.onrender.com/api';
 
-const DEFAULT_FEATURED_PRODUCTS = [
-  {
-    id: 1,
-    name: 'Ash & Pink Tracksuit Set',
-    price: 75000,
-    image: img1,
-    is_product: true,
-  },
-  {
-    id: 2,
-    name: 'Navy Blue Tracksuit Set',
-    price: 75000,
-    image: img2,
-    is_product: true,
-  },
-  {
-    id: 3,
-    name: 'Brown Diamond Set',
-    price: 75000,
-    image: img3,
-    is_product: true,
-  },
-  {
-    id: 4,
-    name: 'Pink Diamond Set',
-    price: 75000,
-    image: img4,
-    is_product: true,
-  },
-];
+const DEFAULT_CATEGORY_IMAGES = {
+  newArrivals: 'https://res.cloudinary.com/dwhwdkfia/image/upload/v1786624254/products/hh7gi5fyxookuopvrae5.jpg',
+  sets: 'https://res.cloudinary.com/dwhwdkfia/image/upload/v1786620683/prechi_products/cugrpbmrbtexkzr8b0zj.jpg',
+  maleWears: 'https://res.cloudinary.com/dwhwdkfia/image/upload/v1786609055/kb21cywto2ljzfwqy2cs.jpg',
+  femaleWears: 'https://res.cloudinary.com/dwhwdkfia/image/upload/v1786620533/prechi_products/b02g7rxr25jxtcbcccwj.jpg'
+};
 
 const LandingPage = () => {
   const [products, setProducts] = useState([]);
@@ -128,42 +104,16 @@ const LandingPage = () => {
     contextLoading: false,
   };
 
-  const {
-    currency = 'NGN',
-    exchangeRate = 1,
-    country = 'Nigeria',
-    contextLoading = false,
-  } = currencyContext;
-
-  const formatPrice = (price) => {
-    let parsedPrice = 0;
-    if (typeof price === 'number') {
-      parsedPrice = price;
-    } else if (typeof price === 'string') {
-      parsedPrice = parseFloat(price.replace(/[₦,]/g, '')) || 0;
-    }
-    const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate);
-    const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-    return displayPrice.toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-      style: 'currency',
-      currency: displayCurrency,
-      minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-      maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-    });
-  };
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setProductsLoading(true);
         const res = await axios.get(`${API_BASE_URL}/shopall`);
         if (Array.isArray(res.data) && res.data.length > 0) {
-          setProducts(res.data.slice(0, 4));
-        } else {
-          setProducts(DEFAULT_FEATURED_PRODUCTS);
+          setProducts(res.data);
         }
       } catch (error) {
-        setProducts(DEFAULT_FEATURED_PRODUCTS);
+        console.error('Error fetching products for category showcase:', error);
       } finally {
         setProductsLoading(false);
       }
@@ -174,6 +124,46 @@ const LandingPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
+
+  const getCategoryCards = () => {
+    const newArrivalProd = products.find(p => p.is_new_release || p.category?.toLowerCase() === 'new');
+    const setsProd = products.find(p => p.category === 'Sets' && !p.name?.toLowerCase().includes('men'));
+    const maleProd = products.find(p => p.name?.toLowerCase().includes('men') || p.name?.toLowerCase().includes('male'));
+    const femaleProd = products.find(p => p.name?.toLowerCase().includes('skirt') || p.name?.toLowerCase().includes('pink') || p.name?.toLowerCase().includes('milkshake') || (!p.name?.toLowerCase().includes('men') && p.category === 'Sets'));
+
+    return [
+      {
+        id: 'new-arrivals',
+        title: 'New Arrivals',
+        subtitle: 'Latest Drops & Fresh Fits',
+        link: '/shop?category=new',
+        image: newArrivalProd?.image || DEFAULT_CATEGORY_IMAGES.newArrivals,
+      },
+      {
+        id: 'sets',
+        title: 'Sets',
+        subtitle: 'Coordinated Luxury Outfits',
+        link: '/shop?category=Sets',
+        image: setsProd?.image || DEFAULT_CATEGORY_IMAGES.sets,
+      },
+      {
+        id: 'male-wears',
+        title: 'Male Wears',
+        subtitle: "Men's Premium Streetwear",
+        link: '/shop?category=Male%20Wears',
+        image: maleProd?.image || DEFAULT_CATEGORY_IMAGES.maleWears,
+      },
+      {
+        id: 'female-wears',
+        title: 'Female Wears',
+        subtitle: "Women's Elevated Essentials",
+        link: '/shop?category=Female%20Wears',
+        image: femaleProd?.image || DEFAULT_CATEGORY_IMAGES.femaleWears,
+      },
+    ];
+  };
+
+  const categoryCards = getCategoryCards();
 
   return (
     <PageTransition className="min-h-[100dvh] bg-Secondarycolor grain-overlay">
@@ -188,13 +178,13 @@ const LandingPage = () => {
         {/* Hero */}
         <HeroSection />
 
-        {/* Featured Products Showcase Section */}
+        {/* Explore Collection Section */}
         <section className="py-12 md:py-16 lg:py-20 bg-Secondarycolor overflow-hidden">
           <div className="section-container mb-6 md:mb-8">
             <div className="flex items-end justify-between">
               <div>
                 <span className="text-xs font-display font-medium tracking-[0.15em] uppercase text-text-tertiary mb-2 block">
-                  Featured
+                  Categories
                 </span>
                 <h2 className="text-2xl sm:text-3xl lg:text-4xl font-display font-semibold tracking-tight text-Primarycolor">
                   Explore the collection
@@ -210,15 +200,14 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Product Cards Grid */}
+          {/* Category Cards Grid */}
           <div className="section-container">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-              {(products.length > 0 ? products : DEFAULT_FEATURED_PRODUCTS).map((product, index) => (
-                <ParallaxProductCard
-                  key={product.id || index}
-                  product={product}
+              {categoryCards.map((categoryItem, index) => (
+                <ParallaxCategoryCard
+                  key={categoryItem.id}
+                  category={categoryItem}
                   index={index}
-                  formatPrice={formatPrice}
                 />
               ))}
             </div>
@@ -227,7 +216,7 @@ const LandingPage = () => {
             <div className="flex sm:hidden justify-center mt-8">
               <Button asChild variant="outline" size="sm" className="w-full max-w-[200px]">
                 <Link to="/shop">
-                  Shop all products
+                  Shop all categories
                 </Link>
               </Button>
             </div>

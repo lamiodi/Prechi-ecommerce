@@ -68,17 +68,20 @@ const ShopAllPage = () => {
   const itemsPerPage = 16;
   const category = searchParams.get('category');
 
-  const specialFilters = ['All', 'New Arrivals', '3 in 1', '5 in 1'];
+  const specialFilters = ['All', 'New Arrivals', 'Sets', 'Male Wears', 'Female Wears', '3 in 1', '5 in 1'];
 
   const filterCategories = useMemo(() => {
     const dynamicCategories = categories.filter(c =>
-      !['new arrivals', '3 in 1', '5 in 1', 'all'].includes(c.toLowerCase())
+      !['new arrivals', 'new arrival', 'new', 'sets', 'male wears', 'female wears', '3 in 1', '5 in 1', 'all'].includes(c.toLowerCase())
     );
     return [...specialFilters, ...dynamicCategories];
   }, [categories]);
 
   const categoryMap = {
     'New Arrivals': 'new',
+    'Sets': 'Sets',
+    'Male Wears': 'Male Wears',
+    'Female Wears': 'Female Wears',
     '3 in 1': '3in1',
     '5 in 1': '5in1',
     ...categories.reduce((acc, cat) => ({ ...acc, [cat]: cat }), {})
@@ -86,6 +89,17 @@ const ShopAllPage = () => {
 
   const reverseCategoryMap = {
     'new': 'New Arrivals',
+    'new arrivals': 'New Arrivals',
+    'new arrival': 'New Arrivals',
+    'sets': 'Sets',
+    'male wears': 'Male Wears',
+    'male_wears': 'Male Wears',
+    'male': 'Male Wears',
+    'men': 'Male Wears',
+    'female wears': 'Female Wears',
+    'female_wears': 'Female Wears',
+    'female': 'Female Wears',
+    'women': 'Female Wears',
     '3in1': '3 in 1',
     '5in1': '5 in 1',
     ...categories.reduce((acc, cat) => ({ ...acc, [cat.toLowerCase()]: cat }), {})
@@ -94,6 +108,8 @@ const ShopAllPage = () => {
   const metaConfig = {
     'All': { title: 'Shop All - Premium Tracksuits, Sets & Streetwear | Prechi Clothing', description: 'Explore our complete collection of premium tracksuits, coordinated sets, and streetwear.' },
     'Sets': { title: 'Premium Sets Collection | Prechi Clothing', description: 'Discover our luxury coordinated sets collection. Premium comfort sets with superior fit.' },
+    'Male Wears': { title: "Men's Streetwear & Sets Collection | Prechi Clothing", description: "Discover our premium men's collection featuring luxury tracksuits, sets, and streetwear." },
+    'Female Wears': { title: "Women's Fashion & Sets Collection | Prechi Clothing", description: "Explore our elevated women's collection featuring stylish sets and activewear." },
     'Bags': { title: 'Signature Leather Bags | Prechi Clothing', description: 'Explore our luxury handcrafted signature leather bags.' },
     'Tracksuits': { title: 'Premium Tracksuits & Activewear | Prechi Clothing', description: 'Shop high-performance tracksuits and activewear. Superior comfort and stylish designs.' },
     'New Arrivals': { title: 'New Arrivals - Latest Collection | Prechi Clothing', description: 'Discover our newest arrivals in premium comfort wear.' },
