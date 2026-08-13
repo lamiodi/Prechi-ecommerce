@@ -65,7 +65,13 @@ const ProductDetails = () => {
     const sku = (p?.sku_prefix || '').toUpperCase();
     const nameStr = (p?.name || '').toLowerCase();
 
-    if (idNum === 45 || sku === 'PSB' || nameStr.includes('skirt set') || nameStr.includes('short skirt')) {
+    // 1. Prechi Signature Leather Bag (productone) - No split, no add-ons
+    if (idNum === 44 || sku === 'PSB' || nameStr.includes('signature leather bag')) {
+      return null;
+    }
+
+    // 2. Prechi Short Skirt Set (producttwo) - Base ₦80,000 + Optional White Inner Tank Top (+₦10,000)
+    if (idNum === 45 || sku === 'SSS' || nameStr.includes('skirt set') || nameStr.includes('short skirt')) {
       return {
         pieces: [
           { id: 'full', label: 'Full Two-Piece Skirt Set', price: 80000 }
@@ -76,7 +82,8 @@ const ProductDetails = () => {
       };
     }
 
-    if (idNum === 46 || sku === 'SSS' || (nameStr.includes('bright tracksuit') && !nameStr.includes('men'))) {
+    // 3. Prechi Bright Tracksuit Set (productthree) - Base ₦80,000 | Pant (₦60,000) | Top (₦20,000) | No add-ons
+    if (idNum === 46 || sku === 'BTS' || (nameStr.includes('bright tracksuit') && !nameStr.includes('men'))) {
       return {
         pieces: [
           { id: 'full', label: 'Full Tracksuit Set (Top + Pant)', price: 80000 },
@@ -86,7 +93,8 @@ const ProductDetails = () => {
       };
     }
 
-    if (idNum === 47 || sku === 'BTS' || nameStr.includes('men bright set')) {
+    // 4. Prechi Men Bright Set (productfour) - Base ₦85,000 | Pant (₦60,000) | Top (₦25,000) | Optional Bag (+₦70,000)
+    if (idNum === 47 || sku === 'MBS' || nameStr.includes('men bright set')) {
       return {
         pieces: [
           { id: 'full', label: 'Full Set (Top + Pant)', price: 85000 },
@@ -99,17 +107,19 @@ const ProductDetails = () => {
       };
     }
 
-    if (idNum === 48 || sku === 'MBS' || nameStr.includes('black set men')) {
+    // 5. Prechi Black Set Men (productfive) - Base ₦100,000 | Pant (₦50,000) | Top (₦50,000) | No add-ons
+    if (idNum === 48 || sku === 'BSM' || nameStr.includes('black set men')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full Set (Sleeveless + Pant)', price: 100000 },
+          { id: 'full', label: 'Full Set (Top + Pant)', price: 100000 },
           { id: 'pant', label: 'Pant Only', price: 50000 },
-          { id: 'top', label: 'Sleeveless Top Only', price: 50000 }
+          { id: 'top', label: 'Top Only', price: 50000 }
         ]
       };
     }
 
-    if (idNum === 49 || sku === 'BSM' || nameStr.includes('niga striped') || nameStr.includes('striped tracksuit')) {
+    // 6. Prechi Niga Striped Tracksuit Set (productsix) - Base ₦110,000 | Pant (₦50,000) | Round Neck (₦60,000) | No add-ons
+    if (idNum === 49 || sku === 'NST' || nameStr.includes('niga striped') || nameStr.includes('striped tracksuit')) {
       return {
         pieces: [
           { id: 'full', label: 'Full Tracksuit Set (Round Neck + Pant)', price: 110000 },
@@ -119,7 +129,8 @@ const ProductDetails = () => {
       };
     }
 
-    if (idNum === 50 || sku === 'NST' || nameStr.includes('navy blue & white t set') || nameStr.includes('white t set')) {
+    // 7. Prechi Navy Blue & White T Set (productseven) - Base ₦120,000 + Optional Matching Bag (+₦70,000)
+    if (idNum === 50 || sku === 'NWT' || nameStr.includes('navy blue & white t set') || nameStr.includes('white t set') || nameStr.includes('navy blue t set')) {
       return {
         pieces: [
           { id: 'full', label: 'Full T-Shirt Set', price: 120000 }
@@ -287,15 +298,25 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id, variantParam]);
 
+  const handleVariantChange = (variant) => {
+    if (!variant) return;
+    setSelectedVariant(variant);
+    setSelectedColor(variant.color_name);
+    const availableSizes = Array.isArray(variant.sizes) ? variant.sizes : [];
+    if (selectedSize && !availableSizes.some((s) => s.size_name === selectedSize)) {
+      setSelectedSize(availableSizes[0]?.size_name || null);
+    } else if (!selectedSize && availableSizes.length > 0) {
+      setSelectedSize(availableSizes[0]?.size_name || null);
+    }
+    setSelectedImage(0);
+  };
+
   const handleColorChange = (colorName) => {
     if (!productData || productData.type !== "product") return;
     const variants = Array.isArray(productData?.data?.variants) ? productData.data.variants : [];
     const variant = variants.find((v) => v.color_name === colorName);
     if (variant) {
-      setSelectedVariant(variant);
-      setSelectedColor(variant.color_name);
-      setSelectedSize(variant.sizes?.[0]?.size_name || null);
-      setSelectedImage(0);
+      handleVariantChange(variant);
     }
   };
 
@@ -761,34 +782,34 @@ const ProductDetails = () => {
 
               <div className="h-px bg-border" />
 
-              {/* Color selector */}
-              {colorOptions.length > 0 && (
+              {/* Variant / Style / Color selector */}
+              {isProduct && Array.isArray(data?.variants) && data.variants.length > 1 && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs uppercase tracking-[0.08em] font-medium text-text-secondary">
-                      Color: <span className="text-Primarycolor">{toTitleCase(selectedColor)}</span>
+                      Select Option / Color: <span className="text-Primarycolor font-semibold">{toTitleCase(selectedVariant?.name || selectedColor || '')}</span>
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-2.5">
-                    {colorOptions.map((col) => {
-                      const hex = colorMap[col] || "#000000";
-                      const isSelected = selectedColor === col;
+                    {data.variants.map((v) => {
+                      const isSelected = (selectedVariant?.id && v.id) ? selectedVariant.id === v.id : (selectedVariant?.variant_id === v.variant_id);
+                      const hex = colorMap[v.color_name] || "#000000";
                       return (
                         <button
-                          key={col}
-                          onClick={() => handleColorChange(col)}
-                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                            isSelected ? 'ring-2 ring-Primarycolor ring-offset-2' : 'hover:scale-110'
+                          key={v.variant_id || v.id}
+                          type="button"
+                          onClick={() => handleVariantChange(v)}
+                          className={`flex items-center gap-2 px-3.5 py-2 rounded-sm border text-xs font-display transition-all duration-200 ${
+                            isSelected
+                              ? 'border-Primarycolor bg-Primarycolor/5 text-Primarycolor font-semibold ring-1 ring-Primarycolor shadow-sm'
+                              : 'border-border hover:border-Primarycolor/50 text-text-secondary bg-white'
                           }`}
-                          style={{ backgroundColor: hex }}
-                          title={col}
                         >
-                          {isSelected && col === 'White' && (
-                            <Check size={12} className="text-Primarycolor" weight="bold" />
-                          )}
-                          {isSelected && col !== 'White' && (
-                            <Check size={12} className="text-white" weight="bold" />
-                          )}
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0"
+                            style={{ backgroundColor: hex }}
+                          />
+                          <span>{v.name || v.color_name}</span>
                         </button>
                       );
                     })}
