@@ -273,7 +273,7 @@ const ShopAllPage = () => {
 
           {/* Product grid */}
           {loading || contextLoading ? (
-            <ShopSkeleton />
+            <ShopSkeleton mobileLayout={mobileLayout} count={itemsPerPage} />
           ) : error ? (
             <div className="text-center py-20">
               <p className="text-text-secondary font-display text-sm mb-4">Something went wrong loading products.</p>

@@ -259,8 +259,8 @@ const ProductCard = React.memo(({ product, onImageError, autoPlay = true }) => {
                     onClick={(e) => handleSelectIndex(e, idx)}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       idx === currentIndex
-                        ? 'w-4 bg-white shadow-xs'
-                        : 'w-1.5 bg-white/60 hover:bg-white'
+                        ? 'w-4 bg-white shadow-sm opacity-100'
+                        : 'w-1.5 bg-white/60 hover:bg-white opacity-70 group-hover:opacity-100'
                     }`}
                   />
                 ))}
