@@ -57,6 +57,7 @@ const ProductDetails = () => {
   const [bundleType, setBundleType] = useState("3-in-1");
   const [selectedPieceId, setSelectedPieceId] = useState("full");
   const [selectedAddonIds, setSelectedAddonIds] = useState([]);
+  const [selectedBagColor, setSelectedBagColor] = useState("Black");
 
   const getPricingSplitConfig = (dataObj) => {
     if (!dataObj || dataObj.type !== "product") return null;
@@ -139,7 +140,19 @@ const ProductDetails = () => {
           { id: 'full', label: 'Full T-Shirt Set', price: 120000 }
         ],
         addons: [
-          { id: 'bag', label: 'Matching Signature Leather Bag', price: 70000 }
+          { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }
+        ]
+      };
+    }
+
+    // 8. Prechi White Fix Set (producteight) - Base ₦120,000 + Optional Matching Bag (+₦70,000)
+    if (idNum === 51 || sku === 'WFS' || nameStr.includes('white fix set') || nameStr.includes('white fix')) {
+      return {
+        pieces: [
+          { id: 'full', label: 'Full 2-Piece Set', price: 120000 }
+        ],
+        addons: [
+          { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }
         ]
       };
     }
@@ -581,7 +594,11 @@ const ProductDetails = () => {
     if (config.addons) {
       config.addons.forEach((a) => {
         if (selectedAddonIds.includes(a.id)) {
-          details.push(`+ ${a.label}`);
+          if (a.id === 'bag' || a.label.toLowerCase().includes('bag')) {
+            details.push(`+ ${a.label} (${selectedBagColor} Color)`);
+          } else {
+            details.push(`+ ${a.label}`);
+          }
         }
       });
     }
@@ -597,6 +614,15 @@ const ProductDetails = () => {
   const parsedPrice = Number.parseFloat(rawPrice) || 0;
   const displayPrice = country === "Nigeria" ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
   const displayCurrency = country === "Nigeria" ? "NGN" : "USD";
+
+  const bagColorsList = [
+    { name: 'Black', hex: '#000000' },
+    { name: 'Brown', hex: '#8B4513' },
+    { name: 'Light Grey', hex: '#D3D3D3' },
+    { name: 'Blue', hex: '#0000FF' },
+    { name: 'Green', hex: '#008000' },
+    { name: 'Red', hex: '#FF0000' }
+  ];
 
   const isSoldOut = isProduct ? (Number(data?.total_stock) === 0) : false;
   const isVariantSoldOut = isProduct && selectedVariant && selectedSize
@@ -904,7 +930,7 @@ const ProductDetails = () => {
                       <label className="text-xs uppercase tracking-[0.08em] font-medium text-text-secondary block mb-2.5">
                         Optional Add-Ons
                       </label>
-                      <div className="space-y-2">
+                      <div className="space-y-2.5">
                         {splitConfig.addons.map((addon) => {
                           const isChecked = selectedAddonIds.includes(addon.id);
                           const addonPriceNGN = addon.price;
@@ -920,29 +946,61 @@ const ProductDetails = () => {
                             }
                           };
 
+                          const isBagAddon = addon.id === 'bag' || addon.label.toLowerCase().includes('bag');
+
                           return (
-                            <button
-                              key={addon.id}
-                              type="button"
-                              onClick={toggleAddon}
-                              className={`w-full flex items-center justify-between p-3 rounded-sm border text-left text-xs font-display transition-all duration-200 ${
-                                isChecked
-                                  ? "border-Primarycolor bg-Primarycolor/5 text-Primarycolor font-semibold ring-1 ring-Primarycolor"
-                                  : "border-border hover:border-Primarycolor/50 text-text-secondary bg-white"
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5">
-                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                                  isChecked ? "border-Primarycolor bg-Primarycolor text-white" : "border-border"
-                                }`}>
-                                  {isChecked && <Check size={12} weight="bold" />}
+                            <div key={addon.id} className="space-y-2">
+                              <button
+                                type="button"
+                                onClick={toggleAddon}
+                                className={`w-full flex items-center justify-between p-3 rounded-sm border text-left text-xs font-display transition-all duration-200 ${
+                                  isChecked
+                                    ? "border-Primarycolor bg-Primarycolor/5 text-Primarycolor font-semibold ring-1 ring-Primarycolor"
+                                    : "border-border hover:border-Primarycolor/50 text-text-secondary bg-white"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                                    isChecked ? "border-Primarycolor bg-Primarycolor text-white" : "border-border"
+                                  }`}>
+                                    {isChecked && <Check size={12} weight="bold" />}
+                                  </div>
+                                  <span>{addon.label}</span>
                                 </div>
-                                <span>{addon.label}</span>
-                              </div>
-                              <span className="font-semibold tabular-nums text-Primarycolor">
-                                {displayAddonPrice}
-                              </span>
-                            </button>
+                                <span className="font-semibold tabular-nums text-Primarycolor">
+                                  {displayAddonPrice}
+                                </span>
+                              </button>
+
+                              {isChecked && isBagAddon && (
+                                <div className="p-3 bg-white border border-border rounded-sm space-y-2.5 animate-fadeIn">
+                                  <div className="flex items-center justify-between text-[0.75rem] font-display">
+                                    <span className="uppercase tracking-[0.05em] font-medium text-text-secondary">Select Bag Color:</span>
+                                    <span className="font-semibold text-Primarycolor">{selectedBagColor}</span>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {bagColorsList.map((bColor) => (
+                                      <button
+                                        key={bColor.name}
+                                        type="button"
+                                        onClick={() => setSelectedBagColor(bColor.name)}
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border text-[0.7rem] font-display transition-all ${
+                                          selectedBagColor === bColor.name
+                                            ? 'border-Primarycolor bg-Primarycolor/10 text-Primarycolor font-semibold ring-1 ring-Primarycolor'
+                                            : 'border-border bg-Secondarycolor/50 text-text-secondary hover:border-Primarycolor/50'
+                                        }`}
+                                      >
+                                        <span
+                                          className="w-3.5 h-3.5 rounded-full border border-black/20 flex-shrink-0"
+                                          style={{ backgroundColor: bColor.hex }}
+                                        />
+                                        <span>{bColor.name}</span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           );
                         })}
                       </div>
