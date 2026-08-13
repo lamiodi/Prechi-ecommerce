@@ -25,6 +25,16 @@ export const getShopAll = async (req, res) => {
              WHERE bi.bundle_id = MIN(b.id)
              LIMIT 1)
           ) AS image,
+          COALESCE(
+            (SELECT JSON_AGG(bi.image_url)
+             FROM (
+               SELECT DISTINCT ON (image_url) image_url, is_primary, position, id
+               FROM bundle_images
+               WHERE bundle_id = MIN(b.id)
+               ORDER BY image_url, (is_primary IS TRUE) DESC, position ASC, id ASC
+             ) bi),
+            '[]'::json
+          ) AS images,
           FALSE AS is_product
         FROM bundles b
         JOIN products p ON b.product_id = p.id
@@ -37,6 +47,9 @@ export const getShopAll = async (req, res) => {
         name: row.name,
         price: row.price,
         image: row.image || 'https://via.placeholder.com/300x300?text=No+Image',
+        images: Array.isArray(row.images) && row.images.length > 0
+          ? row.images
+          : [row.image || 'https://via.placeholder.com/300x300?text=No+Image'],
         is_product: false,
         bundle_types: row.bundle_types
       }));
@@ -63,6 +76,16 @@ export const getShopAll = async (req, res) => {
              WHERE bi.bundle_id = MIN(b.id)
              LIMIT 1)
           ) AS image,
+          COALESCE(
+            (SELECT JSON_AGG(bi.image_url)
+             FROM (
+               SELECT DISTINCT ON (image_url) image_url, is_primary, position, id
+               FROM bundle_images
+               WHERE bundle_id = MIN(b.id)
+               ORDER BY image_url, (is_primary IS TRUE) DESC, position ASC, id ASC
+             ) bi),
+            '[]'::json
+          ) AS images,
           FALSE AS is_product
         FROM bundles b
         JOIN products p ON b.product_id = p.id
@@ -75,6 +98,9 @@ export const getShopAll = async (req, res) => {
         name: row.name,
         price: row.price,
         image: row.image || 'https://via.placeholder.com/300x300?text=No+Image',
+        images: Array.isArray(row.images) && row.images.length > 0
+          ? row.images
+          : [row.image || 'https://via.placeholder.com/300x300?text=No+Image'],
         is_product: false,
         bundle_types: row.bundle_types
       }));
@@ -107,6 +133,16 @@ export const getShopAll = async (req, res) => {
             ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
+          (
+            SELECT JSON_AGG(img.image_url)
+            FROM (
+              SELECT DISTINCT ON (pi.image_url) pi.image_url, pi.is_primary, pi.position, pi.id
+              FROM product_images pi 
+              JOIN product_variants pv ON pi.variant_id = pv.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+              ORDER BY pi.image_url, (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
+            ) img
+          ) AS images,
           COALESCE(
             (SELECT SUM(vs.stock_quantity) 
              FROM variant_sizes vs 
@@ -152,6 +188,16 @@ export const getShopAll = async (req, res) => {
             ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
+          (
+            SELECT JSON_AGG(img.image_url)
+            FROM (
+              SELECT DISTINCT ON (pi.image_url) pi.image_url, pi.is_primary, pi.position, pi.id
+              FROM product_images pi 
+              JOIN product_variants pv ON pi.variant_id = pv.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+              ORDER BY pi.image_url, (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
+            ) img
+          ) AS images,
           COALESCE(
             (SELECT SUM(vs.stock_quantity) 
              FROM variant_sizes vs 
@@ -196,6 +242,16 @@ export const getShopAll = async (req, res) => {
             ORDER BY (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
             LIMIT 1
           ) AS primary_image,
+          (
+            SELECT JSON_AGG(img.image_url)
+            FROM (
+              SELECT DISTINCT ON (pi.image_url) pi.image_url, pi.is_primary, pi.position, pi.id
+              FROM product_images pi 
+              JOIN product_variants pv ON pi.variant_id = pv.id
+              WHERE pv.product_id = p.id AND pv.is_active = TRUE
+              ORDER BY pi.image_url, (pi.is_primary IS TRUE) DESC, pi.position ASC, pi.id ASC
+            ) img
+          ) AS images,
           COALESCE(
             (SELECT SUM(vs.stock_quantity) 
              FROM variant_sizes vs 
@@ -223,7 +279,10 @@ export const getShopAll = async (req, res) => {
       id: row.product_id,
       name: row.product_name,
       price: row.price,
-      image: row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image',
+      image: row.primary_image || (row.images && row.images[0]) || 'https://via.placeholder.com/300x300?text=No+Image',
+      images: Array.isArray(row.images) && row.images.length > 0
+        ? row.images
+        : [row.primary_image || 'https://via.placeholder.com/300x300?text=No+Image'],
       variantId: row.variant_id,
       category: row.category,
       created_at: row.created_at,

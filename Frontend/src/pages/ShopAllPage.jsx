@@ -10,6 +10,7 @@ import SEO from '../components/SEO';
 import PageTransition from '../components/PageTransition';
 import { Button } from '../components/ui/button';
 import { SkeletonPulse, ShopSkeleton } from '../components/skeletons';
+import ProductCard from '../components/ProductCard';
 import { toTitleCase } from '../lib/utils';
 
 const useMetaTags = (title, description) => {
@@ -332,113 +333,6 @@ const ShopAllPage = () => {
   );
 };
 
-// ─── Product Card ─────────────────────────────────────────────────
-const colorMap = {
-  Black: "#000000",
-  White: "#FFFFFF",
-  Brown: "#8B4513",
-  Grey: "#808080",
-  "Light Grey": "#D3D3D3",
-  Pink: "#FFC0CB",
-  Lilac: "#C8A2C8",
-  Blue: "#0000FF",
-  "Navy Blue": "#000080",
-  Green: "#008000",
-  Red: "#FF0000",
-};
 
-const ProductCard = ({ product, onImageError }) => {
-  const { id, name, price, image, is_product, variantId, bundle_types, total_stock, colors } = product;
-  const { currency, exchangeRate, country } = useContext(CurrencyContext);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  const isSoldOut = is_product ? (total_stock === 0) : false;
-
-  let displayName = toTitleCase(name || 'Unnamed Product');
-
-  const productUrl = is_product
-    ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
-    : `/bundle/${id}`;
-
-  const parsedPrice = parseFloat(price) || 0;
-  const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
-  const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-
-  return (
-    <div className="group flex flex-col">
-      <Link to={productUrl} className="block relative overflow-hidden bg-surface">
-        <div className="relative w-full aspect-[3/4] overflow-hidden">
-          {!imageLoaded && <SkeletonPulse className="absolute inset-0" rounded="" />}
-          <img
-            src={image}
-            alt={displayName}
-            className={`w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-[1.03] ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-            onError={onImageError}
-            onLoad={() => setImageLoaded(true)}
-            loading="lazy"
-          />
-
-          {isSoldOut && (
-            <div className="absolute inset-0 bg-Primarycolor/50 flex items-center justify-center z-10">
-              <span className="text-xs font-display font-medium tracking-[0.1em] uppercase text-white">
-                Sold out
-              </span>
-            </div>
-          )}
-
-          {bundle_types && bundle_types.length > 0 && (
-            <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-              {bundle_types.map((type, index) => (
-                <span key={index} className="bg-Primarycolor text-white text-[0.625rem] font-display font-medium tracking-[0.08em] uppercase px-2.5 py-1">
-                  {type}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="absolute inset-0 bg-Primarycolor/0 group-hover:bg-Primarycolor/5 transition-colors duration-500" />
-        </div>
-      </Link>
-
-      <div className="pt-3 sm:pt-4">
-        <Link to={productUrl}>
-          <h3 className="text-sm font-display font-medium text-text-primary leading-snug line-clamp-1 group-hover:text-text-secondary transition-colors duration-300">
-            {displayName}
-          </h3>
-        </Link>
-        <div className="mt-1 flex items-center justify-between">
-          <p className="text-sm font-display text-text-secondary tabular-nums">
-            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-              style: 'currency',
-              currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-            })}
-          </p>
-
-          {colors && colors.length > 1 && (
-            <div className="flex items-center gap-1" title={`${colors.length} options available`}>
-              {colors.slice(0, 4).map((c, i) => (
-                <span
-                  key={i}
-                  className="w-2.5 h-2.5 rounded-full border border-black/20"
-                  style={{ backgroundColor: colorMap[c.color_name] || c.color_code || '#000000' }}
-                />
-              ))}
-              {colors.length > 4 && (
-                <span className="text-[0.65rem] text-text-tertiary font-display font-medium">
-                  +{colors.length - 4}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default ShopAllPage;

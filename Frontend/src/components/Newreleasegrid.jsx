@@ -5,6 +5,7 @@ import { CurrencyContext } from '../pages/CurrencyContext';
 import { ArrowRight } from '@phosphor-icons/react';
 import { Button } from './ui/button';
 import { SkeletonPulse } from './skeletons';
+import ProductCard from './ProductCard';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
 
@@ -133,70 +134,6 @@ const NewReleaseGrid = () => {
   );
 };
 
-const ProductCard = ({ product, onImageError }) => {
-  const { name, price, image, productId, variantId, total_stock } = product;
-  const { currency, exchangeRate, country } = useContext(CurrencyContext);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
-  const isSoldOut = total_stock === 0;
-
-  let displayName = name || 'Unnamed Product';
-  if (displayName.includes('–')) displayName = displayName.split('–')[0].trim();
-  if (displayName.match(/\((.*?)\)$/)) displayName = displayName.replace(/\((.*?)\)$/, '').trim();
-
-  const parsedPrice = parseFloat(price) || 0;
-  const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
-  const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-
-  return (
-    <div className="group flex flex-col">
-      <Link to={`/product/${productId}?variant=${variantId}`} className="block relative overflow-hidden bg-surface">
-        <div className="relative w-full aspect-[3/4] overflow-hidden">
-          {!imageLoaded && <SkeletonPulse className="absolute inset-0" rounded="" />}
-
-          {isSoldOut && (
-            <div className="absolute inset-0 bg-Primarycolor/50 flex items-center justify-center z-10">
-              <span className="text-xs font-display font-medium tracking-[0.1em] uppercase text-white">
-                Sold out
-              </span>
-            </div>
-          )}
-
-          <img
-            src={image}
-            alt={displayName}
-            className={`w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-[1.03] ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-            onError={onImageError}
-            onLoad={() => setImageLoaded(true)}
-            loading="lazy"
-            width={400}
-            height={533}
-          />
-
-          <div className="absolute inset-0 bg-Primarycolor/0 group-hover:bg-Primarycolor/5 transition-colors duration-500" />
-        </div>
-      </Link>
-
-      <div className="pt-3 sm:pt-4">
-        <Link to={`/product/${productId}?variant=${variantId}`}>
-          <h3 className="text-sm font-display font-medium text-text-primary leading-snug line-clamp-1 group-hover:text-text-secondary transition-colors duration-300">
-            {displayName}
-          </h3>
-        </Link>
-        <p className="mt-1 text-sm font-display text-text-secondary tabular-nums">
-          {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-            style: 'currency',
-            currency: displayCurrency,
-            minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-            maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-          })}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 export default NewReleaseGrid;

@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import { SearchSkeleton } from '../components/skeletons';
+import ProductCard from '../components/ProductCard';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api`
@@ -286,74 +287,6 @@ const SearchResults = () => {
   );
 };
 
-const ProductCard = ({ product, onAddToCart, onImageError }) => {
-  const { id, name, price, image, is_product, variantId, bundle_types } = product;
-  const { currency, exchangeRate, country } = useContext(CurrencyContext);
 
-  // Clean product name (remove trailing "– Something")
-  let displayName = name || 'Unnamed Product';
-  if (displayName.includes('–')) {
-    displayName = displayName.split('–')[0].trim();
-  }
-
-  // Generate product URL based on type
-  const productUrl = is_product
-    ? `/product/${id}${variantId ? `?variant=${variantId}` : ''}`
-    : `/bundle/${id}`;
-
-  // Format price based on currency
-  const parsedPrice = parseFloat(price) || 0;
-  const displayPrice = country === 'Nigeria' ? parsedPrice : (parsedPrice * exchangeRate).toFixed(2);
-  const displayCurrency = country === 'Nigeria' ? 'NGN' : 'USD';
-
-  return (
-    <div className="group bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100">
-      <Link to={productUrl} className="block relative overflow-hidden">
-        <div className="relative w-full aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-          <img
-            src={image}
-            alt={displayName}
-            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500 ease-out"
-            onError={onImageError}
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300"></div>
-          {/* Updated to show all bundle types */}
-          {bundle_types && bundle_types.length > 0 && (
-            <div className="absolute top-3 right-3 flex flex-col gap-1">
-              {bundle_types.map((type, index) => (
-                <span key={index} className="bg-Primarycolor text-white text-xs px-3 py-1.5 rounded-full font-semibold shadow-md backdrop-blur-sm">
-                  {type}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="p-3 sm:p-4">
-          <h3 className="text-sm sm:text-base font-semibold text-Primarycolor mb-2 line-clamp-2 leading-tight group-hover:text-Primarycolor transition-colors duration-200">
-            {displayName}
-          </h3>
-          <p className="text-lg sm:text-xl font-semibold font-Manrope text-Accent">
-            {parseFloat(displayPrice).toLocaleString(country === 'Nigeria' ? 'en-NG' : 'en-US', {
-              style: 'currency',
-              currency: displayCurrency,
-              minimumFractionDigits: country === 'Nigeria' ? 0 : 2,
-              maximumFractionDigits: country === 'Nigeria' ? 0 : 2
-            })}
-          </p>
-        </div>
-      </Link>
-      <div className="p-3 sm:p-4 pt-1 mt-auto">
-        <Link to={productUrl}>
-          <button
-            className="w-full bg-gradient-to-r from-black to-gray-800 text-white font-semibold py-3 px-4 rounded-lg hover:from-gray-800 hover:to-black active:scale-95 text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform group-hover:translate-y-0"
-          >
-            Shop Now
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
-};
 
 export default SearchResults;
