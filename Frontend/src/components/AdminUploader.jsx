@@ -518,6 +518,7 @@ export default function AdminUploader() {
             <option value="Gymwears">Gymwears</option>
             <option value="Briefs">Briefs</option>
             <option value="Sets">Sets</option>
+            <option value="Bags">Bags</option>
            
           </select>
           {fieldErrors.category && (

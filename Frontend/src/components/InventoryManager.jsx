@@ -31,7 +31,7 @@ const api = axios.create({
   timeout: 15000,
 });
 
-const PRESET_CATEGORIES = ['Gymwears', 'Briefs', 'Sets', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories'];
+const PRESET_CATEGORIES = ['Gymwears', 'Briefs', 'Sets', 'Bags', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories'];
 const PRESET_GENDERS = ['Unisex', 'Male', 'Female'];
 const PRESET_COLORS = [
   { id: 1, color_name: 'Black' },

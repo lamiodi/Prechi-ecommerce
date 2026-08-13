@@ -21,6 +21,8 @@ export const searchProducts = async (req, res) => {
       'sets': 'Sets',
       'bundle': 'Sets',
       'bundles': 'Sets',
+      'bag': 'Bags',
+      'bags': 'Bags',
       'new': 'new',
       'new arrivals': 'new',
       '3in1': '3-in-1',
