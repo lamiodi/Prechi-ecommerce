@@ -125,7 +125,7 @@ const DeliveryFeeThankYou = () => {
               💡 <strong>Tip:</strong> Create a permanent account to easily track all your orders and enjoy exclusive benefits!
             </p>
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/signup')}
               className="mt-2 text-sm text-yellow-700 hover:text-yellow-900 underline font-medium"
             >
               Create Permanent Account

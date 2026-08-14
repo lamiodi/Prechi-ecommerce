@@ -54,8 +54,7 @@ const UserOrders = () => {
     if (currency === 'NGN') {
       return `₦${Number(amount).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
     } else if (currency === 'USD') {
-      const totalAmount = amount > 1000 ? amount / 100 : amount;
-      return `$${Number(totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      return `$${Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     }
     return `${amount} ${currency}`;
   };

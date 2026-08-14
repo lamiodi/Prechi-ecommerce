@@ -413,8 +413,8 @@ export const addToCart = async (req, res) => {
         } else {
           // No existing items, add a new one
           await sql`
-            INSERT INTO cart_items (cart_id, variant_id, size_id, quantity, is_bundle, price, color_name, size_name)
-            VALUES (${cart_id}, ${variant_id}, ${size_id}, ${quantity}, ${false}, ${itemPrice}, ${color_name}, ${size_name})
+            INSERT INTO cart_items (cart_id, variant_id, size_id, quantity, is_bundle, price)
+            VALUES (${cart_id}, ${variant_id}, ${size_id}, ${quantity}, ${false}, ${itemPrice})
           `;
           console.log(`Added new single product: variant_id=${variant_id}, quantity=${quantity}, price=${itemPrice}`);
         }

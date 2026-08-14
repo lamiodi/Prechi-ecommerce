@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProductSchema = ({ productData, selectedVariant, selectedSize, isProduct, currentUrl }) => {
+const ProductSchema = ({ productData, selectedVariant, selectedSize, isProduct, currentUrl, price: customPrice }) => {
   if (!productData || !productData.data) return null;
 
   const { type, data } = productData;
@@ -14,8 +14,11 @@ const ProductSchema = ({ productData, selectedVariant, selectedSize, isProduct, 
     : Array.isArray(data?.images) ? data.images : [];
   
   // Get price information
-  const rawPrice = isProductType ? data?.price : data?.price || 0;
-  const price = Number.parseFloat(rawPrice) || 0;
+  let price = Number.parseFloat(customPrice) || 0;
+  if (!price || price <= 0) {
+    const rawPrice = isProductType ? data?.price : data?.price || 0;
+    price = Number.parseFloat(rawPrice) || 0;
+  }
   
   // Get SKU - use variant ID for products, bundle ID for bundles
   const sku = isProductType 

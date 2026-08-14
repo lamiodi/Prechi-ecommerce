@@ -5,6 +5,8 @@ dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const DEFAULT_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || 'Prechi Clothing <onboarding@resend.dev>';
+
 // Logo header function for all email templates
 const getLogoHeader = () => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -43,7 +45,7 @@ export const sendResetEmail = async (to, token) => {
   `;
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to,
       subject: 'Password Reset Request',
       html,
@@ -93,7 +95,7 @@ export const sendAdminDeliveryFeePaymentConfirmation = async (orderId, customerN
   `;
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to: process.env.ADMIN_EMAIL,
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
@@ -146,7 +148,7 @@ export const sendAdminDeliveryFeeNotification = async (orderId, userName, countr
   `;
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to: process.env.ADMIN_EMAIL,
       subject: `Action Required: DHL Delivery Fee for Order ${orderId}`,
       html,
@@ -246,10 +248,9 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
 
     const formatCurrency = (amount, curr) => {
       if (curr === 'NGN') {
-        return `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
+        return `₦${Number(amount).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
       } else if (curr === 'USD') {
-        const totalAmount = amount > 1000 ? amount / 100 : amount;
-        return `$${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+        return `$${Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
       }
       return `${amount} ${curr}`;
     };
@@ -449,7 +450,7 @@ export const sendOrderConfirmationEmail = async (to, name, orderId, total, curre
 
     try {
       await resend.emails.send({
-        from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+        from: DEFAULT_FROM_EMAIL,
         to,
         subject: `Order Confirmation - Order #${orderId}`,
         html,
@@ -501,7 +502,7 @@ export const sendOrderStatusUpdateEmail = async (to, name, orderId, status, addi
 
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to,
       subject: `${status === 'delivery_fee_paid' ? 'Delivery Fee Payment Confirmation' : 'Order Status Update'} - Order #${orderId}`,
       html,
@@ -577,7 +578,7 @@ export const sendDeliveryFeePaymentConfirmation = async (to, userName, orderId, 
 
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to,
       subject: `Delivery Fee Payment Confirmed for Order #${orderId}`,
       html,
@@ -630,7 +631,7 @@ export const sendAdminPaymentConfirmationNotification = async (orderId, customer
 
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to: process.env.ADMIN_EMAIL,
       subject: `Payment Confirmed for Order #${orderId}`,
       html,
@@ -680,7 +681,7 @@ export const sendDeliveryFeePaymentLinkEmail = async (to, userName, orderId, del
 
   try {
     await resend.emails.send({
-      from: 'Prechi Clothing <prechi.clothing@gmail.com>',
+      from: DEFAULT_FROM_EMAIL,
       to,
       subject: `Delivery Fee Payment Required - Order #${orderId}`,
       html,

@@ -1,17 +1,69 @@
-import dotenv from 'dotenv';
 import postgres from 'postgres';
-dotenv.config();
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Use direct connection (port 5432) derived from DATABASE_URL to bypass pooler timeout issues
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
 const connectionString = process.env.DATABASE_URL
   ? process.env.DATABASE_URL.replace(':6543', ':5432')
   : 'postgres://postgres:postgres@localhost:5432/prechi_clothing';
 
-const sql = postgres(connectionString);
+const sql = postgres(connectionString, { ssl: 'require', max: 1 });
 
-async function fix() {
+async function fixSizePricesAndStoredProc() {
+  console.log('🔧 Starting database fixes for product size prices & cart functions...\n');
+
   try {
-    await sql`
+    await sql.begin(async (sql) => {
+      // 1. Fix Variant 78 (White variant of Prechi Men Bright Set, Product 47)
+      console.log('1️⃣ Fixing size prices for Variant 78 (White Men Bright Set)...');
+      const whiteVariantSizes = await sql`
+        SELECT vs.id, vs.size_id, s.size_name, vs.stock_quantity, vs.price
+        FROM variant_sizes vs
+        JOIN sizes s ON vs.size_id = s.id
+        WHERE vs.variant_id = 78
+      `;
+
+      for (const vs of whiteVariantSizes) {
+        const isPlusSize = ['3XL', '4XL', '5XL'].includes(vs.size_name);
+        const correctPrice = isPlusSize ? 90000.00 : 85000.00;
+        await sql`
+          UPDATE variant_sizes
+          SET price = ${correctPrice}
+          WHERE id = ${vs.id}
+        `;
+        console.log(`   Updated Variant 78 Size ${vs.size_name} -> ₦${correctPrice}`);
+      }
+
+      // 2. Ensure any other variant_sizes with price <= 0 get updated from product base_price (plus plus-size offset if applicable)
+      console.log('\n2️⃣ Checking for any other variant_sizes with price = 0...');
+      const zeroPrices = await sql`
+        SELECT vs.id, vs.variant_id, pv.product_id, p.name as product_name, p.base_price, s.size_name
+        FROM variant_sizes vs
+        JOIN product_variants pv ON vs.variant_id = pv.id
+        JOIN products p ON pv.product_id = p.id
+        JOIN sizes s ON vs.size_id = s.id
+        WHERE vs.price IS NULL OR vs.price <= 0
+      `;
+
+      for (const zp of zeroPrices) {
+        const isPlusSize = ['3XL', '4XL', '5XL'].includes(zp.size_name);
+        const base = Number(zp.base_price) || 0;
+        const plusOffset = isPlusSize ? 5000 : 0;
+        const resolvedPrice = base + plusOffset;
+        await sql`
+          UPDATE variant_sizes
+          SET price = ${resolvedPrice}
+          WHERE id = ${zp.id}
+        `;
+        console.log(`   Updated Product ${zp.product_id} (${zp.product_name}) Size ${zp.size_name} -> ₦${resolvedPrice}`);
+      }
+
+      // 3. Update PostgreSQL stored function get_cart_items_optimized
+      console.log('\n3️⃣ Updating stored procedure public.get_cart_items_optimized...');
+      await sql.unsafe(`
 CREATE OR REPLACE FUNCTION public.get_cart_items_optimized(p_cart_id INTEGER)
 RETURNS TABLE (
   cart_item_id INTEGER,
@@ -80,7 +132,8 @@ BEGIN
       jsonb_build_object(
         'size_id', s.id,
         'size_name', s.size_name,
-        'stock_quantity', vs.stock_quantity
+        'stock_quantity', vs.stock_quantity,
+        'price', vs.price
       ) ORDER BY s.id
     ) as sizes_array
     FROM variant_sizes vs
@@ -147,12 +200,16 @@ BEGIN
   WHERE ci.cart_id = p_cart_id AND ci.deleted_at IS NULL;
 END;
 $$ LANGUAGE plpgsql;
-    `;
-    console.log("Corrected get_cart_items_optimized!");
-  } catch (e) {
-    console.error(e);
+      `);
+      console.log('   ✅ Stored procedure public.get_cart_items_optimized updated successfully!');
+    });
+
+    console.log('\n🎉 All database size pricing and cart fixes applied successfully!');
+  } catch (err) {
+    console.error('❌ Error executing database fixes:', err);
   } finally {
-    process.exit(0);
+    await sql.end();
   }
 }
-fix();
+
+fixSizePricesAndStoredProc();

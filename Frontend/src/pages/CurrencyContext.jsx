@@ -4,7 +4,7 @@ export const CurrencyContext = createContext();
 
 export const CurrencyProvider = ({ children }) => {
   const [currency, setCurrency] = useState('NGN');
-  const [exchangeRate, setExchangeRate] = useState(1529.26);
+  const [exchangeRate, setExchangeRate] = useState(0.000735);
   const [country, setCountry] = useState('Nigeria');
   const [contextLoading, setContextLoading] = useState(true);
 
@@ -25,47 +25,45 @@ export const CurrencyProvider = ({ children }) => {
 
       const savedExchangeRate = localStorage.getItem('exchangeRate');
       if (savedExchangeRate) {
-        const { rate, timestamp, currency: savedCurrency } = JSON.parse(savedExchangeRate);
-        const isRecent = Date.now() - timestamp < 24 * 60 * 60 * 1000; // 24 hours
-        if (isRecent && savedCurrency === mappedCurrency) {
-          setExchangeRate(rate);
-          setContextLoading(false);
-          console.log('Using cached exchange rate:', { currency: mappedCurrency, rate, country: name });
-          return;
-        }
+        try {
+          const { rate, timestamp, currency: savedCurrency } = JSON.parse(savedExchangeRate);
+          const isRecent = Date.now() - timestamp < 24 * 60 * 60 * 1000; // 24 hours
+          if (isRecent && savedCurrency === mappedCurrency && rate > 0) {
+            setExchangeRate(rate);
+            setContextLoading(false);
+            console.log('Using cached exchange rate:', { currency: mappedCurrency, rate, country: name });
+            return;
+          }
+        } catch (e) {}
       }
 
-      if (mappedCurrency === 'USD') {
+      if (mappedCurrency === 'NGN') {
         setExchangeRate(1);
-        localStorage.setItem('exchangeRate', JSON.stringify({ rate: 1, timestamp: Date.now(), currency: mappedCurrency }));
-      } else if (mappedCurrency === 'NGN') {
+        localStorage.setItem('exchangeRate', JSON.stringify({ rate: 1, timestamp: Date.now(), currency: 'NGN' }));
+      } else {
         try {
           const apiKey = import.meta.env.VITE_EXCHANGERATE_API_KEY;
           if (!apiKey) {
             throw new Error('API key is missing');
           }
-          const response = await fetch(`https://api.exchangerate-api.com/v4/latest/USD?apiKey=${apiKey}`);
+          const response = await fetch(`https://v6.exchangerate-api.com/v6/${apiKey}/latest/NGN`);
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
           const data = await response.json();
-          const rate = data.rates[mappedCurrency] || 1529.26;
+          const rate = data.conversion_rates?.USD || 0.000735;
           setExchangeRate(rate);
           localStorage.setItem('exchangeRate', JSON.stringify({ rate, timestamp: Date.now(), currency: mappedCurrency }));
           console.log('Exchange rate fetched:', { currency: mappedCurrency, rate, country: name });
         } catch (err) {
           console.error('Error initializing exchange rate:', err.message);
-          const fallbackRate = 1529.26;
+          const fallbackRate = 0.000735;
           setExchangeRate(fallbackRate);
           localStorage.setItem('exchangeRate', JSON.stringify({ rate: fallbackRate, timestamp: Date.now(), currency: mappedCurrency }));
         }
-      } else {
-        // For other currencies (e.g., GBP), use USD for now as per requirement
-        setExchangeRate(1);
-        localStorage.setItem('exchangeRate', JSON.stringify({ rate: 1, timestamp: Date.now(), currency: mappedCurrency }));
       }
       setContextLoading(false);
-      console.log('Context initialized:', { currency: mappedCurrency, exchangeRate: exchangeRate || 1529.26, country: name });
+      console.log('Context initialized:', { currency: mappedCurrency, exchangeRate: exchangeRate || 0.000735, country: name });
     };
 
     initializeCurrency();

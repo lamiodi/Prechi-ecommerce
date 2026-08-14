@@ -129,6 +129,7 @@ export const CartDrawerProvider = ({ children }) => {
           variant_id: productPayload.variant_id,
           size_id: productPayload.size_id,
           quantity: productPayload.quantity || 1,
+          price: productPayload.price,
           bundle_id: productPayload.bundle_id,
           items: productPayload.items
         }, {

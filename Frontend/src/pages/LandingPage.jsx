@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from 'react';
-import { Link } from 'react-router-dom';
+
 import axios from 'axios';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowUpRight } from '@phosphor-icons/react';
-import { Button } from '../components/ui/button';
+
+
 import Navbar2 from '../components/Navbar2';
 import { CurrencyContext } from '../pages/CurrencyContext';
 import NewsletterForm from '../components/NewsletterForm';
@@ -190,13 +190,7 @@ const LandingPage = () => {
                   Explore the collection
                 </h2>
               </div>
-              <Link
-                to="/shop"
-                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-display font-medium tracking-[0.04em] uppercase text-text-secondary hover:text-text-primary transition-colors duration-300 group"
-              >
-                Shop all
-                <ArrowUpRight size={14} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Link>
+
             </div>
           </div>
 
@@ -212,14 +206,7 @@ const LandingPage = () => {
               ))}
             </div>
 
-            {/* Mobile shop all */}
-            <div className="flex sm:hidden justify-center mt-8">
-              <Button asChild variant="outline" size="sm" className="w-full max-w-[200px]">
-                <Link to="/shop">
-                  Shop all categories
-                </Link>
-              </Button>
-            </div>
+
           </div>
         </section>
 

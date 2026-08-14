@@ -785,9 +785,9 @@ export const getOrderShippingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    // Get the order to find the user
+    // Get the order to find the address_id and user_id
     const [order] = await sql`
-      SELECT user_id
+      SELECT user_id, address_id
       FROM orders 
       WHERE id = ${orderId}
     `;
@@ -796,17 +796,28 @@ export const getOrderShippingAddress = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    // Get the user's default shipping address
-    const [address] = await sql`
-      SELECT 
-        a.*,
-        ${orderId} AS order_id
-      FROM addresses a
-      WHERE a.user_id = ${order.user_id}
-      AND a.deleted_at IS NULL
-      ORDER BY a.is_default DESC, a.created_at DESC
-      LIMIT 1
-    `;
+    let address = null;
+    if (order.address_id) {
+      [address] = await sql`
+        SELECT a.*, ${orderId} AS order_id
+        FROM addresses a
+        WHERE a.id = ${order.address_id}
+      `;
+    }
+
+    // Fallback if address_id was not populated or deleted
+    if (!address && order.user_id) {
+      [address] = await sql`
+        SELECT 
+          a.*,
+          ${orderId} AS order_id
+        FROM addresses a
+        WHERE a.user_id = ${order.user_id}
+        AND a.deleted_at IS NULL
+        ORDER BY a.is_default DESC, a.created_at DESC
+        LIMIT 1
+      `;
+    }
 
     if (!address) {
       return res.status(404).json({ error: 'Shipping address not found' });
@@ -823,9 +834,9 @@ export const getOrderBillingAddress = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    // Get the order to find the user
+    // Get the order to find the billing_address_id and user_id
     const [order] = await sql`
-      SELECT user_id
+      SELECT user_id, billing_address_id
       FROM orders 
       WHERE id = ${orderId}
     `;
@@ -834,17 +845,28 @@ export const getOrderBillingAddress = async (req, res) => {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    // Get the user's default billing address
-    const [address] = await sql`
-      SELECT 
-        a.*,
-        ${orderId} AS order_id
-      FROM billing_addresses a
-      WHERE a.user_id = ${order.user_id}
-      AND a.deleted_at IS NULL
-      ORDER BY a.created_at DESC
-      LIMIT 1
-    `;
+    let address = null;
+    if (order.billing_address_id) {
+      [address] = await sql`
+        SELECT a.*, ${orderId} AS order_id
+        FROM billing_addresses a
+        WHERE a.id = ${order.billing_address_id}
+      `;
+    }
+
+    // Fallback if billing_address_id was not populated
+    if (!address && order.user_id) {
+      [address] = await sql`
+        SELECT 
+          a.*,
+          ${orderId} AS order_id
+        FROM billing_addresses a
+        WHERE a.user_id = ${order.user_id}
+        AND a.deleted_at IS NULL
+        ORDER BY a.created_at DESC
+        LIMIT 1
+      `;
+    }
 
     if (!address) {
       return res.status(404).json({ error: 'Billing address not found' });

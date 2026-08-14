@@ -579,9 +579,6 @@ const ProductDetails = () => {
     const config = getPricingSplitConfig(productData);
     if (!config) return getSizeSpecificPrice();
 
-    const pieceObj = config.pieces?.find((p) => p.id === selectedPieceId) || config.pieces?.[0];
-    const basePiecePrice = pieceObj ? pieceObj.price : getSizeSpecificPrice();
-
     const sizes = Array.isArray(selectedVariant?.sizes) ? selectedVariant.sizes : [];
     const defaultSizeObj = sizes.find((s) => s.size_name === 'S' || s.size_name === 'M') || sizes[0];
     
@@ -594,6 +591,18 @@ const ProductDetails = () => {
     const currentSizeObj = sizes.find((s) => s.size_name === selectedSize);
     const currentSizePrice = parseSizePrice(currentSizeObj);
     const sizeOffset = Math.max(0, currentSizePrice - defaultSizePrice);
+
+    const pieceObj = config.pieces?.find((p) => p.id === selectedPieceId) || config.pieces?.[0];
+    let basePiecePrice = 0;
+    if (pieceObj) {
+      if (pieceObj.id === 'full') {
+        basePiecePrice = defaultSizePrice > 0 ? defaultSizePrice : pieceObj.price;
+      } else {
+        basePiecePrice = pieceObj.price;
+      }
+    } else {
+      basePiecePrice = getSizeSpecificPrice();
+    }
 
     const addonsPrice = (config.addons || [])
       .filter((a) => selectedAddonIds.includes(a.id))
@@ -687,6 +696,7 @@ const ProductDetails = () => {
         selectedSize={selectedSize}
         isProduct={isProduct}
         currentUrl={window.location.href}
+        price={parsedPrice}
       />
       <Navbar2 />
 
@@ -880,8 +890,9 @@ const ProductDetails = () => {
                       const isSelected = selectedSize === sz.size_name;
                       const isOut = sz.stock_quantity <= 0;
                       const szPrice = Number(sz.price) > 0 ? Number(sz.price) : Number(data?.price || 0);
-                      const baseP = Number(data?.price || 0);
-                      const priceDiff = szPrice - baseP;
+                      const baseSizeObj = sizeOptions.find((s) => s.size_name === 'S' || s.size_name === 'M') || sizeOptions[0];
+                      const baseSizePrice = Number(baseSizeObj?.price) > 0 ? Number(baseSizeObj.price) : Number(data?.price || 0);
+                      const priceDiff = szPrice - baseSizePrice;
 
                       return (
                         <button
