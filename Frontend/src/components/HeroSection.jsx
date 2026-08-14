@@ -52,9 +52,9 @@ const HeroSection = () => {
         >
           <source src={videoSrc} type="video/mp4" />
         </video>
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-Primarycolor/40 to-transparent" />
+        {/* Gradient overlays (optimized for 20% higher video visibility while maintaining text legibility) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor/80 via-Primarycolor/24 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-Primarycolor/30 to-transparent" />
       </motion.div>
 
       {/* Parallax Content */}
