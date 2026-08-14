@@ -367,6 +367,16 @@ export default function Navbar2() {
 
             {/* Bottom actions */}
             <div className="mt-auto pt-6 border-t border-white/10 flex flex-col gap-1">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openCart();
+                }}
+                className="flex items-center gap-3 text-white/80 hover:text-white py-2.5 text-sm font-display transition-colors w-full text-left"
+              >
+                <ShoppingBag size={18} weight="light" />
+                Shopping Bag {totalCartCount > 0 && `(${totalCartCount})`}
+              </button>
               {user ? (
                 <>
                   <Link

@@ -149,10 +149,14 @@ export const CartDrawerProvider = ({ children }) => {
     const userId = getUserId();
     const token = user?.token || localStorage.getItem('token');
 
+    const prevCart = cart;
+    const remaining = (cart.items || []).filter(i => i.id !== itemId);
+    const subtotal = remaining.reduce((acc, curr) => acc + (curr.quantity * (Number(curr.item?.price) || Number(curr.price) || 0)), 0);
+    const updatedCart = { ...cart, items: remaining, subtotal };
+    setCart(updatedCart);
+
     if (!token || !userId) {
-      const remaining = (cart.items || []).filter(i => i.id !== itemId);
-      const subtotal = remaining.reduce((acc, curr) => acc + (curr.quantity * (curr.item?.price || 0)), 0);
-      saveGuestCart({ items: remaining, subtotal });
+      saveGuestCart(updatedCart);
       return;
     }
 
@@ -160,8 +164,8 @@ export const CartDrawerProvider = ({ children }) => {
       await axios.delete(`${API_BASE_URL}/api/cart/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await fetchCart();
     } catch (err) {
+      setCart(prevCart);
       toast.error('Could not remove item');
     }
   };
@@ -171,10 +175,14 @@ export const CartDrawerProvider = ({ children }) => {
     const userId = getUserId();
     const token = user?.token || localStorage.getItem('token');
 
+    const prevCart = cart;
+    const updated = (cart.items || []).map(i => i.id === itemId ? { ...i, quantity: newQuantity } : i);
+    const subtotal = updated.reduce((acc, curr) => acc + (curr.quantity * (Number(curr.item?.price) || Number(curr.price) || 0)), 0);
+    const updatedCart = { ...cart, items: updated, subtotal };
+    setCart(updatedCart);
+
     if (!token || !userId) {
-      const updated = (cart.items || []).map(i => i.id === itemId ? { ...i, quantity: newQuantity } : i);
-      const subtotal = updated.reduce((acc, curr) => acc + (curr.quantity * (curr.item?.price || 0)), 0);
-      saveGuestCart({ items: updated, subtotal });
+      saveGuestCart(updatedCart);
       return;
     }
 
@@ -182,8 +190,8 @@ export const CartDrawerProvider = ({ children }) => {
       await axios.put(`${API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      await fetchCart();
     } catch (err) {
+      setCart(prevCart);
       toast.error('Could not update quantity');
     }
   };
