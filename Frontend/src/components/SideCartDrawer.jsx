@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash, Plus, Minus, ShoppingBag, ArrowRight, Sparkle } from '@phosphor-icons/react';
 import { useCartDrawer } from '../context/CartDrawerContext';
@@ -16,6 +16,14 @@ const SideCartDrawer = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [addingId, setAddingId] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close cart drawer automatically on route changes
+  useEffect(() => {
+    if (isCartOpen) {
+      closeCart();
+    }
+  }, [location.pathname]);
 
   const currencyContext = useContext(CurrencyContext) || {
     currency: 'NGN',
@@ -38,7 +46,10 @@ const SideCartDrawer = () => {
     if (isCartOpen) {
       document.body.style.overflow = 'hidden';
       const handleKeyDown = (e) => {
-        if (e.key === 'Escape') closeCart();
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeCart();
+        }
       };
       window.addEventListener('keydown', handleKeyDown);
       return () => {
@@ -67,12 +78,20 @@ const SideCartDrawer = () => {
   const freeShippingThresholdNGN = 50000;
   const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThresholdNGN) * 100));
 
-  const handleCheckoutClick = () => {
+  const handleCheckoutClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     closeCart();
     navigate('/checkout');
   };
 
-  const handleViewCartClick = () => {
+  const handleViewCartClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     closeCart();
     navigate('/cart');
   };
@@ -99,15 +118,19 @@ const SideCartDrawer = () => {
   return (
     <AnimatePresence>
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end font-display">
+        <div className="fixed inset-0 z-[100] flex justify-end font-display">
           {/* Backdrop overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            onClick={closeCart}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              closeCart();
+            }}
+            className="fixed inset-0 bg-black/65 backdrop-blur-sm cursor-pointer z-[100]"
             aria-hidden="true"
           />
 
@@ -120,7 +143,8 @@ const SideCartDrawer = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Shopping Bag"
-            className="relative w-full max-w-full sm:max-w-md bg-Secondarycolor h-[100dvh] shadow-2xl flex flex-col z-10 border-l border-border overscroll-contain"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-full sm:max-w-md bg-Secondarycolor h-[100dvh] shadow-2xl flex flex-col z-[101] border-l border-border overscroll-contain"
           >
             {/* Top Header */}
             <div className="px-4 py-3.5 sm:px-6 sm:py-4 border-b border-border flex items-center justify-between bg-surface flex-shrink-0">
@@ -131,8 +155,13 @@ const SideCartDrawer = () => {
                 </h2>
               </div>
               <button
-                onClick={closeCart}
-                className="h-9 w-9 flex items-center justify-center text-text-tertiary hover:text-Primarycolor hover:bg-black/5 active:scale-95 transition-all rounded-full"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  closeCart();
+                }}
+                className="h-10 w-10 -mr-2 flex items-center justify-center text-text-tertiary hover:text-Primarycolor hover:bg-black/5 active:scale-95 transition-all rounded-full cursor-pointer"
                 aria-label="Close cart drawer"
               >
                 <X size={20} />

@@ -94,6 +94,17 @@ export default function Navbar2() {
     }
   };
 
+  const handleCartClick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+    setIsMenuOpen(false);
+    openCart();
+  };
+
   // Colors based on context
   const textColor = isDark ? 'text-white' : 'text-Primarycolor';
   const hoverColor = isDark ? 'hover:text-white/70' : 'hover:text-Primarycolor/70';
@@ -101,7 +112,7 @@ export default function Navbar2() {
 
   if (loading && !loadingTimeout) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 h-16">
+      <nav className="fixed top-0 left-0 right-0 z-40 h-16">
         <div className="h-full flex items-center justify-center">
           <div className="w-5 h-5 border border-current border-t-transparent rounded-full animate-spin opacity-40" />
         </div>
@@ -112,7 +123,7 @@ export default function Navbar2() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ${
           isScrolled
             ? isDark
               ? 'bg-Primarycolor/90 backdrop-blur-xl border-b border-white/5'
@@ -259,8 +270,8 @@ export default function Navbar2() {
                 </button>
               ) : (
                 <button
-                  onClick={openCart}
-                  className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300 relative`}
+                  onClick={handleCartClick}
+                  className={`p-2 ${textColor} ${hoverColor} transition-colors duration-300 relative cursor-pointer`}
                   aria-label="Open Shopping Bag"
                 >
                   <ShoppingBag size={iconSize} weight="light" />
