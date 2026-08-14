@@ -41,16 +41,17 @@ const HeroSection = () => {
       >
         <video
           ref={videoRef}
-          src={videoSrc}
           autoPlay
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           onError={handleVideoError}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[1.2s] opacity-100"
           aria-hidden="true"
-        />
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-Primarycolor via-Primarycolor/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-Primarycolor/40 to-transparent" />
