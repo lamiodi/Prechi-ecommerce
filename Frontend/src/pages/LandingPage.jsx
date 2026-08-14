@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, Suspense, lazy, useContext } from '
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { ArrowUpRight } from '@phosphor-icons/react';
 
 
 import Navbar2 from '../components/Navbar2';

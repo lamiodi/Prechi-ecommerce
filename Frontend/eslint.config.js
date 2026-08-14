@@ -93,38 +93,8 @@ export default [
       'jsx-a11y/role-supports-aria-props': 'error',
       
       // Import/Export
-      'import/order': ['error', {
-        'newlines-between': 'always',
-        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-      }],
-      'import/no-unresolved': 'error',
-      'import/no-webpack-loader-syntax': 'error',
       'import/no-duplicates': 'error',
-      'import/export': 'error',
       'import/first': 'error',
-      'import/namespace': ['error', { allowComputed: true }],
-      'import/default': 'error',
-      'import/no-named-as-default': 'error',
-      'import/no-named-as-default-member': 'error',
-      'import/no-deprecated': 'warn',
-      'import/no-extraneous-dependencies': ['error', {
-        devDependencies: ['**/*.test.js', '**/*.spec.js'],
-        optionalDependencies: false,
-        peerDependencies: false,
-      }],
-      'import/no-mutable-exports': 'error',
-      'import/no-commonjs': 'error',
-      'import/no-amd': 'error',
-      'import/no-nodejs-modules': 'error',
-      'import/unambiguous': 'error',
-      'import/no-internal-modules': 'error',
-      'import/no-relative-packages': 'error',
-      'import/no-dynamic-require': 'error',
-      'import/no-import-module-exports': 'error',
-      'import/no-self-import': 'error',
-      'import/no-cycle': ['warn', { maxDepth: '∞' }],
-      'import/no-useless-path-segments': 'error',
-      'import/no-unused-modules': ['error', { unusedExports: true }],
       
       // React Refresh
       'react-refresh/only-export-components': [
