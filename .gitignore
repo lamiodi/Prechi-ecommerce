@@ -107,3 +107,6 @@ public/uploads/
 .cloudinary/
 Frontend/src/components/AdminUploader.jsx
 Frontend/public/products/
+
+# Pre-launch audit archive (heavy untracked image leftovers)
+_archive/2026-09-audit/frontend-src/public-products/
