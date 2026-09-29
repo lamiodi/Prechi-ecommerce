@@ -663,7 +663,7 @@ export const updateOrderStatus = async (req, res) => {
 export const setDeliveryFee = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { delivery_fee } = req.body;
+    const { delivery_fee, currency } = req.body;
 
     if (!orderId || isNaN(orderId)) {
       return res.status(400).json({ error: 'Invalid order ID' });
@@ -671,6 +671,10 @@ export const setDeliveryFee = async (req, res) => {
 
     if (typeof delivery_fee !== 'number' || isNaN(delivery_fee) || delivery_fee < 0) {
       return res.status(400).json({ error: 'Invalid delivery fee. Must be a positive number' });
+    }
+
+    if (currency && !['NGN', 'USD'].includes(currency)) {
+      return res.status(400).json({ error: 'Invalid currency. Must be NGN or USD' });
     }
 
     const [order] = await sql`
@@ -694,12 +698,14 @@ export const setDeliveryFee = async (req, res) => {
 
     const [updatedOrder] = await sql`
       UPDATE orders
-      SET delivery_fee = ${delivery_fee}, updated_at = NOW()
+      SET delivery_fee = ${delivery_fee},
+          delivery_fee_currency = ${currency || order.currency || 'NGN'},
+          updated_at = NOW()
       WHERE id = ${orderId}
       RETURNING *
     `;
 
-    console.log(`setDeliveryFee: Set fee ${delivery_fee} for order ${orderId}`);
+    console.log(`setDeliveryFee: Set fee ${delivery_fee} ${currency || order.currency || 'NGN'} for order ${orderId}`);
     res.json(updatedOrder);
   } catch (error) {
     console.error('setDeliveryFee error:', error.message, error.stack);

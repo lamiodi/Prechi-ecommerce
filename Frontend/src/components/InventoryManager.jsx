@@ -24,12 +24,13 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toastSuccess, toastError } from '../utils/toastConfig';
 import { toTitleCase } from '../lib/utils';
+import { attachAdminAuthInterceptor, getAdminAuthHeaders } from '../utils/adminAuth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://prechi-ecommerce.onrender.com';
-const api = axios.create({
+const api = attachAdminAuthInterceptor(axios.create({
   baseURL: `${API_BASE_URL}/api/inventory`,
   timeout: 15000,
-});
+}));
 
 const PRESET_CATEGORIES = ['Gymwears', 'Briefs', 'Sets', 'Bags', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Accessories'];
 const PRESET_GENDERS = ['Unisex', 'Male', 'Female'];
@@ -371,7 +372,7 @@ const InventoryManager = () => {
             `${API_BASE_URL}/api/inventory/variants/${variant.id}/media`,
             formData,
             {
-              headers: { 'Content-Type': 'multipart/form-data' },
+              headers: { 'Content-Type': 'multipart/form-data', ...getAdminAuthHeaders() },
             }
           );
         }

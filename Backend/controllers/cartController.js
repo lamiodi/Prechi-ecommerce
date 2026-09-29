@@ -366,7 +366,10 @@ export const addToCart = async (req, res) => {
           }
         }
 
-        const itemPrice = (req.body.price && Number(req.body.price) > 0) ? Number(req.body.price) : base_price;
+        // Price always comes from the server (size price when set, else product
+        // base price). Client-supplied prices are ignored so a tampered request
+        // cannot seed an underpriced cart that later flows into an order.
+        const itemPrice = base_price;
 
         // First, let's check if there are any existing items for this variant, size, and price
         const existingItems = await sql`

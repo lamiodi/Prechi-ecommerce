@@ -2,6 +2,7 @@ import sql from '../db/index.js';
 import dotenv from 'dotenv';
 import { Country } from 'country-state-city';
 import { sendAdminDeliveryFeeNotification } from '../utils/emailService.js';
+import { getAllowedItemPrices } from '../utils/pricingConfig.js';
 import logger from '../utils/logger.js';
 dotenv.config();
 
@@ -10,6 +11,18 @@ const shippingOptions = [
   { id: 2, method: 'Delivery within Lagos Mainland', total_cost: 6000, estimated_delivery: '5–7 business days' },
   { id: 3, method: 'Outside Lagos', total_cost: 7000, estimated_delivery: '7–10 business days' },
 ];
+
+// Server-side NGN→USD rate for USD orders. Never trust a client-supplied
+// exchange rate — it would let a caller shrink the validated price of an order.
+async function getServerNgnToUsdRate() {
+  try {
+    const [row] = await sql`SELECT rate FROM settings WHERE key = 'ngn_to_usd_rate' LIMIT 1`;
+    const rate = Number(row && row.rate);
+    return rate > 0 ? rate : null;
+  } catch {
+    return null; // settings table missing / query failed
+  }
+}
 
 export const createOrder = async (req, res) => {
   const {
@@ -303,6 +316,17 @@ export const createOrder = async (req, res) => {
         throw new Error('Invalid currency');
       }
 
+      // FX rate for USD orders comes from the server (settings table), never the client
+      let serverFxRate = 1;
+      if (currency === 'USD') {
+        serverFxRate = await getServerNgnToUsdRate();
+        if (!serverFxRate) {
+          const err = new Error('USD checkout is temporarily unavailable. Please place your order in NGN.');
+          err.statusCode = 400;
+          throw err;
+        }
+      }
+
       let calculatedSubtotal = 0;
       const orderItems = [];
 
@@ -340,7 +364,7 @@ export const createOrder = async (req, res) => {
         if (item.variant_id) {
           // Fetch product variant, using LEFT JOIN for sizes to handle null size_id
           const [variant] = await sql`
-            SELECT pv.id, p.name, p.base_price, 
+            SELECT pv.id, p.id AS product_id, p.name, p.base_price, p.sku_prefix,
                    (SELECT image_url FROM product_images WHERE variant_id = pv.id ORDER BY is_primary DESC, position ASC LIMIT 1) as image_url,
                    c.color_name, s.size_name
             FROM product_variants pv
@@ -386,20 +410,42 @@ export const createOrder = async (req, res) => {
             throw err;
           }
 
-          // Validate price
-          const actualBasePrice = (variantSize.price && Number(variantSize.price) > 0) ? Number(variantSize.price) : Number(variant.base_price);
-          
-          let expectedPrice;
-          if (currency === 'USD' && exchange_rate > 0) {
-            expectedPrice = Number((actualBasePrice * exchange_rate).toFixed(2));
-          } else {
-            expectedPrice = actualBasePrice;
-          }
-          
-          // Allow custom item pricing for split options and add-ons as long as item.price is positive
-          if (item.price <= 0) {
+          // ---- Server-side price authority ----
+          // Never trust the client-supplied price. Build the set of prices the
+          // storefront UI can legitimately produce for this variant/size (covers
+          // split-option pieces and add-ons) and require a match (₦1 tolerance).
+          if (!(Number(item.price) > 0)) {
             console.error(`Validation failed: Invalid price for variant ${item.variant_id}: got ${item.price} ${currency}`);
-            throw new Error(`Invalid price for variant ${item.variant_id}`);
+            const err = new Error('Invalid item price. Please refresh your cart and try again.');
+            err.statusCode = 400;
+            throw err;
+          }
+
+          const sizeRows = await sql`
+            SELECT s.size_name, vs.price
+            FROM variant_sizes vs
+            JOIN sizes s ON s.id = vs.size_id
+            WHERE vs.variant_id = ${item.variant_id}
+          `;
+
+          let allowedPrices = getAllowedItemPrices({
+            productId: variant.product_id,
+            sku: variant.sku_prefix,
+            productName: variant.name,
+            sizes: sizeRows,
+            productBasePrice: variant.base_price,
+            selectedSizeName: variant.size_name,
+          });
+          if (currency === 'USD') {
+            allowedPrices = allowedPrices.map(p => Number((p * serverFxRate).toFixed(2)));
+          }
+
+          const priceMatches = allowedPrices.some(p => Math.abs(p - Number(item.price)) <= 1);
+          if (!priceMatches) {
+            console.error(`Validation failed: Price mismatch for variant ${item.variant_id}: got ${item.price} ${currency}, allowed: ${allowedPrices.join(', ')}`);
+            const err = new Error('An item price in your cart has changed. Please refresh your cart and try again.');
+            err.statusCode = 400;
+            throw err;
           }
 
           calculatedSubtotal += item.price * item.quantity;
@@ -503,8 +549,8 @@ export const createOrder = async (req, res) => {
           // Validate bundle price — account for 5-in-1 bundles which cost 1.5x the base bundle_price
           const bundlePriceMultiplier = (item.bundle_items && item.bundle_items.length === 5) ? 1.5 : 1;
           const baseBundlePrice = Number(bundle.bundle_price) * bundlePriceMultiplier;
-          const expectedPrice = currency === 'USD' && exchange_rate > 0
-            ? Number((baseBundlePrice * exchange_rate).toFixed(2))
+          const expectedPrice = currency === 'USD'
+            ? Number((baseBundlePrice * serverFxRate).toFixed(2))
             : baseBundlePrice;
           if (Math.abs(expectedPrice - item.price) > 1) { // Allow ₦1 tolerance for rounding
             console.error(`Validation failed: Price mismatch for bundle ${item.bundle_id}: expected ${expectedPrice} ${currency}, got ${item.price} ${currency}`);
@@ -523,11 +569,16 @@ export const createOrder = async (req, res) => {
         }
       }
 
-      // Enforce canonical shipping cost and discount validation
+      // Enforce canonical shipping cost — never trust the client-supplied shipping_cost
       const canonicalOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
       let validatedShippingCost = 0;
       if (delivery_option === 'standard' && address.country.toLowerCase() === 'nigeria') {
-        validatedShippingCost = canonicalOption ? canonicalOption.total_cost : (shipping_cost > 0 ? shipping_cost : 4000);
+        if (!canonicalOption) {
+          const err = new Error('Invalid shipping method selected. Please choose a delivery option and try again.');
+          err.statusCode = 400;
+          throw err;
+        }
+        validatedShippingCost = canonicalOption.total_cost;
         calculatedSubtotal += validatedShippingCost;
       } else if (delivery_option === 'international') {
         validatedShippingCost = 0;
@@ -536,7 +587,9 @@ export const createOrder = async (req, res) => {
       // Discount validation - coupons/discounts are currently disabled
       const validatedDiscount = 0;
 
-      const calculatedTax = tax || (delivery_option === 'international' ? Number((calculatedSubtotal * 0.05).toFixed(2)) : 0);
+      // Tax is always computed server-side (5% for international orders); the
+      // client-supplied tax value is ignored.
+      const calculatedTax = delivery_option === 'international' ? Number((calculatedSubtotal * 0.05).toFixed(2)) : 0;
       const calculatedTotal = Number((calculatedSubtotal - validatedDiscount + calculatedTax).toFixed(2));
 
       if (calculatedTotal <= 0) {
@@ -562,9 +615,9 @@ export const createOrder = async (req, res) => {
             delivery_fee_paid, idempotency_key
           ) VALUES (
             ${user_id}, ${finalAddressId}, ${finalBillingAddressId}, ${finalCartId},
-            ${calculatedSubtotal - shipping_cost}, ${total}, ${discount}, 
-            ${calculatedTax}, ${shippingMethodName}, ${shipping_cost},
-            ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note || null}, 
+            ${calculatedSubtotal - validatedShippingCost}, ${total}, ${validatedDiscount},
+            ${calculatedTax}, ${shippingMethodName}, ${validatedShippingCost},
+            ${payment_method}, 'pending', 'pending', ${currency}, ${reference}, ${note || null},
             ${address.country.toLowerCase() === 'nigeria' ? true : false}, ${idempotencyKey || null}
           )
           RETURNING id
@@ -798,20 +851,36 @@ export const verifyOrderByReference = async (req, res) => {
 export const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
+    const requester = req.user;
+
+    if (!requester) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // First try without deleted_at
+    let [order] = await sql`SELECT id, user_id, payment_status, status FROM orders WHERE id = ${orderId}`;
+
+    // If order exists and has deleted_at column, check it's null
+    if (order && 'deleted_at' in order) {
+      [order] = await sql`SELECT id, user_id, payment_status, status FROM orders WHERE id = ${orderId} AND deleted_at IS NULL`;
+    }
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Authorization: admins may cancel any order; customers only their own pending ones.
+    // Cancelling restores stock, so an unguarded route here would let anyone
+    // cancel paid orders or inflate inventory.
+    const isOwner = Number(order.user_id) === Number(requester.id);
+    if (!requester.isAdmin && !isOwner) {
+      return res.status(403).json({ error: 'You can only cancel your own orders' });
+    }
+    if (!requester.isAdmin && order.payment_status !== 'pending') {
+      return res.status(403).json({ error: 'Paid orders can only be cancelled by customer support' });
+    }
 
     await sql.begin(async (sql) => {
-      // First try without deleted_at
-      let [order] = await sql`SELECT * FROM orders WHERE id = ${orderId}`;
-
-      // If order exists and has deleted_at column, check it's null
-      if (order && 'deleted_at' in order) {
-        [order] = await sql`SELECT * FROM orders WHERE id = ${orderId} AND deleted_at IS NULL`;
-      }
-
-      if (!order) {
-        throw new Error('Order not found');
-      }
-
       const items = await sql`SELECT * FROM order_items WHERE order_id = ${orderId}`;
 
       for (const item of items) {

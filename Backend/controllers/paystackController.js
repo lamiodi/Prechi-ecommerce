@@ -158,13 +158,13 @@ export const verifyPayment = async (req, res) => {
 
     const { status, data } = response.data;
 
-    if (!status || data.status !== 'success') {
-      console.error(`Payment not successful for reference=${reference}`);
+    if (!status || data.status === 'failed') {
+      console.error(`Payment failed for reference=${reference}`);
 
-      // Restock items if payment failed
+      // Restock items only on a definitive Paystack failure
       const orderItems = await sql`
         SELECT variant_id, size_id, quantity, bundle_id, bundle_details
-        FROM order_items 
+        FROM order_items
         WHERE order_id = ${order.id}
       `;
 
@@ -191,7 +191,7 @@ export const verifyPayment = async (req, res) => {
         }
 
         await sql`
-          UPDATE orders 
+          UPDATE orders
           SET payment_status = 'failed', updated_at = NOW()
           WHERE reference = ${reference} AND payment_status = 'pending'
         `;
@@ -203,6 +203,19 @@ export const verifyPayment = async (req, res) => {
 
       const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
       return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=failed`);
+    }
+
+    if (data.status !== 'success') {
+      // 'abandoned' / 'ongoing': the customer can still complete this payment
+      // from the same authorization URL, so the order stays pending — do NOT
+      // restock or mark it failed (otherwise a later success would charge the
+      // customer for an order stuck in 'failed').
+      console.warn(`Payment still pending at Paystack (status: ${data.status}) for reference=${reference}`);
+      if (wantsJson) {
+        return res.status(200).json({ message: `Payment not completed yet (status: ${data.status})`, paymentStatus: 'pending', order });
+      }
+      const frontendUrl = process.env.FRONTEND_URL || 'https://prechi-ecommerce.onrender.com';
+      return res.redirect(`${frontendUrl}/thank-you?reference=${reference}&status=pending`);
     }
 
     // Verify amount and currency against database order
@@ -287,19 +300,19 @@ export const verifyPayment = async (req, res) => {
 
 export const initializeDeliveryFeePayment = async (req, res) => {
   try {
-    const { order_id, delivery_fee, currency, callback_url } = req.body;
-    console.log(`💳 Initializing Paystack delivery fee payment: order_id=${order_id}, delivery_fee=${delivery_fee}, currency=${currency}`);
+    const { order_id, callback_url } = req.body;
+    console.log(`💳 Initializing Paystack delivery fee payment: order_id=${order_id}`);
 
-    if (!order_id || !delivery_fee || !currency) {
+    if (!order_id) {
       console.error('Missing required fields for delivery fee payment initialization');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const orderCheck = await sql`
-      SELECT 
-        o.id, o.total, o.currency, o.payment_status, 
+      SELECT
+        o.id, o.total, o.currency, o.payment_status,
         a.country as shipping_country,
-        o.delivery_fee, o.delivery_fee_paid,
+        o.delivery_fee, o.delivery_fee_currency, o.delivery_fee_paid,
         u.email as user_email, u.first_name as user_first_name, u.is_temporary,
         ba.email as billing_email, ba.full_name as billing_full_name,
         COALESCE(u.email, ba.email) as email,
@@ -333,14 +346,19 @@ export const initializeDeliveryFeePayment = async (req, res) => {
       return res.status(400).json({ error: 'Delivery fee already paid for this order' });
     }
 
+    // Security: the fee amount and currency come from the order row (set by an
+    // admin via PUT /api/admin/orders/:orderId/delivery-fee). Client-supplied
+    // amounts are ignored — otherwise anyone could initialize a ₦0.01 charge
+    // and have the delivery fee marked as paid.
+    const deliveryFee = Number(order.delivery_fee);
+    if (!deliveryFee || deliveryFee <= 0) {
+      console.error(`No delivery fee set for order: ${order_id}`);
+      return res.status(400).json({ error: 'No delivery fee has been set for this order yet' });
+    }
+    const feeCurrency = order.delivery_fee_currency || order.currency || 'NGN';
+
     const timestamp = Date.now();
     const reference = `DF-${order_id}-${timestamp}`;
-
-    await sql`
-      UPDATE orders
-      SET delivery_fee = ${delivery_fee}, updated_at = NOW()
-      WHERE id = ${order_id}
-    `;
 
     const defaultCallbackUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/delivery-fee-thank-you`;
     const finalCallbackUrl = callback_url || defaultCallbackUrl;
@@ -349,8 +367,8 @@ export const initializeDeliveryFeePayment = async (req, res) => {
       `${PAYSTACK_BASE_URL}/transaction/initialize`,
       {
         email: order.email,
-        amount: Math.round(delivery_fee * 100), // Convert to kobo/cents
-        currency,
+        amount: Math.round(deliveryFee * 100), // Convert to kobo/cents
+        currency: feeCurrency,
         reference,
         callback_url: finalCallbackUrl,
         metadata: {
@@ -406,8 +424,8 @@ export const initializeDeliveryFeePayment = async (req, res) => {
         finalEmail,
         finalName,
         order_id,
-        delivery_fee,
-        currency,
+        deliveryFee,
+        feeCurrency,
         authorization_url
       );
       console.log('✅ Sent delivery fee payment link email:', {
@@ -430,7 +448,8 @@ export const initializeDeliveryFeePayment = async (req, res) => {
       authorization_url,
       access_code,
       reference: paystackReference,
-      delivery_fee,
+      delivery_fee: deliveryFee,
+      currency: feeCurrency,
       emailSent
     });
   } catch (err) {
@@ -464,8 +483,8 @@ export const verifyDeliveryFeePayment = async (req, res) => {
     console.log(`🔎 Verifying Paystack delivery fee payment: reference=${reference}, order_id=${order_id}`);
 
     const orderCheck = await sql`
-      SELECT 
-        o.id, o.user_id, o.delivery_fee, o.delivery_fee_paid, o.currency,
+      SELECT
+        o.id, o.user_id, o.delivery_fee, o.delivery_fee_currency, o.delivery_fee_paid, o.currency,
         u.email as user_email, u.first_name as user_first_name, u.is_temporary,
         ba.email as billing_email, ba.full_name as billing_full_name,
         COALESCE(u.email, ba.email) as email,
@@ -503,12 +522,25 @@ export const verifyDeliveryFeePayment = async (req, res) => {
 
     const { status, data } = response.data;
 
+    // Security: verify the paid amount and currency match the fee stored on the
+    // order — the verification endpoint must not trust status alone.
+    const expectedAmountInKobo = Math.round(Number(order.delivery_fee) * 100);
+    const feeCurrency = order.delivery_fee_currency || order.currency;
+
     if (!status || data.status !== 'success') {
       console.error(`Delivery fee payment not successful for reference=${reference}`);
       if (req.method === 'GET') {
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/delivery-fee-thank-you?reference=${reference}&status=failed&type=delivery_fee`);
       }
       return res.status(400).json({ error: 'Delivery fee payment not successful', order });
+    }
+
+    if (Math.abs(Number(data.amount) - expectedAmountInKobo) > 1 || data.currency !== feeCurrency) {
+      console.error(`Security alert: Delivery fee amount mismatch for reference=${reference}. Expected: ${expectedAmountInKobo} ${feeCurrency}, got: ${data.amount} ${data.currency}`);
+      if (req.method === 'GET') {
+        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/delivery-fee-thank-you?reference=${reference}&status=failed&type=delivery_fee`);
+      }
+      return res.status(400).json({ error: 'Delivery fee payment amount or currency mismatch' });
     }
 
     await sql`

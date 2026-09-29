@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 function ContactWhatsAppWidget() {
   const [formData, setFormData] = useState({ name: '', message: '' });

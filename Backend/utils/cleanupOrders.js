@@ -1,5 +1,6 @@
 import sql from '../db/index.js';
 import cron from 'node-cron';
+import { cleanTmp } from './cleanTmp.js';
 
 export const cleanupOldOrders = async () => {
   try {
@@ -79,5 +80,8 @@ export const cleanupOldOrders = async () => {
   }
 };
 
-// Schedule to run daily at midnight
-cron.schedule('0 0 * * *', cleanupOldOrders);
+// Schedule to run daily at midnight (order cleanup + stale tmp-file cleanup)
+cron.schedule('0 0 * * *', async () => {
+  await cleanupOldOrders();
+  await cleanTmp().catch(err => console.error('cleanTmp failed:', err.message));
+});

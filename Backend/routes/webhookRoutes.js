@@ -25,7 +25,7 @@ router.post('/webhook', async (req, res) => {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Validate Paystack signature
+    // Validate Paystack signature (constant-time comparison to prevent timing attacks)
     if (!req.rawBody) {
       console.error('Raw body not available');
       return res.status(400).json({ error: 'Invalid request' });
@@ -36,7 +36,12 @@ router.post('/webhook', async (req, res) => {
       .update(req.rawBody)
       .digest('hex');
 
-    if (hash !== req.headers['x-paystack-signature']) {
+    const expectedSignature = Buffer.from(hash, 'hex');
+    const receivedSignature = Buffer.from(String(req.headers['x-paystack-signature'] || ''), 'hex');
+    if (
+      receivedSignature.length !== expectedSignature.length ||
+      !crypto.timingSafeEqual(expectedSignature, receivedSignature)
+    ) {
       console.error('Invalid Paystack webhook signature');
       return res.status(400).json({ error: 'Invalid signature' });
     }
@@ -44,6 +49,14 @@ router.post('/webhook', async (req, res) => {
     // Parse the raw body
     const payload = JSON.parse(req.rawBody.toString('utf8'));
     const { event, data } = payload;
+
+    // Some Paystack events carry no reference — ack and ignore them so Paystack
+    // does not retry indefinitely.
+    if (!data || typeof data.reference !== 'string' || !data.reference) {
+      console.warn(`Webhook event without reference ignored: ${event}`);
+      return res.status(200).json({ message: 'Event ignored' });
+    }
+
     const reference = data.reference;
 
     // Validate reference format
@@ -400,13 +413,5 @@ async function sendOrderConfirmationEmailHelper(orderDetails) {
     console.error('Email error details:', emailError.response?.data || emailError);
   }
 }
-
-// Test endpoint to verify webhook route is working
-router.get('/test', (req, res) => {
-  res.status(200).json({
-    message: 'Webhook endpoint is working',
-    timestamp: new Date().toISOString()
-  });
-});
 
 export default router;

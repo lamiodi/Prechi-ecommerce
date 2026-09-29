@@ -20,11 +20,16 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-icons': ['@phosphor-icons/react', 'lucide-react'],
-          'utils': ['axios', 'uuid', 'date-fns', 'framer-motion', 'clsx', 'tailwind-merge'],
+          'utils': ['axios', 'uuid', 'date-fns', 'motion', 'clsx', 'tailwind-merge'],
         }
       }
     },
     chunkSizeWarningLimit: 800
+  },
+  esbuild: {
+    // Keep error/warn for prod debugging; strip noisy/debug statements
+    pure: ['console.log', 'console.debug', 'console.info'],
+    drop: ['debugger'],
   }
 });
 

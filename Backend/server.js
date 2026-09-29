@@ -42,7 +42,9 @@ const requiredEnvVars = [
   'CLOUDINARY_API_SECRET',
   'RESEND_API_KEY',
   'PAYSTACK_SECRET_KEY',
-  'DATABASE_URL'
+  'DATABASE_URL',
+  'FRONTEND_URL',
+  'JWT_SECRET'
 ];
 
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -95,15 +97,23 @@ app.use(
 
 
 // ==== Security Middleware ====
+app.set('trust proxy', 1); // behind Render's reverse proxy — without this, express-rate-limit would key on the proxy IP and throttle all visitors collectively
 app.use(helmet());
 app.use(hpp());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 300, // per IP per window
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  skip: (req) =>
+    // Never rate-limit Paystack webhooks or health probes — Paystack retries
+    // on non-200 and throttling here can drop payment events.
+    req.path.startsWith('/api/webhooks') ||
+    req.path === '/health' ||
+    req.path === '/healthz' ||
+    req.path === '/',
 });
 
 // Apply rate limiting to all requests
@@ -163,6 +173,11 @@ app.get("/health", (req, res) =>
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() })
 );
 app.get("/healthz", (req, res) => res.status(200).json({ status: "ok" }));
+
+// ==== 404 for unmatched routes (JSON, not the Express HTML default) ====
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found', path: req.originalUrl });
+});
 
 // ==== Error Handler ====
 app.use(errorMiddleware);

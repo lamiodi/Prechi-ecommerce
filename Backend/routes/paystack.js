@@ -16,7 +16,8 @@ const router = express.Router();
 // Initialize payment
 router.post('/initialize', initializePayment);
 
-// Verify payment (callback from Paystack)
+// Verify payment (callback from Paystack). GET only — the POST variant was
+// dead code: the controller read the reference from req.query exclusively.
 router.get('/verify', verifyPayment);
 
 

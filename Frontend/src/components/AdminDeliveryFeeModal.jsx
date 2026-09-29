@@ -56,12 +56,18 @@ const AdminDeliveryFeeModal = ({
       const frontendUrl = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
       const callbackUrl = `${frontendUrl.replace(/\/$/, '')}/delivery-fee-thank-you`;
 
+      // Save the fee on the order first (admin-only endpoint). Payment
+      // initialization reads the amount/currency from the DB — the public
+      // initialize endpoint no longer accepts client-supplied amounts.
+      await authApi.put(`/api/admin/orders/${selectedOrder.id}/delivery-fee`, {
+        delivery_fee: Number(deliveryFee),
+        currency,
+      });
+
       const response = await authApi.post(
         '/api/paystack/delivery-fee/initialize',
         {
           order_id: selectedOrder.id,
-          delivery_fee: deliveryFee,
-          currency: currency,
           callback_url: callbackUrl
         }
       );

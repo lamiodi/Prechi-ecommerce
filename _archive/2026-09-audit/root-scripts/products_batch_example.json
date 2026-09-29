@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Sample WhatsApp Product 1",
+    "description": "High quality product description from WhatsApp",
+    "base_price": 75000,
+    "sku_prefix": "SW1",
+    "category": "sets",
+    "gender": "unisex",
+    "is_new_release": true,
+    "images": [
+      "/products/sample1.jpg"
+    ],
+    "variants": [
+      {
+        "name": "Black",
+        "color_id": 1,
+        "sizes": [
+          { "size_id": 1, "stock_quantity": 10, "price": 75000 },
+          { "size_id": 2, "stock_quantity": 15, "price": 75000 },
+          { "size_id": 3, "stock_quantity": 15, "price": 75000 },
+          { "size_id": 4, "stock_quantity": 10, "price": 80000 }
+        ]
+      }
+    ]
+  }
+]

@@ -2,6 +2,7 @@
 import express from 'express';
 import { getProductById, uploadProduct } from '../controllers/productController.js';
 import { getShopAll } from '../controllers/shop/getShopAll.js';
+import { authenticateToken, requireAdmin } from '../middleware/authMiddleware.js';
 import upload from '../utils/multer.js';
 
 const router = express.Router();
@@ -21,6 +22,7 @@ const multiFieldUpload = upload.fields([
 
 router.get('/', getShopAll);
 router.get('/:id', getProductById);
-router.post('/', multiFieldUpload, uploadProduct);
+// Product creation is admin-only (was previously unauthenticated)
+router.post('/', authenticateToken, requireAdmin, multiFieldUpload, uploadProduct);
 
 export default router;

@@ -1,7 +1,9 @@
 // Jest configuration for backend testing
 export default {
   testEnvironment: 'node',
-  transform: {},
+  transform: {
+    '^.+\.js$': 'babel-jest',
+  },
   testMatch: [
     '**/tests/**/*.test.js',
     '**/tests/**/*.spec.js'

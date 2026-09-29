@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle, Loader2, AlertCircle, Info } from 'lucide-react';
+import { attachAdminAuthInterceptor } from '../utils/adminAuth';
 
 // Define API_BASE_URL with proper endpoint handling
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Create axios instance with proper configuration
-const api = axios.create({
+const api = attachAdminAuthInterceptor(axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   }
-});
+}));
 
 // Standard colors fallback in case database connection fails
 const STANDARD_COLORS = [

@@ -6,11 +6,14 @@ import {
   getOrdersByUser,
   getOrderById
 } from '../controllers/orderController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
+// Order creation is public (guest checkout); the server validates all pricing itself.
 router.post('/', createOrder);
-router.get('/verify/:reference', verifyOrderByReference); 
+router.get('/verify/:reference', verifyOrderByReference);
 
-router.delete('/:orderId', cancelOrder);
-router.get('/user/:userId', getOrdersByUser);
-router.get('/:id', getOrderById);
+// These endpoints mutate or expose order data and require authentication
+router.delete('/:orderId', authenticateToken, cancelOrder);
+router.get('/user/:userId', authenticateToken, getOrdersByUser);
+router.get('/:id', authenticateToken, getOrderById);
 export default router;

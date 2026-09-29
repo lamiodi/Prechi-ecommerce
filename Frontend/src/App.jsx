@@ -16,7 +16,6 @@ import gsap from 'gsap';
 import LandingPage from './pages/LandingPage';
 
 // Lazy load other pages
-const Home = lazy(() => import('./pages/Home'));
 const ShopAllPage = lazy(() => import('./pages/ShopAllPage'));
 const ProductDetails = lazy(() => import('./pages/ProductDetails'));
 const Cart = lazy(() => import('./pages/Cart'));
@@ -34,6 +33,7 @@ const ThankYou = lazy(() => import('./pages/ThankYou'));
 const DeliveryFeeThankYou = lazy(() => import('./pages/DeliveryFeeThankYou'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const SearchResults = lazy(() => import('./pages/SearchResults'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -111,6 +111,9 @@ function App() {
 
                     <Route path="/admin/login" element={<AdminLogin />} />
                     <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
+                    {/* Catch-all: unknown URLs get a proper 404 page */}
+                    <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AnimatePresence>
               </Suspense>
