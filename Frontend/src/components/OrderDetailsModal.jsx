@@ -33,30 +33,52 @@ const OrderDetailsModal = ({
   // Function to get shipping method icon and description
   const getShippingMethodInfo = (method) => {
     const shippingMethods = {
-      'Delivery within Lagos Island': { 
-        icon: <Truck className="w-4 h-4" />, 
+      // KTI rate-card method names (current)
+      'Lagos Island delivery': {
+        icon: <Truck className="w-4 h-4" />,
+        description: 'Bike delivery within Lagos Island',
+        estimated: 'Next working day'
+      },
+      'Lagos Mainland delivery': {
+        icon: <Package className="w-4 h-4" />,
+        description: 'Bike delivery within Lagos Mainland',
+        estimated: 'Next working day'
+      },
+      'Interstate delivery': {
+        icon: <MapPin className="w-4 h-4" />,
+        description: 'Interstate delivery (outside Lagos)',
+        estimated: '3–7 business days'
+      },
+      // Legacy method names (historical orders)
+      'Delivery within Lagos Island': {
+        icon: <Truck className="w-4 h-4" />,
         description: 'Fast delivery within Lagos Island',
         estimated: '3-5 business days'
       },
-      'Delivery within Lagos Mainland': { 
-        icon: <Package className="w-4 h-4" />, 
+      'Delivery within Lagos Mainland': {
+        icon: <Package className="w-4 h-4" />,
         description: 'Reliable delivery within Lagos Mainland',
         estimated: '5-7 business days'
       },
-      'Outside Lagos': { 
-        icon: <MapPin className="w-4 h-4" />, 
+      'Outside Lagos': {
+        icon: <MapPin className="w-4 h-4" />,
         description: 'Delivery outside Lagos state',
         estimated: '7-10 business days'
       },
-      'International': { 
-        icon: <Globe className="w-4 h-4" />, 
+      'International': {
+        icon: <Globe className="w-4 h-4" />,
         description: 'International shipping service',
         estimated: '10-21 business days'
       }
     };
-    
-    return shippingMethods[method] || { 
-      icon: <Package className="w-4 h-4" />, 
+
+    // 'Interstate delivery — <State>' method names match by prefix
+    if (typeof method === 'string' && method.startsWith('Interstate delivery')) {
+      return shippingMethods['Interstate delivery'];
+    }
+
+    return shippingMethods[method] || {
+      icon: <Package className="w-4 h-4" />,
       description: 'Standard delivery',
       estimated: 'Delivery time varies'
     };

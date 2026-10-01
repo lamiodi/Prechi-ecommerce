@@ -3,14 +3,13 @@ import dotenv from 'dotenv';
 import { Country } from 'country-state-city';
 import { sendAdminDeliveryFeeNotification } from '../utils/emailService.js';
 import { getAllowedItemPrices } from '../utils/pricingConfig.js';
+import { getShippingQuote } from '../utils/shippingRates.js';
 import logger from '../utils/logger.js';
 dotenv.config();
 
-const shippingOptions = [
-  { id: 1, method: 'Delivery within Lagos Island', total_cost: 4000, estimated_delivery: '3–5 business days' },
-  { id: 2, method: 'Delivery within Lagos Mainland', total_cost: 6000, estimated_delivery: '5–7 business days' },
-  { id: 3, method: 'Outside Lagos', total_cost: 7000, estimated_delivery: '7–10 business days' },
-];
+// Shipping rates live in utils/shippingRates.js (KTI Logistics rate card).
+// The client's shipping_method_id only selects a Lagos zone; the cost is
+// always resolved server-side from the address state + zone.
 
 // Server-side NGN→USD rate for USD orders. Never trust a client-supplied
 // exchange rate — it would let a caller shrink the validated price of an order.
@@ -569,16 +568,29 @@ export const createOrder = async (req, res) => {
         }
       }
 
-      // Enforce canonical shipping cost — never trust the client-supplied shipping_cost
-      const canonicalOption = shippingOptions.find(opt => opt.id === Number(shipping_method_id));
+      // Enforce canonical shipping cost — resolved server-side from the
+      // address state (and Lagos zone selection), never from the client's number
       let validatedShippingCost = 0;
+      let shippingMethodName = 'Standard Delivery';
       if (delivery_option === 'standard' && address.country.toLowerCase() === 'nigeria') {
-        if (!canonicalOption) {
-          const err = new Error('Invalid shipping method selected. Please choose a delivery option and try again.');
+        const quote = getShippingQuote({ state: address.state, zoneId: shipping_method_id });
+        if (!quote) {
+          const err = new Error('Please provide the delivery state for your order.');
           err.statusCode = 400;
           throw err;
         }
-        validatedShippingCost = canonicalOption.total_cost;
+        if (quote.type === 'lagos-needs-zone') {
+          const err = new Error('Please select your delivery area within Lagos.');
+          err.statusCode = 400;
+          throw err;
+        }
+        if (quote.type === 'unavailable') {
+          const err = new Error(`We don't currently offer flat-rate delivery to ${quote.state}. Please contact us on WhatsApp to arrange delivery.`);
+          err.statusCode = 400;
+          throw err;
+        }
+        validatedShippingCost = quote.cost;
+        shippingMethodName = quote.method;
         calculatedSubtotal += validatedShippingCost;
       } else if (delivery_option === 'international') {
         validatedShippingCost = 0;
@@ -602,8 +614,6 @@ export const createOrder = async (req, res) => {
         console.error(`Validation failed: Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}`);
         throw new Error(`Total mismatch: calculated ${calculatedTotal} ${currency}, provided ${total} ${currency}. Please refresh your cart and try again.`);
       }
-
-      const shippingMethodName = canonicalOption ? canonicalOption.method : 'Standard Delivery';
 
       // Try to insert order with idempotency key
       let order;

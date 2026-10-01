@@ -1,12 +1,13 @@
 // routes/metaRoutes.js
 import express from 'express';
-import { getSizes, getColors, getStandardColors, syncStandardColors } from '../controllers/metaController.js';
+import { getSizes, getColors, getStandardColors, syncStandardColors, getShippingOptions } from '../controllers/metaController.js';
 
 const router = express.Router();
 
 router.get('/sizes', getSizes);
 router.get('/colors', getColors);
 router.get('/standard-colors', getStandardColors);
+router.get('/shipping-options', getShippingOptions);
 router.post('/sync-standard-colors', syncStandardColors);
 
 export default router;

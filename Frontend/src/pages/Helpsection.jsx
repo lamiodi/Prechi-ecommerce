@@ -140,27 +140,30 @@ const HelpPage = () => {
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-blue-600 mr-3" />
-                  Delivery within Lagos Mainland
+                  Lagos Delivery (Bike)
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-PatrickHand">5–7 business days</span>
+                    <span className="font-semibold font-PatrickHand">Within 24 hours – next working day</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Cost:</span>
-                    <span className="font-semibold font-PatrickHand">₦4,000</span>
+                    <span className="font-semibold font-PatrickHand">₦3,000 – ₦8,000</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Available:</span>
-                    <span className="font-semibold font-PatrickHand">Lagos Mainland areas</span>
+                    <span className="font-semibold font-PatrickHand">All Lagos areas (rate by zone)</span>
                   </div>
+                  <p className="font-PatrickHand text-gray-500 text-sm leading-relaxed">
+                    Island zones from ₦3,000 (Lekki Ph 1 &amp; 2, Ikate, Agungi, Chevron, Ikota, VGC) and Mainland zones from ₦4,500. Pick the exact zone at checkout — pick-up is included.
+                  </p>
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-purple-600 mr-3" />
-                  Delivery within Lagos Island
+                  Interstate — West
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -169,35 +172,44 @@ const HelpPage = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Cost:</span>
-                    <span className="font-semibold font-PatrickHand">₦6,000</span>
+                    <span className="font-semibold font-PatrickHand">₦7,500</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Available:</span>
-                    <span className="font-semibold font-PatrickHand">Lagos Island areas</span>
+                    <span className="font-semibold font-PatrickHand">Ogun, Oyo, Ekiti, Osun, Ondo</span>
                   </div>
+                  <p className="font-PatrickHand text-gray-500 text-sm leading-relaxed">
+                    The exact rate for your state is applied automatically at checkout.
+                  </p>
                 </div>
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                 <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-4 flex items-center">
                   <Truck className="w-6 h-6 text-green-600 mr-3" />
-                  Outside Lagos
+                  Interstate — East, South-South &amp; North
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Delivery Time:</span>
-                    <span className="font-semibold font-PatrickHand">7–10 business days</span>
+                    <span className="font-semibold font-PatrickHand">3–5 days (South) · 5–7 days (North)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Cost:</span>
-                    <span className="font-semibold font-PatrickHand">₦7,000</span>
+                    <span className="font-semibold font-PatrickHand">₦10,000 – ₦12,500</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-PatrickHand text-gray-600">Available:</span>
-                    <span className="font-semibold font-PatrickHand">All other Nigerian states</span>
+                    <span className="font-semibold font-PatrickHand">Selected states</span>
                   </div>
+                  <p className="font-PatrickHand text-gray-500 text-sm leading-relaxed">
+                    East &amp; South-South from ₦10,000; North Central, North West and North East from ₦10,000–₦12,500. States not listed are priced on request — contact us.
+                  </p>
                 </div>
               </div>
             </div>
+            <p className="font-PatrickHand text-gray-500 text-sm text-center">
+              Standard rates cover parcels weighing 0.5kg–2.5kg; heavier parcels may attract an additional fee. Rates are VAT inclusive and pick-up is included.
+            </p>
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-gray-100">
               <h4 className="text-xl font-semibold font-Manrope text-Primarycolor mb-6">Shipping Locations for Nigeria</h4>
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6">

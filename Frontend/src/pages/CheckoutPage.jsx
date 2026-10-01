@@ -28,6 +28,7 @@ import { useAuth } from '../context/AuthContext';
 import { useUserManager } from '../hooks/useUserManager';
 import { CurrencyContext } from './CurrencyContext';
 import { countries } from '../utils/countries';
+import { resolveShippingForState } from '../utils/shipping';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
@@ -61,14 +62,10 @@ const CheckoutPage = () => {
   const [billingAddresses, setBillingAddresses] = useState([]);
   const [shippingAddressId, setShippingAddressId] = useState(null);
   const [billingAddressId, setBillingAddressId] = useState(null);
-  const [shippingMethod, setShippingMethod] = useState({
-    id: 1,
-    method: 'Delivery within Lagos Island',
-    total_cost: 4000,
-    estimated_delivery: '3–5 business days',
-    icon: 'truck',
-    description: 'Fast delivery within Lagos Island'
-  });
+  // Lagos zone / interstate selection. Null until the customer picks a Lagos
+  // zone; interstate rates are auto-selected from the address state.
+  const [shippingMethod, setShippingMethod] = useState(null);
+  const [shippingRates, setShippingRates] = useState({ lagosZones: [], interstateRates: [] });
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderNote, setOrderNote] = useState('');
   const [formErrors, setFormErrors] = useState({});
@@ -125,33 +122,6 @@ const CheckoutPage = () => {
   const [missingFieldsSummary, setMissingFieldsSummary] = useState([]);
   const [idempotencyKey] = useState(() => uuidv4());
 
-  const shippingOptions = [
-    {
-      id: 1,
-      method: 'Delivery within Lagos Island',
-      total_cost: 4000,
-      estimated_delivery: '3–5 business days',
-      icon: 'truck',
-      description: 'Fast delivery within Lagos Island'
-    },
-    {
-      id: 2,
-      method: 'Delivery within Lagos Mainland',
-      total_cost: 6000,
-      estimated_delivery: '5–7 business days',
-      icon: 'package',
-      description: 'Reliable delivery within Lagos Mainland'
-    },
-    {
-      id: 3,
-      method: 'Outside Lagos',
-      total_cost: 7000,
-      estimated_delivery: '7–10 business days',
-      icon: 'home',
-      description: 'Delivery outside Lagos state'
-    },
-  ];
-
   // Dynamically determine the active shipping country from selected address or inline shippingForm
   const activeShippingAddress = useMemo(() => {
     if (shippingAddresses.length > 0 && shippingAddressId) {
@@ -168,6 +138,49 @@ const CheckoutPage = () => {
   const isNigeria = useMemo(() => {
     return activeShippingCountry?.trim().toLowerCase() === 'nigeria';
   }, [activeShippingCountry]);
+
+  // Active delivery state (saved address or inline form) + what the KTI rate
+  // card offers there
+  const activeShippingState = useMemo(() => {
+    return (activeShippingAddress?.state || shippingForm?.state || '').trim();
+  }, [activeShippingAddress, shippingForm?.state]);
+
+  const shippingResolution = useMemo(() => {
+    if (!isNigeria) return null;
+    return resolveShippingForState(activeShippingState, shippingRates.interstateRates);
+  }, [isNigeria, activeShippingState, shippingRates.interstateRates]);
+
+  // Load the KTI shipping rate card once
+  useEffect(() => {
+    let cancelled = false;
+    axios.get(`${API_BASE_URL}/api/meta/shipping-options`)
+      .then(res => {
+        if (cancelled) return;
+        setShippingRates({
+          lagosZones: Array.isArray(res.data?.lagosZones) ? res.data.lagosZones : [],
+          interstateRates: Array.isArray(res.data?.interstateRates) ? res.data.interstateRates : [],
+        });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  // Interstate deliveries are priced from the state automatically; Lagos needs
+  // an explicit zone pick, so clear any stale selection when the state changes.
+  useEffect(() => {
+    if (!isNigeria) return;
+    if (shippingResolution?.type === 'interstate') {
+      setShippingMethod({
+        id: null,
+        method: `Interstate delivery — ${shippingResolution.rate.state}`,
+        total_cost: shippingResolution.rate.cost,
+        estimated_delivery: shippingResolution.rate.eta,
+      });
+      setFormErrors(prev => ({ ...prev, shippingMethod: '' }));
+    } else {
+      setShippingMethod(null);
+    }
+  }, [isNigeria, shippingResolution]);
 
   const decodeToken = (token) => {
     try {
@@ -341,10 +354,18 @@ const CheckoutPage = () => {
     }
 
     // 3. Delivery Method validation (ONLY required for Nigeria)
-    if (isNigeria && !shippingMethod) {
-      errors.shippingMethod = 'Please select a delivery method';
-      missing.push('Delivery Method');
-      if (!firstMissingId) firstMissingId = 'section-delivery-method';
+    if (isNigeria) {
+      if (shippingResolution?.type === 'unavailable') {
+        errors.shippingMethod = `We don't currently deliver to ${activeShippingState} automatically — please contact us on WhatsApp`;
+        missing.push('Delivery Method');
+        if (!firstMissingId) firstMissingId = 'section-delivery-method';
+      } else if (!shippingMethod) {
+        errors.shippingMethod = activeShippingState
+          ? 'Please select your delivery area'
+          : 'Please enter your delivery state to see delivery options';
+        missing.push('Delivery Method');
+        if (!firstMissingId) firstMissingId = 'section-delivery-method';
+      }
     }
 
     // 4. Billing Address validation
@@ -394,7 +415,7 @@ const CheckoutPage = () => {
     setGuestFormErrors({});
     setMissingFieldsSummary([]);
     return true;
-  }, [isGuest, guestForm, isAuthenticated, shippingAddresses, shippingAddressId, shippingForm, isNigeria, shippingMethod, billingAddressOption, billingAddresses, billingAddressId, billingForm]);
+  }, [isGuest, guestForm, isAuthenticated, shippingAddresses, shippingAddressId, shippingForm, isNigeria, shippingMethod, shippingResolution, activeShippingState, billingAddressOption, billingAddresses, billingAddressId, billingForm]);
 
   const generateOrderReference = () => `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
@@ -1170,41 +1191,87 @@ const CheckoutPage = () => {
                 </div>
 
                 {isNigeria ? (
-                  <div className="space-y-3">
-                    {shippingOptions.map((option) => (
-                      <label
-                        key={option.id}
-                        className={`flex items-start gap-4 p-4 border rounded-sm cursor-pointer transition-all ${
-                          shippingMethod?.id === option.id
-                            ? 'border-Primarycolor bg-surface ring-1 ring-Primarycolor'
-                            : 'border-border hover:border-text-tertiary'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="shippingMethod"
-                          checked={shippingMethod?.id === option.id}
-                          onChange={() => {
-                            setShippingMethod(option);
-                            setFormErrors(prev => ({ ...prev, shippingMethod: '' }));
-                          }}
-                          className="mt-1 accent-Primarycolor"
-                        />
+                  shippingResolution?.type === 'lagos' ? (
+                    <div className="space-y-3">
+                      <p className="text-xs text-text-tertiary">Select your delivery area — rate depends on the zone (bike delivery, next working day).</p>
+                      {['island', 'mainland'].map((area) => (
+                        <div key={area} className="space-y-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
+                            Lagos {area === 'island' ? 'Island' : 'Mainland'}
+                          </p>
+                          {shippingRates.lagosZones.filter(z => z.area === area).map((zone) => (
+                            <label
+                              key={zone.id}
+                              className={`flex items-start gap-4 p-4 border rounded-sm cursor-pointer transition-all ${
+                                shippingMethod?.id === zone.id
+                                  ? 'border-Primarycolor bg-surface ring-1 ring-Primarycolor'
+                                  : 'border-border hover:border-text-tertiary'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="shippingMethod"
+                                checked={shippingMethod?.id === zone.id}
+                                onChange={() => {
+                                  setShippingMethod({
+                                    id: zone.id,
+                                    method: area === 'island' ? 'Lagos Island delivery' : 'Lagos Mainland delivery',
+                                    total_cost: zone.cost,
+                                    estimated_delivery: 'Next working day',
+                                  });
+                                  setFormErrors(prev => ({ ...prev, shippingMethod: '' }));
+                                }}
+                                className="mt-1 accent-Primarycolor"
+                              />
+                              <div className="flex-1 flex justify-between items-start text-xs">
+                                <div>
+                                  <p className="font-semibold text-Primarycolor">Lagos {area === 'island' ? 'Island' : 'Mainland'} delivery</p>
+                                  <p className="text-text-tertiary mt-0.5">{zone.label}</p>
+                                  <p className="text-text-tertiary mt-0.5">Next working day</p>
+                                </div>
+                                <span className="font-semibold text-Primarycolor tabular-nums text-sm">
+                                  ₦{zone.cost.toLocaleString()}
+                                </span>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      ))}
+                      {formErrors.shippingMethod && (
+                        <p className="text-[11px] text-rose-600 mt-1 font-medium">{formErrors.shippingMethod}</p>
+                      )}
+                    </div>
+                  ) : shippingResolution?.type === 'interstate' ? (
+                    <div className="space-y-3">
+                      <div className="p-4 border border-Primarycolor bg-surface ring-1 ring-Primarycolor rounded-sm flex items-start gap-4">
+                        <Package size={20} className="text-Primarycolor flex-shrink-0 mt-0.5" />
                         <div className="flex-1 flex justify-between items-start text-xs">
                           <div>
-                            <p className="font-semibold text-Primarycolor">{option.method}</p>
-                            <p className="text-text-tertiary mt-0.5">{option.estimated_delivery}</p>
+                            <p className="font-semibold text-Primarycolor">Interstate delivery — {shippingResolution.rate.state}</p>
+                            <p className="text-text-tertiary mt-0.5">{shippingResolution.rate.eta}</p>
+                            <p className="text-text-tertiary mt-0.5">Rate for {shippingResolution.rate.state} (region: {shippingResolution.rate.region})</p>
                           </div>
                           <span className="font-semibold text-Primarycolor tabular-nums text-sm">
-                            ₦{option.total_cost.toLocaleString()}
+                            ₦{shippingResolution.rate.cost.toLocaleString()}
                           </span>
                         </div>
-                      </label>
-                    ))}
-                    {formErrors.shippingMethod && (
-                      <p className="text-[11px] text-rose-600 mt-1 font-medium">{formErrors.shippingMethod}</p>
-                    )}
-                  </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-surface border border-border rounded-sm flex items-start gap-3">
+                      <WarningCircle size={20} className="text-rose-500 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs">
+                        <p className="font-semibold text-Primarycolor">
+                          {shippingResolution?.type === 'unavailable'
+                            ? `We don't currently deliver to ${activeShippingState} automatically`
+                            : 'Enter your delivery state to see delivery options'}
+                        </p>
+                        <p className="text-text-tertiary mt-0.5">
+                          Flat-rate delivery currently covers Lagos and selected states. For other locations, please contact us on WhatsApp to arrange delivery.
+                        </p>
+                      </div>
+                    </div>
+                  )
                 ) : (
                   <div className="p-4 bg-surface border border-border rounded-sm flex items-start gap-3">
                     <Package size={20} className="text-Primarycolor flex-shrink-0 mt-0.5" />

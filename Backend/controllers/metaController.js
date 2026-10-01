@@ -1,5 +1,6 @@
 // Enhanced meta controller with standard colors support
 import sql from '../db/index.js';
+import { getShippingRateCard } from '../utils/shippingRates.js';
 
 // Standard colors that should always be available
 const STANDARD_COLORS = [
@@ -68,16 +69,23 @@ export const syncStandardColors = async (req, res) => {
       await sql`
         INSERT INTO colors (id, color_name, color_code)
         VALUES (${color.id}, ${color.color_name}, ${color.color_code})
-        ON CONFLICT (id) DO UPDATE 
+        ON CONFLICT (id) DO UPDATE
         SET color_name = EXCLUDED.color_name,
             color_code = EXCLUDED.color_code
       `;
     }
-    
+
     console.log('✅ Standard colors synced to database');
     res.json({ message: 'Standard colors synced successfully', colors: STANDARD_COLORS });
   } catch (err) {
     console.error('Error syncing standard colors:', err);
     res.status(500).json({ error: 'Failed to sync standard colors' });
   }
+};
+
+// Public shipping rate card (KTI Logistics) for the checkout zone picker
+// and the help page. The authoritative pricing happens server-side at
+// order creation — this is display data.
+export const getShippingOptions = (req, res) => {
+  res.json(getShippingRateCard());
 };
