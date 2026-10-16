@@ -1217,7 +1217,7 @@ const CheckoutPage = () => {
                 {isNigeria ? (
                   shippingResolution?.type === 'lagos' ? (
                     <div className="space-y-3">
-                      <p className="text-xs text-text-tertiary">Select your delivery area — rate depends on the zone (bike delivery, next working day).</p>
+                      <p className="text-xs text-text-tertiary">Select your delivery area — flat fee per order, however many items you buy.</p>
                       {['island', 'mainland'].map((area) => (
                         <div key={area} className="space-y-2">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-text-tertiary">
@@ -1241,7 +1241,7 @@ const CheckoutPage = () => {
                                     id: zone.id,
                                     method: area === 'island' ? 'Lagos Island delivery' : 'Lagos Mainland delivery',
                                     total_cost: zone.cost,
-                                    estimated_delivery: 'Next working day',
+                                    estimated_delivery: zone.eta,
                                   });
                                   setFormErrors(prev => ({ ...prev, shippingMethod: '' }));
                                 }}
@@ -1251,7 +1251,7 @@ const CheckoutPage = () => {
                                 <div>
                                   <p className="font-semibold text-Primarycolor">Lagos {area === 'island' ? 'Island' : 'Mainland'} delivery</p>
                                   <p className="text-text-tertiary mt-0.5">{zone.label}</p>
-                                  <p className="text-text-tertiary mt-0.5">Next working day</p>
+                                  <p className="text-text-tertiary mt-0.5">{zone.eta}</p>
                                 </div>
                                 <span className="font-semibold text-Primarycolor tabular-nums text-sm">
                                   ₦{zone.cost.toLocaleString()}

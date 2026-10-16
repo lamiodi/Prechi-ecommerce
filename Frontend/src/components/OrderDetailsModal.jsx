@@ -33,16 +33,16 @@ const OrderDetailsModal = ({
   // Function to get shipping method icon and description
   const getShippingMethodInfo = (method) => {
     const shippingMethods = {
-      // KTI rate-card method names (current)
+      // Current rate-card method names (Oct 2026 domestic card)
       'Lagos Island delivery': {
         icon: <Truck className="w-4 h-4" />,
-        description: 'Bike delivery within Lagos Island',
-        estimated: 'Next working day'
+        description: 'Local delivery within Lagos Island',
+        estimated: '1–3 business days'
       },
       'Lagos Mainland delivery': {
         icon: <Package className="w-4 h-4" />,
-        description: 'Bike delivery within Lagos Mainland',
-        estimated: 'Next working day'
+        description: 'Local delivery within Lagos Mainland',
+        estimated: '1–3 business days'
       },
       'Interstate delivery': {
         icon: <MapPin className="w-4 h-4" />,

@@ -34,11 +34,13 @@ const NigeriaStateSelect = ({
               <option key={s} value={s}>{s === 'FCT' ? 'FCT — Abuja' : s}</option>
             ))}
           </optgroup>
-          <optgroup label="Not yet covered — contact us on WhatsApp">
-            {uncovered.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </optgroup>
+          {uncovered.length > 0 && (
+            <optgroup label="Not yet covered — contact us on WhatsApp">
+              {uncovered.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </optgroup>
+          )}
         </>
       ) : (
         covered.map((s) => (
