@@ -38,3 +38,32 @@ export function resolveShippingForState(rawState, interstateRates = []) {
   const rate = interstateRates.find(r => r.state.toLowerCase() === normalized.toLowerCase());
   return rate ? { type: 'interstate', rate } : { type: 'unavailable' };
 }
+
+// All 36 states + FCT, canonical spellings matching the KTI rate card.
+// Geography is static; delivery coverage comes from the rate card passed in,
+// so the dropdown stays in sync with the backend automatically.
+export const ALL_NIGERIA_STATES = [
+  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
+  'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe', 'Imo',
+  'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos',
+  'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto',
+  'Taraba', 'Yobe', 'Zamfara',
+];
+
+/**
+ * Split the state list into deliverable / not-yet-covered groups based on the
+ * live KTI rate card. Lagos always counts as deliverable (zone delivery).
+ * When no rate card has loaded yet, everything is returned as covered so the
+ * dropdown doesn't mislabel states while the API call is in flight.
+ */
+export function getNigeriaStateGroups(interstateRates = []) {
+  const covered = new Set(interstateRates.map(r => r.state));
+  if (covered.size === 0) {
+    return { haveRates: false, covered: ALL_NIGERIA_STATES, uncovered: [] };
+  }
+  return {
+    haveRates: true,
+    covered: ALL_NIGERIA_STATES.filter(s => s === 'Lagos' || covered.has(s)),
+    uncovered: ALL_NIGERIA_STATES.filter(s => s !== 'Lagos' && !covered.has(s)),
+  };
+}

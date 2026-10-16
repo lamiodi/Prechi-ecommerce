@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Save, X } from 'lucide-react';
 import { countries } from '../utils/countries';
+import NigeriaStateSelect from './NigeriaStateSelect';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
-const ShippingAddressForm = ({ 
-  address, 
-  onSubmit, 
+const ShippingAddressForm = ({
+  address,
+  onSubmit,
   onCancel,
-  formErrors, 
-  setFormErrors, 
+  formErrors,
+  setFormErrors,
   actionLoading,
   isGuest = false,
-  guestData = null
+  guestData = null,
+  interstateRates = []
 }) => {
   const { state, setState } = address;
   const [formData, setFormData] = useState({
@@ -173,16 +175,26 @@ const ShippingAddressForm = ({
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            State *
+            State / Province *
           </label>
-          <Input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            className={`${errors.state ? 'border-red-500' : ''}`}
-            placeholder="State"
-          />
+          {formData.country?.trim().toLowerCase() === 'nigeria' ? (
+            <NigeriaStateSelect
+              id="shipping-state"
+              value={formData.state}
+              onChange={(value) => handleChange({ target: { name: 'state', value } })}
+              interstateRates={interstateRates}
+              className={errors.state ? 'border-red-500' : 'border-gray-300'}
+            />
+          ) : (
+            <Input
+              type="text"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              className={`${errors.state ? 'border-red-500' : ''}`}
+              placeholder="State / Province / Region"
+            />
+          )}
           {errors.state && (
             <p className="text-sm text-red-600 mt-1">{errors.state}</p>
           )}

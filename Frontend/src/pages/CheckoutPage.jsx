@@ -28,7 +28,8 @@ import { useAuth } from '../context/AuthContext';
 import { useUserManager } from '../hooks/useUserManager';
 import { CurrencyContext } from './CurrencyContext';
 import { countries } from '../utils/countries';
-import { resolveShippingForState } from '../utils/shipping';
+import { resolveShippingForState, normalizeNigeriaState, ALL_NIGERIA_STATES } from '../utils/shipping';
+import NigeriaStateSelect from '../components/NigeriaStateSelect';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import PaystackPop from '@paystack/inline-js';
@@ -181,6 +182,18 @@ const CheckoutPage = () => {
       setShippingMethod(null);
     }
   }, [isNigeria, shippingResolution]);
+
+  // Switching country back to Nigeria can leave a foreign state value in the
+  // form (e.g. "London") that no dropdown option matches — clear it so the
+  // customer picks a valid state instead of hitting a dead resolution.
+  useEffect(() => {
+    if (!isNigeria) return;
+    const raw = shippingForm.state?.trim();
+    if (!raw) return;
+    if (!ALL_NIGERIA_STATES.includes(normalizeNigeriaState(raw))) {
+      setShippingForm(prev => ({ ...prev, state: '' }));
+    }
+  }, [isNigeria, shippingForm.state]);
 
   const decodeToken = (token) => {
     try {
@@ -1059,6 +1072,7 @@ const CheckoutPage = () => {
                           setFormErrors={setFormErrors}
                           actionLoading={shippingAddressLoading}
                           isGuest={isGuest}
+                          interstateRates={shippingRates.interstateRates}
                         />
                       </React.Suspense>
                     )}
@@ -1116,16 +1130,26 @@ const CheckoutPage = () => {
 
                       <div>
                         <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">
-                          State *
+                          State / Province *
                         </label>
-                        <Input
-                          id="input-shipping-state"
-                          type="text"
-                          value={shippingForm.state}
-                          onChange={(e) => handleShippingFormChange('state', e.target.value)}
-                          placeholder="State / Region"
-                          className={formErrors.state ? 'border-rose-500 bg-rose-50/20' : ''}
-                        />
+                        {isNigeria ? (
+                          <NigeriaStateSelect
+                            id="input-shipping-state"
+                            value={shippingForm.state}
+                            onChange={(value) => handleShippingFormChange('state', value)}
+                            interstateRates={shippingRates.interstateRates}
+                            className={formErrors.state ? 'border-rose-500' : 'border-border'}
+                          />
+                        ) : (
+                          <Input
+                            id="input-shipping-state"
+                            type="text"
+                            value={shippingForm.state}
+                            onChange={(e) => handleShippingFormChange('state', e.target.value)}
+                            placeholder="State / Province / Region"
+                            className={formErrors.state ? 'border-rose-500 bg-rose-50/20' : ''}
+                          />
+                        )}
                         {formErrors.state && (
                           <p className="text-[11px] text-rose-600 mt-1">{formErrors.state}</p>
                         )}
@@ -1348,16 +1372,26 @@ const CheckoutPage = () => {
 
                       <div>
                         <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider mb-1">
-                          State *
+                          State / Province *
                         </label>
-                        <Input
-                          id="input-billing-state"
-                          type="text"
-                          value={billingForm.state}
-                          onChange={(e) => handleBillingFormChange('state', e.target.value)}
-                          placeholder="State"
-                          className={formErrors.billing_state ? 'border-rose-500 bg-rose-50/20' : ''}
-                        />
+                        {billingForm.country?.trim().toLowerCase() === 'nigeria' ? (
+                          <NigeriaStateSelect
+                            id="input-billing-state"
+                            value={billingForm.state}
+                            onChange={(value) => handleBillingFormChange('state', value)}
+                            interstateRates={shippingRates.interstateRates}
+                            className={formErrors.billing_state ? 'border-rose-500' : 'border-border'}
+                          />
+                        ) : (
+                          <Input
+                            id="input-billing-state"
+                            type="text"
+                            value={billingForm.state}
+                            onChange={(e) => handleBillingFormChange('state', e.target.value)}
+                            placeholder="State / Province / Region"
+                            className={formErrors.billing_state ? 'border-rose-500 bg-rose-50/20' : ''}
+                          />
+                        )}
                       </div>
                     </div>
 
