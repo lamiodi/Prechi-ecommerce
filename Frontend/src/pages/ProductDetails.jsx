@@ -146,11 +146,11 @@ const ProductDetails = () => {
       };
     }
 
-    // 7. Prechi Navy Blue & White T Set (productseven) - Base ₦120,000 + Optional Matching Bag (+₦70,000)
+    // 7. Prechi Navy Blue & White T Set (productseven) - Base ₦100,000 + Optional Matching Bag (+₦70,000)
     if (idNum === 50 || sku === 'NWT' || nameStr.includes('navy blue & white t set') || nameStr.includes('white t set') || nameStr.includes('navy blue t set')) {
       return {
         pieces: [
-          { id: 'full', label: 'Full T-Shirt Set', price: baseProductPrice || 120000 }
+          { id: 'full', label: 'Full T-Shirt Set', price: baseProductPrice || 100000 }
         ],
         addons: [
           { id: 'bag', label: 'Prechi Signature Leather Bag', price: 70000 }

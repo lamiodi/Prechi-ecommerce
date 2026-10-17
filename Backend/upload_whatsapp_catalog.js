@@ -216,7 +216,7 @@ const whatsappProducts = [
   {
     name: 'Navy Blue / White T Set',
     description: 'Classic dual-tone 2-piece set in deep navy blue accented with crisp white stripe trim. Designed with an athletic yet refined drape for versatile daily luxury.',
-    base_price: 120000,
+    base_price: 100000,
     sku_prefix: 'NTS',
     category: 'Sets',
     gender: 'unisex',
